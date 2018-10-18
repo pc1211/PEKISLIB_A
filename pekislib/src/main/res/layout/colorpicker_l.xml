@@ -81,7 +81,7 @@
         android:orientation="horizontal"
     	android:layout_width="match_parent"
     	android:layout_height="match_parent">
-        <com.example.bonux.pekislib_a.ColorWheelView
+        <com.example.pgyl.pekislib_a.ColorWheelView
             android:id="@+id/COLORS_VIEW"
             android:layout_marginTop="8dp"
             android:layout_width="match_parent"

@@ -11,7 +11,7 @@
         android:layout_weight="1"
         android:background="@android:color/black"
         android:orientation="horizontal">
-        <com.example.bonux.pekislib_a.ColorWheelView
+        <com.example.pgyl.pekislib_a.ColorWheelView
             android:id="@+id/COLORS_VIEW"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
