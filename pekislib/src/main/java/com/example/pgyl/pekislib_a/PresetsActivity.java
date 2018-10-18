@@ -1,0 +1,514 @@
+package com.example.pgyl.pekislib_a;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static com.example.pgyl.pekislib_a.Constants.ACTIVITY_EXTRA_KEYS;
+import static com.example.pgyl.pekislib_a.Constants.ACTIVITY_START_TYPE;
+import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
+import static com.example.pgyl.pekislib_a.Constants.NOT_FOUND;
+import static com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITIES;
+import static com.example.pgyl.pekislib_a.Constants.PEKISLIB_TABLES;
+import static com.example.pgyl.pekislib_a.Constants.SHP_FILE_NAME_SUFFIX;
+import static com.example.pgyl.pekislib_a.Constants.TABLE_ACTIVITY_INFOS_DATA_FIELDS;
+import static com.example.pgyl.pekislib_a.Constants.TABLE_EXTRA_KEYS;
+import static com.example.pgyl.pekislib_a.Constants.TABLE_IDS;
+import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_EXTRA_KEYS;
+import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_TITLE;
+import static com.example.pgyl.pekislib_a.InputButtonsActivity.KEYBOARDS;
+import static com.example.pgyl.pekislib_a.TimeDateUtils.TIMEUNITS;
+import static com.example.pgyl.pekislib_a.TimeDateUtils.convertMsToHms;
+
+public class PresetsActivity extends Activity {
+    //region Constantes
+    private enum COMMANDS {
+        NEXT("Next"), CANCEL("Cancel"), FIELD("Field"), OK("OK"), ADD("Add"), REMOVE("Remove"), DESELECT("Deselect"), DEFAULT("Default");
+
+        private String valueText;
+
+        COMMANDS(String valueText) {
+            this.valueText = valueText;
+        }
+
+        public String TEXT() {
+            return valueText;
+        }
+    }
+
+    public enum PRESET_ACTIVITY_EXTRA_KEYS {
+        SEPARATOR, DATA_TYPE
+    }
+
+    public enum PRESET_ACTIVITY_DATA_TYPES {
+        COLOR, NORMAL
+    }
+
+    private enum SHP_KEY_NAMES {
+        SELECT_INDEX, COLUMN_INDEX
+    }
+
+    private final int SELECT_INDEX_DEFAULT_VALUE = NOT_FOUND;
+    private final int COLUMN_INDEX_DEFAULT_VALUE = 1;
+    //endregion
+    //region Variables
+    private PresetsHandler presetsHandler;
+    private String[] preset;
+    private String[] labelNames;
+    private String[] keyboards;
+    private String[] timeUnits;
+    private String tableName;
+    private String dataType;
+    private int selectIndex;
+    private int columnIndex;
+    private CustomButton[] buttons;
+    private ListView listView;
+    private boolean validReturnFromCalledActivity;
+    private String calledActivity;
+    private StringShelfDatabase stringShelfDatabase;
+    private String shpFileName;
+    //endregion
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+        getActionBar().setTitle(getIntent().getStringExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString()));
+        setupOrientationLayout();
+        setupButtons();
+        setupList();
+        validReturnFromCalledActivity = false;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        savePreferences();
+        saveCurrentPreset(preset);
+        presetsHandler.saveAndClose();
+        presetsHandler = null;
+        stringShelfDatabase.close();
+        stringShelfDatabase = null;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        shpFileName = getPackageName() + "." + getClass().getSimpleName() + SHP_FILE_NAME_SUFFIX;
+        tableName = getIntent().getStringExtra(TABLE_EXTRA_KEYS.TABLE.toString());
+        dataType = getIntent().getStringExtra(PRESET_ACTIVITY_EXTRA_KEYS.DATA_TYPE.toString());
+
+        setupStringShelfDatabase();
+        setupPresetsHandler();
+        preset = getCurrentPreset();
+        labelNames = getLabelNames();
+        keyboards = getKeyboards();
+        timeUnits = getTimeUnits();
+
+        if (isColdStart()) {
+            setHotStart();
+            selectIndex = SELECT_INDEX_DEFAULT_VALUE;
+            columnIndex = COLUMN_INDEX_DEFAULT_VALUE;
+        } else {
+            selectIndex = getSHPselectIndex();
+            columnIndex = getSHPcolumnIndex();
+            if (validReturnFromCalledActivity) {
+                validReturnFromCalledActivity = false;
+                if (returnsFromInputButtons()) {
+                    preset[columnIndex] = getCurrentStringFromInputButtons(columnIndex);
+                    if (selectIndex != SELECT_INDEX_DEFAULT_VALUE) {
+                        presetsHandler.setPresetColumn(selectIndex, columnIndex, preset[columnIndex]);
+                    }
+                }
+                if (returnsFromHelp()) {
+                    //  NOP
+                }
+            }
+        }
+        setupButtonColors();
+        updateButtonTexts();
+        rebuildPresets();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent returnIntent) {
+        validReturnFromCalledActivity = false;
+        if (requestCode == PEKISLIB_ACTIVITIES.INPUTBUTTONS.ordinal()) {
+            calledActivity = PEKISLIB_ACTIVITIES.INPUTBUTTONS.toString();
+            if (resultCode == RESULT_OK) {
+                validReturnFromCalledActivity = true;
+            }
+        }
+        if (requestCode == PEKISLIB_ACTIVITIES.HELP.ordinal()) {
+            calledActivity = PEKISLIB_ACTIVITIES.HELP.toString();
+            validReturnFromCalledActivity = true;
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_help_only, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.help) {
+            launchHelpActivity();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void onButtonClick(COMMANDS command) {
+        if (command.equals(COMMANDS.NEXT)) {
+            onButtonClickNext();
+        }
+        if (command.equals(COMMANDS.CANCEL)) {
+            onButtonClickCancel();
+        }
+        if (command.equals(COMMANDS.FIELD)) {
+            onButtonClickField();
+        }
+        if (command.equals(COMMANDS.OK)) {
+            onButtonClickOK();
+        }
+        if (command.equals(COMMANDS.ADD)) {
+            onButtonClickAdd();
+        }
+        if (command.equals(COMMANDS.REMOVE)) {
+            onButtonClickRemove();
+        }
+        if (command.equals(COMMANDS.DESELECT)) {
+            onButtonClickDeselect();
+        }
+        if (command.equals(COMMANDS.DEFAULT)) {
+            onButtonClickDefault();
+        }
+    }
+
+    private void onButtonClickNext() {
+        int k = columnIndex;
+        k = k + 1;
+        if (k > (preset.length - 1)) {
+            k = 1;
+        }
+        columnIndex = k;
+        updateButtonTexts();
+    }
+
+    private void onButtonClickCancel() {
+        finish();
+    }
+
+    private void onButtonClickField() {
+        setCurrentStringForInputButtons(columnIndex, preset[columnIndex]);
+        launchInputButtonsActivity();
+    }
+
+    private void onButtonClickOK() {
+        Intent returnIntent = new Intent();
+        setResult(RESULT_OK, returnIntent);
+        finish();
+    }
+
+    private void onButtonClickAdd() {
+        presetsHandler.createNewPreset(preset);
+        rebuildDisplay();
+        updateColorButton(COMMANDS.FIELD);
+    }
+
+    private void onButtonClickRemove() {
+        if (selectIndex != SELECT_INDEX_DEFAULT_VALUE) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Remove preset");
+            builder.setMessage("Are you sure?");
+            builder.setCancelable(false);   // false = pressing back button won't dismiss this alert
+            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int id) {
+                    presetsHandler.removePreset(selectIndex);
+                    rebuildDisplay();
+                }
+            });
+            builder.setNegativeButton("No", null);
+            Dialog dialog = builder.create();
+            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialogInterface) {    // OK pour modifier UI sous-jacente à la boîte de dialogue
+                    updateColorButton(COMMANDS.FIELD);
+                }
+            });
+            dialog.show();
+        } else {
+            Toast.makeText(this, "A preset must be selected in the list", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void onButtonClickDeselect() {
+        if (selectIndex != SELECT_INDEX_DEFAULT_VALUE) {
+            selectIndex = SELECT_INDEX_DEFAULT_VALUE;
+            updateColorButton(COMMANDS.FIELD);
+        } else {
+            Toast.makeText(this, "A preset must be selected in the list", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void onButtonClickDefault() {
+        preset[columnIndex] = getDefaultValue(columnIndex);
+        if (selectIndex != SELECT_INDEX_DEFAULT_VALUE) {
+            presetsHandler.setPresetColumn(selectIndex, columnIndex, preset[columnIndex]);
+            rebuildPresets();
+        }
+        updateButtonTexts();
+    }
+
+    private void onPresetClick(int pos) {
+        if (presetsHandler.getCount() > 0) {
+            preset = presetsHandler.getPreset(pos);
+            selectIndex = pos;
+            columnIndex = COLUMN_INDEX_DEFAULT_VALUE;
+            updateButtonTexts();
+            updateColorButton(COMMANDS.FIELD);
+        }
+    }
+
+    private void updateButtonTexts() {
+        final String SYMBOL_NEXT = " >";   //  Pour signifier qu'on peut passer au champ suivant en poussant sur le bouton
+
+        String fieldText = preset[columnIndex];
+        if ((keyboards[columnIndex].equals(KEYBOARDS.TIME_HMS.toString())) || (keyboards[columnIndex].equals(KEYBOARDS.TIME_XHMS.toString()))) {
+            fieldText = convertMsToHms(Long.parseLong(fieldText), TIMEUNITS.valueOf(timeUnits[columnIndex]));
+        }
+        int index = COMMANDS.FIELD.ordinal();
+        buttons[index].setText(fieldText);
+        index = COMMANDS.NEXT.ordinal();
+        buttons[index].setText(labelNames[columnIndex] + SYMBOL_NEXT);
+    }
+
+    private void updateColorButton(COMMANDS command) {
+        final String SPECIAL_FIELD_UNPRESSED_COLOR = "FF9A22";
+        final String SPECIAL_FIELD_PRESSED_COLOR = "995400";
+
+        int index = command.ordinal();
+        if (command.equals(COMMANDS.FIELD)) {
+            if (selectIndex != SELECT_INDEX_DEFAULT_VALUE) {
+                buttons[index].setUnpressedColor(SPECIAL_FIELD_UNPRESSED_COLOR);
+                buttons[index].setPressedColor(SPECIAL_FIELD_PRESSED_COLOR);
+            } else {
+                buttons[index].setUnpressedColor(BUTTON_STATES.UNPRESSED.DEFAULT_COLOR());
+                buttons[index].setPressedColor(BUTTON_STATES.PRESSED.DEFAULT_COLOR());
+            }
+        }
+        buttons[index].updateColor();
+    }
+
+    private void rebuildDisplay() {
+        selectIndex = SELECT_INDEX_DEFAULT_VALUE;
+        columnIndex = COLUMN_INDEX_DEFAULT_VALUE;
+        rebuildPresets();
+        updateButtonTexts();
+    }
+
+    private void rebuildPresets() {
+        if (selectIndex != SELECT_INDEX_DEFAULT_VALUE) {
+            String presetId = presetsHandler.getPresetId(selectIndex);
+            presetsHandler.sortPresets();
+            selectIndex = presetsHandler.getIndex(presetId);
+        } else {
+            presetsHandler.sortPresets();
+        }
+        if (dataType.equals(PRESET_ACTIVITY_DATA_TYPES.COLOR.toString())) {
+            ListItemColorAdapter lvAdapter = new ListItemColorAdapter(this);
+            lvAdapter.setColorItems(presetsHandler.presetDataList());
+            lvAdapter.setTextItems(presetsHandler.concatenatedDisplayPresetDataList());
+            listView.setAdapter(lvAdapter);
+            lvAdapter = null;
+        } else {
+            ListItemNormalAdapter lvAdapter = new ListItemNormalAdapter(this, presetsHandler.concatenatedDisplayPresetDataList());
+            listView.setAdapter(lvAdapter);
+            lvAdapter = null;
+        }
+    }
+
+    private int getSHPselectIndex() {
+        SharedPreferences shp = getSharedPreferences(shpFileName, MODE_PRIVATE);
+        return shp.getInt(SHP_KEY_NAMES.SELECT_INDEX.toString(), SELECT_INDEX_DEFAULT_VALUE);
+    }
+
+    private int getSHPcolumnIndex() {
+        SharedPreferences shp = getSharedPreferences(shpFileName, MODE_PRIVATE);
+        return shp.getInt(SHP_KEY_NAMES.COLUMN_INDEX.toString(), COLUMN_INDEX_DEFAULT_VALUE);
+    }
+
+    private void savePreferences() {
+        SharedPreferences shp = getSharedPreferences(shpFileName, MODE_PRIVATE);
+        SharedPreferences.Editor shpEditor = shp.edit();
+        shpEditor.putInt(SHP_KEY_NAMES.SELECT_INDEX.toString(), selectIndex);
+        shpEditor.putInt(SHP_KEY_NAMES.COLUMN_INDEX.toString(), columnIndex);
+        shpEditor.commit();
+    }
+
+    private void setupOrientationLayout() {
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setContentView(R.layout.presets_p);
+        } else {
+            setContentView(R.layout.presets_l);
+        }
+    }
+
+    private void setupButtonColors() {
+        final String OK_UNPRESSED_COLOR_DEFAULT = "668CFF";
+        final String OK_PRESSED_COLOR_DEFAULT = "0040FF";
+
+        for (COMMANDS command : COMMANDS.values()) {
+            String unpressedColor = BUTTON_STATES.UNPRESSED.DEFAULT_COLOR();
+            String pressedColor = BUTTON_STATES.PRESSED.DEFAULT_COLOR();
+            if (command.equals(COMMANDS.OK)) {
+                unpressedColor = OK_UNPRESSED_COLOR_DEFAULT;
+                pressedColor = OK_PRESSED_COLOR_DEFAULT;
+            }
+            int index = command.ordinal();
+            buttons[index].setUnpressedColor(unpressedColor);
+            buttons[index].setPressedColor(pressedColor);
+            updateColorButton(command);
+        }
+    }
+
+    private void setupButtons() {
+        final String BUTTON_XML_PREFIX = "BTN_";
+
+        buttons = new CustomButton[COMMANDS.values().length];
+        Class rid = R.id.class;
+        for (COMMANDS command : COMMANDS.values()) {
+            try {
+                int index = command.ordinal();
+                buttons[index] = (CustomButton) findViewById(rid.getField(BUTTON_XML_PREFIX + command.toString()).getInt(rid));   //  1, 2, 3 ... dans le XML
+                buttons[index].setText(command.TEXT());
+                final COMMANDS fcommand = command;
+                buttons[index].setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onButtonClick(fcommand);
+                    }
+                });
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalArgumentException ex) {
+                Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoSuchFieldException ex) {
+                Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SecurityException ex) {
+                Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    private void setupList() {
+        listView = (ListView) findViewById(R.id.CT_LIST);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                onPresetClick(position);
+            }
+        });
+    }
+
+    private void setupPresetsHandler() {
+        presetsHandler = new PresetsHandler(stringShelfDatabase);
+        presetsHandler.setSeparator(getIntent().getStringExtra(PRESET_ACTIVITY_EXTRA_KEYS.SEPARATOR.toString()));
+        presetsHandler.setTableName(tableName);
+    }
+
+    private void setupStringShelfDatabase() {
+        stringShelfDatabase = new StringShelfDatabase(this);
+        stringShelfDatabase.open();
+    }
+
+    private void launchHelpActivity() {
+        Intent callingIntent = new Intent(this, HelpActivity.class);
+        callingIntent.putExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString(), HELP_ACTIVITY_TITLE);
+        callingIntent.putExtra(HELP_ACTIVITY_EXTRA_KEYS.HTML_ID.toString(), R.raw.helppresetsactivity);
+        startActivityForResult(callingIntent, PEKISLIB_ACTIVITIES.HELP.ordinal());
+    }
+
+    private void launchInputButtonsActivity() {
+        setColdStartForInputButtons();
+        Intent callingIntent = new Intent(this, InputButtonsActivity.class);
+        callingIntent.putExtra(TABLE_EXTRA_KEYS.TABLE.toString(), tableName);
+        callingIntent.putExtra(TABLE_EXTRA_KEYS.INDEX.toString(), columnIndex);
+        callingIntent.putExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString(), labelNames[columnIndex]);
+        startActivityForResult(callingIntent, PEKISLIB_ACTIVITIES.INPUTBUTTONS.ordinal());
+    }
+
+    private boolean isColdStart() {
+        return (stringShelfDatabase.selectFieldByIdOrCreate(PEKISLIB_TABLES.ACTIVITY_INFOS.toString(), PEKISLIB_ACTIVITIES.PRESETS.toString(), TABLE_ACTIVITY_INFOS_DATA_FIELDS.START_TYPE.INDEX()).equals(ACTIVITY_START_TYPE.COLD.toString()));
+    }
+
+    private void setHotStart() {
+        stringShelfDatabase.insertOrReplaceFieldById(PEKISLIB_TABLES.ACTIVITY_INFOS.toString(), PEKISLIB_ACTIVITIES.PRESETS.toString(), TABLE_ACTIVITY_INFOS_DATA_FIELDS.START_TYPE.INDEX(), ACTIVITY_START_TYPE.HOT.toString());
+    }
+
+    private void setColdStartForInputButtons() {
+        stringShelfDatabase.insertOrReplaceFieldById(PEKISLIB_TABLES.ACTIVITY_INFOS.toString(), PEKISLIB_ACTIVITIES.INPUTBUTTONS.toString(), TABLE_ACTIVITY_INFOS_DATA_FIELDS.START_TYPE.INDEX(), ACTIVITY_START_TYPE.COLD.toString());
+    }
+
+    private String[] getCurrentPreset() {
+        return stringShelfDatabase.selectRowByIdOrCreate(tableName, TABLE_IDS.CURRENT.toString() + PEKISLIB_ACTIVITIES.PRESETS.toString());
+    }
+
+    private void saveCurrentPreset(String[] value) {
+        stringShelfDatabase.insertOrReplaceRowById(tableName, TABLE_IDS.CURRENT.toString() + PEKISLIB_ACTIVITIES.PRESETS.toString(), value);
+    }
+
+    private String[] getLabelNames() {
+        return stringShelfDatabase.selectRowByIdOrCreate(tableName, TABLE_IDS.LABEL.toString());
+    }
+
+    private String[] getKeyboards() {
+        return stringShelfDatabase.selectRowByIdOrCreate(tableName, TABLE_IDS.KEYBOARD.toString());
+    }
+
+    private String[] getTimeUnits() {
+        return stringShelfDatabase.selectRowByIdOrCreate(tableName, TABLE_IDS.TIMEUNIT.toString());
+    }
+
+    private String getDefaultValue(int index) {
+        return stringShelfDatabase.selectFieldByIdOrCreate(tableName, TABLE_IDS.DEFAULT.toString(), index);
+    }
+
+    private String getCurrentStringFromInputButtons(int index) {
+        return stringShelfDatabase.selectFieldByIdOrCreate(tableName, TABLE_IDS.CURRENT.toString() + PEKISLIB_ACTIVITIES.INPUTBUTTONS.toString(), index);
+    }
+
+    private void setCurrentStringForInputButtons(int index, String value) {
+        stringShelfDatabase.insertOrReplaceFieldById(tableName, TABLE_IDS.CURRENT.toString() + PEKISLIB_ACTIVITIES.INPUTBUTTONS.toString(), index, value);
+    }
+
+    private boolean returnsFromInputButtons() {
+        return (calledActivity.equals(PEKISLIB_ACTIVITIES.INPUTBUTTONS.toString()));
+    }
+
+    private boolean returnsFromHelp() {
+        return (calledActivity.equals(PEKISLIB_ACTIVITIES.HELP.toString()));
+    }
+
+}
