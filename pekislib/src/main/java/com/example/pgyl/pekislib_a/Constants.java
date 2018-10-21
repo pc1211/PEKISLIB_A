@@ -51,6 +51,5 @@ public class Constants {
     public static final String COLOR_PREFIX = "#FF";
     public static final String TABLE_COLORS_REGEXP_HEX_DEFAULT = ".{6}";  // Pour valider 6 caractères HEX dans INPUTBUTTONS pour la table COLORS (RRGGBB)
     public static String SHP_FILE_NAME_SUFFIX = "_preferences";
-    //region Constantes
 
 }

@@ -41,6 +41,17 @@ public class TimeDateUtils {
     public static final SimpleDateFormat ddmmyyyy = new SimpleDateFormat("dd/MM/yyyy");
     public static final String[] days = {"??", "Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"};
 
+    public static long midnightInMillis() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        long ret = calendar.getTimeInMillis();
+        calendar = null;
+        return ret;
+    }
+
     public static String convertMsToHms(long ms, TIMEUNITS timeUnit) {    //   n (en ms) -> HH:MM:SS.CC (format "hmsc")
         String ret = "";
         long p = timeUnit.MS();
