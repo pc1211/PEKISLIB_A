@@ -7,6 +7,8 @@ import android.widget.Toast;
 
 import java.util.Calendar;
 
+import static com.example.pgyl.pekislib_a.TimeDateUtils.TIME_HMS_SEPARATOR;
+
 public class ClockAppAlarmUtils {
 
     public static void setClockAppAlarm(Context context, long timeExp, String message) {
@@ -22,15 +24,16 @@ public class ClockAppAlarmUtils {
             intent.putExtra(AlarmClock.EXTRA_HOUR, expHour);
             intent.putExtra(AlarmClock.EXTRA_MINUTES, expMinutes);
             intent.putExtra(AlarmClock.EXTRA_MESSAGE, message);
-            intent.putExtra(AlarmClock.EXTRA_SKIP_UI, false);
+            intent.putExtra(AlarmClock.EXTRA_SKIP_UI, true);    //  Skip UI
             if (intent.resolveActivity(context.getPackageManager()) != null) {
                 error = false;
+                Toast.makeText(context, "Setting Clock App alarm on " + String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY)) + TIME_HMS_SEPARATOR + String.format("%02d", calendar.get(Calendar.MINUTE)), Toast.LENGTH_LONG).show();
                 context.startActivity(intent);
             }
         }
         calendar = null;
         if (error) {
-            Toast.makeText(context, "Error Setting Clock alarm " + message, Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Error Setting Clock App alarm " + message, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -38,14 +41,14 @@ public class ClockAppAlarmUtils {
         boolean error = true;
         Intent intent = new Intent(AlarmClock.ACTION_DISMISS_ALARM);
         intent.putExtra(AlarmClock.EXTRA_ALARM_SEARCH_MODE, AlarmClock.ALARM_SEARCH_MODE_LABEL);
-        intent.putExtra(AlarmClock.EXTRA_MESSAGE, message);
-        intent.putExtra(AlarmClock.EXTRA_SKIP_UI, false);
+        intent.putExtra(AlarmClock.EXTRA_MESSAGE, message);      //  Pas de Skip UI possible
         if (intent.resolveActivity(context.getPackageManager()) != null) {
             error = false;
+            Toast.makeText(context, "Dismissing Clock App alarm " + message, Toast.LENGTH_LONG).show();
             context.startActivity(intent);
         }
         if (error) {
-            Toast.makeText(context, "Error Dismissing Clock alarm " + message, Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Error Dismissing Clock App alarm " + message, Toast.LENGTH_LONG).show();
         }
     }
 
