@@ -18,7 +18,7 @@ public class MiscUtils {
         //    {public void onClick(DialogInterface dialog, int which) {}});
     }
 
-    public static String caseFirstUpOtherLow(String string) {
+    public static String capitalize(String string) {
         return string.substring(0, 1).toUpperCase(Locale.ENGLISH) + string.substring(1).toLowerCase(Locale.ENGLISH);
     }
 

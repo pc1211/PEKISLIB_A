@@ -12,7 +12,7 @@ import static com.example.pgyl.pekislib_a.TimeDateUtils.TIME_HMS_SEPARATOR;
 public class ClockAppAlarmUtils {
 
     public static boolean setClockAppAlarm(Context context, long timeExp, String message) {
-        boolean error = true;
+        boolean ret = false;
         Calendar calendar = Calendar.getInstance();    // Calendar => OK Time Zone
         int nowHour = calendar.get(Calendar.HOUR_OF_DAY);
         int nowMinutes = calendar.get(Calendar.MINUTE);
@@ -28,34 +28,34 @@ public class ClockAppAlarmUtils {
             intent.putExtra(AlarmClock.EXTRA_MESSAGE, message);
             intent.putExtra(AlarmClock.EXTRA_SKIP_UI, true);    //  Ne pas afficher Clock App
             if (intent.resolveActivity(context.getPackageManager()) != null) {
-                error = false;
+                ret = true;
                 Toast.makeText(context, errorMsg, Toast.LENGTH_LONG).show();
                 context.startActivity(intent);
             }
         }
-        if (error) {
+        if (!ret) {
             errorMsg = "Error " + errorMsg;
             Toast.makeText(context, errorMsg, Toast.LENGTH_LONG).show();
         }
-        return error;
+        return ret;
     }
 
     public static boolean dismissClockAppAlarm(Context context, String message) {
-        boolean error = true;
+        boolean ret = false;
         String errorMsg = "Dismissing Clock App alarm " + message;
         Intent intent = new Intent(AlarmClock.ACTION_DISMISS_ALARM);
         intent.putExtra(AlarmClock.EXTRA_ALARM_SEARCH_MODE, AlarmClock.ALARM_SEARCH_MODE_LABEL);
         intent.putExtra(AlarmClock.EXTRA_MESSAGE, message);      //  On ne peut pas empêcher Clock App de s'afficher
         if (intent.resolveActivity(context.getPackageManager()) != null) {
-            error = false;
+            ret = true;
             Toast.makeText(context, errorMsg, Toast.LENGTH_LONG).show();
             context.startActivity(intent);
         }
-        if (error) {
+        if (!ret) {
             errorMsg = "Error " + errorMsg;
             Toast.makeText(context, errorMsg, Toast.LENGTH_LONG).show();
         }
-        return error;
+        return ret;
     }
 
 }
