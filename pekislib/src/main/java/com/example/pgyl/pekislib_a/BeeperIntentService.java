@@ -17,6 +17,7 @@ public class BeeperIntentService extends IntentService {
         final int DURATION_TONE_CDMA_ALERT_AUTOREDIAL_LITE = 434;   //  7 * 62 ms
 
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        int initVolume = audioManager.getStreamVolume(audioManager.STREAM_MUSIC);
         int maxVolume = audioManager.getStreamMaxVolume(audioManager.STREAM_MUSIC);
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0);
         ToneGenerator toneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME);
@@ -28,6 +29,7 @@ public class BeeperIntentService extends IntentService {
                 e.printStackTrace();
             }
             toneGenerator.release();
+            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, initVolume, 0);
         }
     }
 }
