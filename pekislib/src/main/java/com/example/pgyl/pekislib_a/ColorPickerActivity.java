@@ -29,12 +29,13 @@ import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_TITLE;
 import static com.example.pgyl.pekislib_a.PresetsActivity.PRESET_ACTIVITY_DATA_TYPES;
 import static com.example.pgyl.pekislib_a.PresetsActivity.PRESET_ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.StringShelfDatabase.TABLE_DATA_INDEX;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.ACTIVITY_START_TYPE;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.TABLE_EXTRA_KEYS;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.activityStartStatusCold;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.activityStartStatusHot;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentColorsInColorPickerActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentPresetInPresetsActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentStringInInputButtonsActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getLabelNames;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getLabels;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.isColdStartStatusInColorPickerActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentColorsInColorPickerActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentPresetInPresetsActivity;
@@ -132,10 +133,10 @@ public class ColorPickerActivity extends Activity {
         tableName = getIntent().getStringExtra(TABLE_EXTRA_KEYS.TABLE.toString());
         setupStringShelfDatabase();
         colors = getCurrentColorsInColorPickerActivity(stringShelfDatabase, tableName);
-        labelNames = getLabelNames(stringShelfDatabase, tableName);
+        labelNames = getLabels(stringShelfDatabase, tableName);
 
         if (isColdStartStatusInColorPickerActivity(stringShelfDatabase)) {
-            setStartStatusInColorPickerActivity(stringShelfDatabase, ACTIVITY_START_TYPE.HOT);
+            setStartStatusInColorPickerActivity(stringShelfDatabase, activityStartStatusHot());
             colorIndex = COLOR_INDEX_DEFAULT_VALUE;
         } else {
             colorIndex = getSHPcolorIndex();
@@ -306,7 +307,7 @@ public class ColorPickerActivity extends Activity {
         for (COMMANDS command : COMMANDS.values()) {
             try {
                 int index = command.ordinal();
-                buttons[index] = (Button) findViewById(rid.getField(BUTTON_XML_PREFIX + command.toString()).getInt(rid));   //  1, 2, 3 ... dans le XML
+                buttons[index] = findViewById(rid.getField(BUTTON_XML_PREFIX + command.toString()).getInt(rid));   //  1, 2, 3 ... dans le XML
                 buttons[index].setText(command.TEXT());
                 final COMMANDS fcommand = command;
                 buttons[index].setOnClickListener(new Button.OnClickListener() {
@@ -337,7 +338,7 @@ public class ColorPickerActivity extends Activity {
         for (PRIMARY_COLORS primaryColor : PRIMARY_COLORS.values()) {
             try {
                 int index = primaryColor.INDEX();
-                seekbars[index] = (SeekBar) findViewById(rid.getField(SEEKBAR_XML_PREFIX + (index + 1)).getInt(rid));
+                seekbars[index] = findViewById(rid.getField(SEEKBAR_XML_PREFIX + (index + 1)).getInt(rid));
                 seekbars[index].setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -370,7 +371,7 @@ public class ColorPickerActivity extends Activity {
     }
 
     private void setupColorWheelView() {
-        colorWheelView = (ColorWheelView) findViewById(R.id.COLORS_VIEW);
+        colorWheelView = findViewById(R.id.COLORS_VIEW);
         colorWheelView.setOnColorIndexChangeListener(new ColorWheelView.onColorIndexChangeListener() {
             @Override
             public void onColorIndexChange(int colorIndex) {
@@ -397,7 +398,7 @@ public class ColorPickerActivity extends Activity {
     }
 
     private void launchInputButtonsActivity() {
-        setStartStatusInInputButtonsActivity(stringShelfDatabase, ACTIVITY_START_TYPE.COLD);
+        setStartStatusInInputButtonsActivity(stringShelfDatabase, activityStartStatusCold());
         Intent callingIntent = new Intent(this, InputButtonsActivity.class);
         callingIntent.putExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString(), labelNames[colorIndex]);
         callingIntent.putExtra(TABLE_EXTRA_KEYS.TABLE.toString(), tableName);
@@ -408,7 +409,7 @@ public class ColorPickerActivity extends Activity {
     private void launchPresetsActivity() {
         final String SEPARATOR = " - ";
 
-        setStartStatusInPresetsActivity(stringShelfDatabase, ACTIVITY_START_TYPE.COLD);
+        setStartStatusInPresetsActivity(stringShelfDatabase, activityStartStatusCold());
         Intent callingIntent = new Intent(this, PresetsActivity.class);
         callingIntent.putExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString(), "Color Presets");
         callingIntent.putExtra(PRESET_ACTIVITY_EXTRA_KEYS.SEPARATOR.toString(), SEPARATOR);

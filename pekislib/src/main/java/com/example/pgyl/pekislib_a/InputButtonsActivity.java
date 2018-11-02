@@ -32,8 +32,8 @@ import static com.example.pgyl.pekislib_a.Constants.SHP_FILE_NAME_SUFFIX;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_TITLE;
 import static com.example.pgyl.pekislib_a.MiscUtils.msgBox;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.ACTIVITY_START_TYPE;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.TABLE_EXTRA_KEYS;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.activityStartStatusHot;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentStringInInputButtonsActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getKeyboard;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getMax;
@@ -199,7 +199,7 @@ public class InputButtonsActivity extends Activity {
         pageButtonTexts = getPageButtonTexts(buttonTexts, BUTTONS_PER_PAGE, pages);
 
         if (isColdStartStatusInInputButtonsActivity(stringShelfDatabase)) {
-            setStartStatusInInputButtonsActivity(stringShelfDatabase, ACTIVITY_START_TYPE.HOT);
+            setStartStatusInInputButtonsActivity(stringShelfDatabase, activityStartStatusHot());
             pageIndex = CURRENT_PAGE_INDEX_DEFAULT_VALUE;
             caze = CASES.NO_CASE;
             append = APPEND_DEFAULT_VALUE;
@@ -632,7 +632,7 @@ public class InputButtonsActivity extends Activity {
         for (COMMANDS command : COMMANDS.values()) {
             try {
                 int index = command.ordinal();
-                buttons[index] = (Button) findViewById(rid.getField(BUTTON_XML_PREFIX + command.toString()).getInt(rid));   //  1, 2, 3 ... dans le XML
+                buttons[index] = findViewById(rid.getField(BUTTON_XML_PREFIX + command.toString()).getInt(rid));   //  1, 2, 3 ... dans le XML
                 buttons[index].setText(command.TEXT());
                 final COMMANDS fcommand = command;
                 buttons[index].setOnClickListener(new Button.OnClickListener() {
@@ -657,11 +657,11 @@ public class InputButtonsActivity extends Activity {
         final String BUTTON_XML_PREFIX = "BTN_P";
 
         Class rid = R.id.class;
-        lbldisplay = (TextView) findViewById(R.id.LBL_DISPLAY);
+        lbldisplay = findViewById(R.id.LBL_DISPLAY);
         keyboardButtons = new Button[BUTTONS_PER_PAGE];
         for (int i = 0; i <= (BUTTONS_PER_PAGE - 1); i = i + 1) {
             try {
-                keyboardButtons[i] = (Button) findViewById(rid.getField(BUTTON_XML_PREFIX + (i + 1)).getInt(rid));  // BTN_P1, BTN_P2, ...
+                keyboardButtons[i] = findViewById(rid.getField(BUTTON_XML_PREFIX + (i + 1)).getInt(rid));  // BTN_P1, BTN_P2, ...
                 final int index = i;
                 keyboardButtons[i].setOnClickListener(new View.OnClickListener() {
                     @Override

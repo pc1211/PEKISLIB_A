@@ -27,13 +27,14 @@ import static com.example.pgyl.pekislib_a.Constants.SHP_FILE_NAME_SUFFIX;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_TITLE;
 import static com.example.pgyl.pekislib_a.InputButtonsActivity.KEYBOARDS;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.ACTIVITY_START_TYPE;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.TABLE_EXTRA_KEYS;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.activityStartStatusCold;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.activityStartStatusHot;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentPresetInPresetsActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentStringInInputButtonsActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getDefault;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getKeyboards;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getLabelNames;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getLabels;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getTimeUnits;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.isColdStartStatusInPresetsActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentPresetInPresetsActivity;
@@ -127,12 +128,12 @@ public class PresetsActivity extends Activity {
         setupStringShelfDatabase();
         setupPresetsHandler();
         preset = getCurrentPresetInPresetsActivity(stringShelfDatabase, tableName);
-        labelNames = getLabelNames(stringShelfDatabase, tableName);
+        labelNames = getLabels(stringShelfDatabase, tableName);
         keyboards = getKeyboards(stringShelfDatabase, tableName);
         timeUnits = getTimeUnits(stringShelfDatabase, tableName);
 
         if (isColdStartStatusInPresetsActivity(stringShelfDatabase)) {
-            setStartStatusInPresetsActivity(stringShelfDatabase, ACTIVITY_START_TYPE.HOT);
+            setStartStatusInPresetsActivity(stringShelfDatabase, activityStartStatusHot());
             selectIndex = SELECT_INDEX_DEFAULT_VALUE;
             columnIndex = COLUMN_INDEX_DEFAULT_VALUE;
         } else {
@@ -409,7 +410,7 @@ public class PresetsActivity extends Activity {
         for (COMMANDS command : COMMANDS.values()) {
             try {
                 int index = command.ordinal();
-                buttons[index] = (CustomButton) findViewById(rid.getField(BUTTON_XML_PREFIX + command.toString()).getInt(rid));   //  1, 2, 3 ... dans le XML
+                buttons[index] = findViewById(rid.getField(BUTTON_XML_PREFIX + command.toString()).getInt(rid));   //  1, 2, 3 ... dans le XML
                 buttons[index].setText(command.TEXT());
                 final COMMANDS fcommand = command;
                 buttons[index].setOnClickListener(new View.OnClickListener() {
@@ -431,7 +432,7 @@ public class PresetsActivity extends Activity {
     }
 
     private void setupList() {
-        listView = (ListView) findViewById(R.id.CT_LIST);
+        listView = findViewById(R.id.CT_LIST);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -459,7 +460,7 @@ public class PresetsActivity extends Activity {
     }
 
     private void launchInputButtonsActivity() {
-        setStartStatusInInputButtonsActivity(stringShelfDatabase, ACTIVITY_START_TYPE.COLD);
+        setStartStatusInInputButtonsActivity(stringShelfDatabase, activityStartStatusCold());
         Intent callingIntent = new Intent(this, InputButtonsActivity.class);
         callingIntent.putExtra(TABLE_EXTRA_KEYS.TABLE.toString(), tableName);
         callingIntent.putExtra(TABLE_EXTRA_KEYS.INDEX.toString(), columnIndex);

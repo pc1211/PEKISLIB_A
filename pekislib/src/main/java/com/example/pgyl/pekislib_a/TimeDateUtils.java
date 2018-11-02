@@ -41,7 +41,7 @@ public class TimeDateUtils {
     public static final SimpleDateFormat ddmmyyyy = new SimpleDateFormat("dd/MM/yyyy");
     public static final String[] days = {"??", "Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"};
 
-    public static long midnightInMillis() {
+    public static long midnightTimeInMillis() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
