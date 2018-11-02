@@ -25,18 +25,24 @@ import java.util.logging.Logger;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 import static com.example.pgyl.pekislib_a.Constants.ACTIVITY_EXTRA_KEYS;
-import static com.example.pgyl.pekislib_a.Constants.ACTIVITY_START_TYPE;
 import static com.example.pgyl.pekislib_a.Constants.ERROR_VALUE;
 import static com.example.pgyl.pekislib_a.Constants.NOT_FOUND;
 import static com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITIES;
-import static com.example.pgyl.pekislib_a.Constants.PEKISLIB_TABLES;
 import static com.example.pgyl.pekislib_a.Constants.SHP_FILE_NAME_SUFFIX;
-import static com.example.pgyl.pekislib_a.Constants.TABLE_ACTIVITY_INFOS_DATA_FIELDS;
-import static com.example.pgyl.pekislib_a.Constants.TABLE_EXTRA_KEYS;
-import static com.example.pgyl.pekislib_a.Constants.TABLE_IDS;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_TITLE;
 import static com.example.pgyl.pekislib_a.MiscUtils.msgBox;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.ACTIVITY_START_TYPE;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.TABLE_EXTRA_KEYS;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentStringInInputButtonsActivity;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getKeyboard;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getMax;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getMin;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getRegExp;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getTimeUnit;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.isColdStartStatusInInputButtonsActivity;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentStringInInputButtonsActivity;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatusInInputButtonsActivity;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.TIMEUNITS;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.convertHmsToMs;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.convertMsToHms;
@@ -166,7 +172,7 @@ public class InputButtonsActivity extends Activity {
         super.onPause();
 
         savePreferences();
-        saveCurrentString(columnIndex, editString);
+        setCurrentStringInInputButtonsActivity(stringShelfDatabase, tableName, columnIndex, editString);
         stringShelfDatabase.close();
         stringShelfDatabase = null;
     }
@@ -183,17 +189,17 @@ public class InputButtonsActivity extends Activity {
         tableName = getIntent().getStringExtra(TABLE_EXTRA_KEYS.TABLE.toString());
         columnIndex = getIntent().getIntExtra(TABLE_EXTRA_KEYS.INDEX.toString(), COLUMN_INDEX_DEFAULT_VALUE);
         setupStringShelfDatabase();
-        editString = getCurrentString(columnIndex);
-        keyboard = KEYBOARDS.valueOf(getKeyboard(columnIndex));
+        editString = getCurrentStringInInputButtonsActivity(stringShelfDatabase, tableName, columnIndex);
+        keyboard = KEYBOARDS.valueOf(getKeyboard(stringShelfDatabase, tableName, columnIndex));
         if ((keyboard.equals(KEYBOARDS.TIME_HMS)) || (keyboard.equals(KEYBOARDS.TIME_XHMS))) {
-            timeUnit = TIMEUNITS.valueOf(getTimeUnit(columnIndex));
+            timeUnit = TIMEUNITS.valueOf(getTimeUnit(stringShelfDatabase, tableName, columnIndex));
         }
         buttonTexts = getButtonTexts(keyboard, getOrientation());
         pages = ((buttonTexts.length - 1) / BUTTONS_PER_PAGE) + 1;
         pageButtonTexts = getPageButtonTexts(buttonTexts, BUTTONS_PER_PAGE, pages);
 
-        if (isColdStart()) {
-            setHotStart();
+        if (isColdStartStatusInInputButtonsActivity(stringShelfDatabase)) {
+            setStartStatusInInputButtonsActivity(stringShelfDatabase, ACTIVITY_START_TYPE.HOT);
             pageIndex = CURRENT_PAGE_INDEX_DEFAULT_VALUE;
             caze = CASES.NO_CASE;
             append = APPEND_DEFAULT_VALUE;
@@ -254,9 +260,9 @@ public class InputButtonsActivity extends Activity {
 
     private void onButtonClickOK() {
         String candidate = editString;
-        String smin = getMin(columnIndex);
-        String smax = getMax(columnIndex);
-        String regexp = getRegExp(columnIndex);
+        String smin = getMin(stringShelfDatabase, tableName, columnIndex);
+        String smax = getMax(stringShelfDatabase, tableName, columnIndex);
+        String regexp = getRegExp(stringShelfDatabase, tableName, columnIndex);
         String error = noErrorMessage();
         if (regexp != null) {
             if (!candidate.matches(regexp)) {
@@ -717,42 +723,6 @@ public class InputButtonsActivity extends Activity {
         callingIntent.putExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString(), HELP_ACTIVITY_TITLE);
         callingIntent.putExtra(HELP_ACTIVITY_EXTRA_KEYS.HTML_ID.toString(), R.raw.helpinputbuttonsactivity);
         startActivityForResult(callingIntent, PEKISLIB_ACTIVITIES.HELP.ordinal());
-    }
-
-    private boolean isColdStart() {
-        return (stringShelfDatabase.selectFieldByIdOrCreate(PEKISLIB_TABLES.ACTIVITY_INFOS.toString(), PEKISLIB_ACTIVITIES.INPUTBUTTONS.toString(), TABLE_ACTIVITY_INFOS_DATA_FIELDS.START_TYPE.INDEX()).equals(ACTIVITY_START_TYPE.COLD.toString()));
-    }
-
-    private void setHotStart() {
-        stringShelfDatabase.insertOrReplaceFieldById(PEKISLIB_TABLES.ACTIVITY_INFOS.toString(), PEKISLIB_ACTIVITIES.INPUTBUTTONS.toString(), TABLE_ACTIVITY_INFOS_DATA_FIELDS.START_TYPE.INDEX(), ACTIVITY_START_TYPE.HOT.toString());
-    }
-
-    private String getCurrentString(int index) {
-        return stringShelfDatabase.selectFieldByIdOrCreate(tableName, TABLE_IDS.CURRENT.toString() + PEKISLIB_ACTIVITIES.INPUTBUTTONS.toString(), index);
-    }
-
-    private void saveCurrentString(int index, String value) {
-        stringShelfDatabase.insertOrReplaceFieldById(tableName, TABLE_IDS.CURRENT.toString() + PEKISLIB_ACTIVITIES.INPUTBUTTONS.toString(), index, value);
-    }
-
-    private String getKeyboard(int index) {
-        return stringShelfDatabase.selectFieldByIdOrCreate(tableName, TABLE_IDS.KEYBOARD.toString(), index);
-    }
-
-    private String getTimeUnit(int index) {
-        return stringShelfDatabase.selectFieldByIdOrCreate(tableName, TABLE_IDS.TIMEUNIT.toString(), index);
-    }
-
-    private String getMin(int index) {
-        return stringShelfDatabase.selectFieldByIdOrCreate(tableName, TABLE_IDS.MIN.toString(), index);
-    }
-
-    private String getMax(int index) {
-        return stringShelfDatabase.selectFieldByIdOrCreate(tableName, TABLE_IDS.MAX.toString(), index);
-    }
-
-    private String getRegExp(int index) {
-        return stringShelfDatabase.selectFieldByIdOrCreate(tableName, TABLE_IDS.REGEXP.toString(), index);
     }
 
     private boolean returnsFromHelp() {
