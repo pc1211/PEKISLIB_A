@@ -9,7 +9,7 @@ public class StringShelfDatabaseUtils {
     private enum TABLE_IDS {CURRENT, DEFAULT, LABEL, KEYBOARD, REGEXP, MIN, MAX, TIMEUNIT}
 
     private enum TABLE_ACTIVITY_INFOS_DATA_FIELDS {
-        START_TYPE(1);
+        START_STATUS(1);
 
         private int valueIndex;
 
@@ -103,8 +103,8 @@ public class StringShelfDatabaseUtils {
         return TABLE_IDS.CURRENT.toString();
     }
 
-    public static int getActivityInfosStartTypeIndex() {
-        return TABLE_ACTIVITY_INFOS_DATA_FIELDS.START_TYPE.INDEX();
+    public static int getActivityInfosStartStatusIndex() {
+        return TABLE_ACTIVITY_INFOS_DATA_FIELDS.START_STATUS.INDEX();
     }
     //endregion
 
@@ -120,27 +120,27 @@ public class StringShelfDatabaseUtils {
 
     //region START_STATUS
     public static boolean isColdStartStatusInColorPickerActivity(StringShelfDatabase stringShelfDatabase) {
-        return stringShelfDatabase.selectFieldByIdOrCreate(PEKISLIB_TABLES.ACTIVITY_INFOS.toString(), PEKISLIB_ACTIVITIES.COLOR_PICKER.toString(), TABLE_ACTIVITY_INFOS_DATA_FIELDS.START_TYPE.INDEX()).equals(ACTIVITY_START_STATUS.COLD.toString());
+        return stringShelfDatabase.selectFieldByIdOrCreate(PEKISLIB_TABLES.ACTIVITY_INFOS.toString(), PEKISLIB_ACTIVITIES.COLOR_PICKER.toString(), TABLE_ACTIVITY_INFOS_DATA_FIELDS.START_STATUS.INDEX()).equals(ACTIVITY_START_STATUS.COLD.toString());
     }
 
     public static void setStartStatusInColorPickerActivity(StringShelfDatabase stringShelfDatabase, ACTIVITY_START_STATUS activityStartStatus) {
-        stringShelfDatabase.insertOrReplaceFieldById(PEKISLIB_TABLES.ACTIVITY_INFOS.toString(), PEKISLIB_ACTIVITIES.COLOR_PICKER.toString(), TABLE_ACTIVITY_INFOS_DATA_FIELDS.START_TYPE.INDEX(), activityStartStatus.toString());
+        stringShelfDatabase.insertOrReplaceFieldById(PEKISLIB_TABLES.ACTIVITY_INFOS.toString(), PEKISLIB_ACTIVITIES.COLOR_PICKER.toString(), TABLE_ACTIVITY_INFOS_DATA_FIELDS.START_STATUS.INDEX(), activityStartStatus.toString());
     }
 
     public static boolean isColdStartStatusInPresetsActivity(StringShelfDatabase stringShelfDatabase) {
-        return stringShelfDatabase.selectFieldByIdOrCreate(PEKISLIB_TABLES.ACTIVITY_INFOS.toString(), PEKISLIB_ACTIVITIES.PRESETS.toString(), TABLE_ACTIVITY_INFOS_DATA_FIELDS.START_TYPE.INDEX()).equals(ACTIVITY_START_STATUS.COLD.toString());
+        return stringShelfDatabase.selectFieldByIdOrCreate(PEKISLIB_TABLES.ACTIVITY_INFOS.toString(), PEKISLIB_ACTIVITIES.PRESETS.toString(), TABLE_ACTIVITY_INFOS_DATA_FIELDS.START_STATUS.INDEX()).equals(ACTIVITY_START_STATUS.COLD.toString());
     }
 
     public static void setStartStatusInPresetsActivity(StringShelfDatabase stringShelfDatabase, ACTIVITY_START_STATUS activityStartStatus) {
-        stringShelfDatabase.insertOrReplaceFieldById(PEKISLIB_TABLES.ACTIVITY_INFOS.toString(), PEKISLIB_ACTIVITIES.PRESETS.toString(), TABLE_ACTIVITY_INFOS_DATA_FIELDS.START_TYPE.INDEX(), activityStartStatus.toString());
+        stringShelfDatabase.insertOrReplaceFieldById(PEKISLIB_TABLES.ACTIVITY_INFOS.toString(), PEKISLIB_ACTIVITIES.PRESETS.toString(), TABLE_ACTIVITY_INFOS_DATA_FIELDS.START_STATUS.INDEX(), activityStartStatus.toString());
     }
 
     public static boolean isColdStartStatusInInputButtonsActivity(StringShelfDatabase stringShelfDatabase) {
-        return stringShelfDatabase.selectFieldByIdOrCreate(PEKISLIB_TABLES.ACTIVITY_INFOS.toString(), PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), TABLE_ACTIVITY_INFOS_DATA_FIELDS.START_TYPE.INDEX()).equals(ACTIVITY_START_STATUS.COLD.toString());
+        return stringShelfDatabase.selectFieldByIdOrCreate(PEKISLIB_TABLES.ACTIVITY_INFOS.toString(), PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), TABLE_ACTIVITY_INFOS_DATA_FIELDS.START_STATUS.INDEX()).equals(ACTIVITY_START_STATUS.COLD.toString());
     }
 
     public static void setStartStatusInInputButtonsActivity(StringShelfDatabase stringShelfDatabase, ACTIVITY_START_STATUS activityStartStatus) {
-        stringShelfDatabase.insertOrReplaceFieldById(PEKISLIB_TABLES.ACTIVITY_INFOS.toString(), PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), TABLE_ACTIVITY_INFOS_DATA_FIELDS.START_TYPE.INDEX(), activityStartStatus.toString());
+        stringShelfDatabase.insertOrReplaceFieldById(PEKISLIB_TABLES.ACTIVITY_INFOS.toString(), PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), TABLE_ACTIVITY_INFOS_DATA_FIELDS.START_STATUS.INDEX(), activityStartStatus.toString());
     }
     //endregion
 
