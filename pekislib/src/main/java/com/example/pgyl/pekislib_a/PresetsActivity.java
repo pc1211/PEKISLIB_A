@@ -27,9 +27,8 @@ import static com.example.pgyl.pekislib_a.Constants.SHP_FILE_NAME_SUFFIX;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_TITLE;
 import static com.example.pgyl.pekislib_a.InputButtonsActivity.KEYBOARDS;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.ACTIVITY_START_STATUS;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.TABLE_EXTRA_KEYS;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.activityStartStatusCold;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.activityStartStatusHot;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentPresetInPresetsActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentStringInInputButtonsActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getDefault;
@@ -133,7 +132,7 @@ public class PresetsActivity extends Activity {
         timeUnits = getTimeUnits(stringShelfDatabase, tableName);
 
         if (isColdStartStatusInPresetsActivity(stringShelfDatabase)) {
-            setStartStatusInPresetsActivity(stringShelfDatabase, activityStartStatusHot());
+            setStartStatusInPresetsActivity(stringShelfDatabase, ACTIVITY_START_STATUS.HOT);
             selectIndex = SELECT_INDEX_DEFAULT_VALUE;
             columnIndex = COLUMN_INDEX_DEFAULT_VALUE;
         } else {
@@ -460,7 +459,7 @@ public class PresetsActivity extends Activity {
     }
 
     private void launchInputButtonsActivity() {
-        setStartStatusInInputButtonsActivity(stringShelfDatabase, activityStartStatusCold());
+        setStartStatusInInputButtonsActivity(stringShelfDatabase, ACTIVITY_START_STATUS.COLD);
         Intent callingIntent = new Intent(this, InputButtonsActivity.class);
         callingIntent.putExtra(TABLE_EXTRA_KEYS.TABLE.toString(), tableName);
         callingIntent.putExtra(TABLE_EXTRA_KEYS.INDEX.toString(), columnIndex);
