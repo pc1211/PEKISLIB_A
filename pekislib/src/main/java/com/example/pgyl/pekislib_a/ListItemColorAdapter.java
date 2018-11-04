@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -79,8 +78,8 @@ public class ListItemColorAdapter extends BaseAdapter {
 
     private ListItemColorViewHolder buildViewHolder(View convertView) {
         ListItemColorViewHolder viewHolder = new ListItemColorViewHolder();
-        viewHolder.colorWheelView = (ColorWheelView) convertView.findViewById(R.id.COLORS_VIEW);
-        viewHolder.textView = (TextView) convertView.findViewById(R.id.TV_TXT);
+        viewHolder.colorWheelView = convertView.findViewById(R.id.COLORS_VIEW);
+        viewHolder.textView = convertView.findViewById(R.id.TV_TXT);
         return viewHolder;
     }
 

@@ -34,7 +34,7 @@ public class HelpActivity extends Activity {
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         getActionBar().setTitle(HELP_ACTIVITY_TITLE);
         setContentView(R.layout.help);
-        webView = (WebView) findViewById(R.id.webview);
+        webView = findViewById(R.id.webview);
     }
 
     @Override
