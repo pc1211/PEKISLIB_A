@@ -188,7 +188,7 @@ public class ColorPickerActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.help) {
+        if (item.getItemId() == R.id.HELP) {
             launchHelpActivity();
             return true;
         }

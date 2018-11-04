@@ -27,10 +27,13 @@ public class StringShelfDatabaseUtils {
     public enum TABLE_EXTRA_KEYS {TABLE, INDEX}
 
     //region TABLES
-    public static void createTableActivityInfos(StringShelfDatabase stringShelfDatabase) {
+    public static boolean createTableActivityInfosIfNotExists(StringShelfDatabase stringShelfDatabase) {
+        boolean ret = false;
         if (!stringShelfDatabase.tableExists(PEKISLIB_TABLES.ACTIVITY_INFOS.toString())) {
             stringShelfDatabase.createTable(PEKISLIB_TABLES.ACTIVITY_INFOS.toString(), 1 + TABLE_ACTIVITY_INFOS_DATA_FIELDS.values().length);   //  Champ ID + Données
+            ret = true;
         }
+        return ret;
     }
 
     public static String getActivityInfosTableName() {
