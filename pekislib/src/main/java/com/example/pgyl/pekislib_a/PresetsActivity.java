@@ -59,13 +59,11 @@ public class PresetsActivity extends Activity {
         }
     }
 
-    public enum PRESET_ACTIVITY_EXTRA_KEYS {
-        SEPARATOR, DATA_TYPE
+    public enum PRESETS_ACTIVITY_EXTRA_KEYS {
+        SEPARATOR, IS_COLOR_TYPE
     }
 
-    public enum PRESET_ACTIVITY_DATA_TYPES {
-        COLOR, NORMAL
-    }
+    public static final boolean PRESETS_ACTIVITY_IS_COLOR_TYPE = true;
 
     private enum SHP_KEY_NAMES {
         SELECT_INDEX, COLUMN_INDEX
@@ -81,7 +79,7 @@ public class PresetsActivity extends Activity {
     private String[] keyboards;
     private String[] timeUnits;
     private String tableName;
-    private String dataType;
+    private boolean isColorType;
     private int selectIndex;
     private int columnIndex;
     private CustomButton[] buttons;
@@ -122,7 +120,7 @@ public class PresetsActivity extends Activity {
 
         shpFileName = getPackageName() + "." + getClass().getSimpleName() + SHP_FILE_NAME_SUFFIX;
         tableName = getIntent().getStringExtra(TABLE_EXTRA_KEYS.TABLE.toString());
-        dataType = getIntent().getStringExtra(PRESET_ACTIVITY_EXTRA_KEYS.DATA_TYPE.toString());
+        isColorType = (Integer.parseInt(getIntent().getStringExtra(PRESETS_ACTIVITY_EXTRA_KEYS.IS_COLOR_TYPE.toString())) == 1);
 
         setupStringShelfDatabase();
         setupPresetsHandler();
@@ -140,13 +138,13 @@ public class PresetsActivity extends Activity {
             columnIndex = getSHPcolumnIndex();
             if (validReturnFromCalledActivity) {
                 validReturnFromCalledActivity = false;
-                if (returnsFromInputButtons()) {
+                if (returnsFromInputButtonsActivity()) {
                     preset[columnIndex] = getCurrentStringInInputButtonsActivity(stringShelfDatabase, tableName, columnIndex);
                     if (selectIndex != SELECT_INDEX_DEFAULT_VALUE) {
                         presetsHandler.setPresetColumn(selectIndex, columnIndex, preset[columnIndex]);
                     }
                 }
-                if (returnsFromHelp()) {
+                if (returnsFromHelpActivity()) {
                     //  NOP
                 }
             }
@@ -344,14 +342,14 @@ public class PresetsActivity extends Activity {
         } else {
             presetsHandler.sortPresets();
         }
-        if (dataType.equals(PRESET_ACTIVITY_DATA_TYPES.COLOR.toString())) {
+        if (isColorType == PRESETS_ACTIVITY_IS_COLOR_TYPE) {
             ListItemColorAdapter lvAdapter = new ListItemColorAdapter(this);
             lvAdapter.setColorItems(presetsHandler.presetDataList());
             lvAdapter.setTextItems(presetsHandler.concatenatedDisplayPresetDataList());
             listView.setAdapter(lvAdapter);
             lvAdapter = null;
         } else {
-            ListItemNormalAdapter lvAdapter = new ListItemNormalAdapter(this, presetsHandler.concatenatedDisplayPresetDataList());
+            ListItemNoColorAdapter lvAdapter = new ListItemNoColorAdapter(this, presetsHandler.concatenatedDisplayPresetDataList());
             listView.setAdapter(lvAdapter);
             lvAdapter = null;
         }
@@ -442,7 +440,7 @@ public class PresetsActivity extends Activity {
 
     private void setupPresetsHandler() {
         presetsHandler = new PresetsHandler(stringShelfDatabase);
-        presetsHandler.setSeparator(getIntent().getStringExtra(PRESET_ACTIVITY_EXTRA_KEYS.SEPARATOR.toString()));
+        presetsHandler.setSeparator(getIntent().getStringExtra(PRESETS_ACTIVITY_EXTRA_KEYS.SEPARATOR.toString()));
         presetsHandler.setTableName(tableName);
     }
 
@@ -467,11 +465,11 @@ public class PresetsActivity extends Activity {
         startActivityForResult(callingIntent, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.ordinal());
     }
 
-    private boolean returnsFromInputButtons() {
+    private boolean returnsFromInputButtonsActivity() {
         return (calledActivity.equals(PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString()));
     }
 
-    private boolean returnsFromHelp() {
+    private boolean returnsFromHelpActivity() {
         return (calledActivity.equals(PEKISLIB_ACTIVITIES.HELP.toString()));
     }
 

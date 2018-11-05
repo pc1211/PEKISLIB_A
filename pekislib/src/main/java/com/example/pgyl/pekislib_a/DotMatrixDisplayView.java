@@ -21,8 +21,6 @@ import java.util.Map;
 
 import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
-import static com.example.pgyl.pekislib_a.Constants.OFF_VALUE;
-import static com.example.pgyl.pekislib_a.Constants.ON_VALUE;
 
 public final class DotMatrixDisplayView extends View {  //  Affichage de caract√®res dans une grille de carr√©s avec coordonn√©es (x,y)  ((0,0) √©tant en haut √† gauche de la grille)
     public interface onCustomClickListener {
@@ -216,27 +214,27 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
     }
 
     public void fillGridOn() {
-        fillRect(0, 0, gridWidth, gridHeight, ON_VALUE);
+        fillRect(0, 0, gridWidth, gridHeight, 1);
     }
 
     public void fillGridOff() {
-        fillRect(0, 0, gridWidth, gridHeight, OFF_VALUE);
+        fillRect(0, 0, gridWidth, gridHeight, 0);
     }
 
     public void fillRectOn(int x, int y, int width, int height) {
-        fillRect(x, y, width, height, ON_VALUE);
+        fillRect(x, y, width, height, 1);
     }
 
     public void fillRectOff(int x, int y, int width, int height) {
-        fillRect(x, y, width, height, OFF_VALUE);
+        fillRect(x, y, width, height, 0);
     }
 
     public void setDotOn(int x, int y) {
-        grid[y][x] = ON_VALUE;
+        grid[y][x] = 1;
     }
 
     public void setDotOff(int x, int y) {
-        grid[y][x] = OFF_VALUE;
+        grid[y][x] = 0;
     }
 
     public void setSymbolRightMargin(int symbolRightMargin) {   //  Marge droite pour chaque symbole (en nombre de carr√©s)
@@ -351,7 +349,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         viewCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
         for (int i = 0; i <= (gridHeight - 1); i = i + 1) {
             for (int j = 0; j <= (gridWidth - 1); j = j + 1) {
-                if (grid[i][j] == ON_VALUE) {
+                if (grid[i][j] == 1) {
                     colorIndex = fi;
                 } else {
                     colorIndex = bi;
@@ -373,8 +371,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         symbolPos.set(symbolPos.x + symbolPosInitialOffset.x, symbolPos.y + symbolPosInitialOffset.y);  //  Appliquer un d√©calage avant l'affichage du symbole
         for (int i = 0; i <= (symbolHeight - 1); i = i + 1) {
             for (int j = 0; j <= (symbolWidth - 1); j = j + 1) {
-                if (data[i][j] == ON_VALUE) {
-                    grid[symbolPos.y + i][symbolPos.x + j] = ON_VALUE;
+                if (data[i][j] == 1) {
+                    grid[symbolPos.y + i][symbolPos.x + j] = 1;
                 }
             }
         }
@@ -398,7 +396,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
     }
 
     private void setSymbolCompressionOnBySymbol(SYMBOLS symbol) {
-        if ((symbol.equals(SYMBOLS.DOT)) ||(symbol.equals(SYMBOLS.DOUBLE_DOT))) {
+        if ((symbol.equals(SYMBOLS.DOT)) || (symbol.equals(SYMBOLS.DOUBLE_DOT))) {
             if (symbol.equals(SYMBOLS.DOT)) {
                 setDotCompressionOn();
             }

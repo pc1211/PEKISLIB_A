@@ -26,8 +26,8 @@ import static com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITIES;
 import static com.example.pgyl.pekislib_a.Constants.SHP_FILE_NAME_SUFFIX;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_TITLE;
-import static com.example.pgyl.pekislib_a.PresetsActivity.PRESET_ACTIVITY_DATA_TYPES;
-import static com.example.pgyl.pekislib_a.PresetsActivity.PRESET_ACTIVITY_EXTRA_KEYS;
+import static com.example.pgyl.pekislib_a.PresetsActivity.PRESETS_ACTIVITY_IS_COLOR_TYPE;
+import static com.example.pgyl.pekislib_a.PresetsActivity.PRESETS_ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.StringShelfDatabase.TABLE_DATA_INDEX;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.ACTIVITY_START_STATUS;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.TABLE_EXTRA_KEYS;
@@ -141,13 +141,13 @@ public class ColorPickerActivity extends Activity {
             colorIndex = getSHPcolorIndex();
             if (validReturnFromCalledActivity) {
                 validReturnFromCalledActivity = false;
-                if (returnsFromInputButtons()) {
+                if (returnsFromInputButtonsActivity()) {
                     colors[colorIndex] = getCurrentStringInInputButtonsActivity(stringShelfDatabase, tableName, colorIndex);
                 }
-                if (returnsFromPresets()) {
+                if (returnsFromPresetsActivity()) {
                     colors = getCurrentPresetInPresetsActivity(stringShelfDatabase, tableName);
                 }
-                if (calledActivity.equals(HelpActivity.class.getName())) {
+                if (returnsFromHelpActivity()) {
                     //  NOP
                 }
             }
@@ -411,18 +411,22 @@ public class ColorPickerActivity extends Activity {
         setStartStatusInPresetsActivity(stringShelfDatabase, ACTIVITY_START_STATUS.COLD);
         Intent callingIntent = new Intent(this, PresetsActivity.class);
         callingIntent.putExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString(), "Color Presets");
-        callingIntent.putExtra(PRESET_ACTIVITY_EXTRA_KEYS.SEPARATOR.toString(), SEPARATOR);
-        callingIntent.putExtra(PRESET_ACTIVITY_EXTRA_KEYS.DATA_TYPE.toString(), PRESET_ACTIVITY_DATA_TYPES.COLOR.toString());
+        callingIntent.putExtra(PRESETS_ACTIVITY_EXTRA_KEYS.SEPARATOR.toString(), SEPARATOR);
+        callingIntent.putExtra(PRESETS_ACTIVITY_EXTRA_KEYS.IS_COLOR_TYPE.toString(), String.valueOf(PRESETS_ACTIVITY_IS_COLOR_TYPE ? 1 : 0));
         callingIntent.putExtra(TABLE_EXTRA_KEYS.TABLE.toString(), tableName);
         startActivityForResult(callingIntent, PEKISLIB_ACTIVITIES.PRESETS.ordinal());
     }
 
-    private boolean returnsFromInputButtons() {
+    private boolean returnsFromInputButtonsActivity() {
         return (calledActivity.equals(PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString()));
     }
 
-    private boolean returnsFromPresets() {
+    private boolean returnsFromPresetsActivity() {
         return (calledActivity.equals(PEKISLIB_ACTIVITIES.PRESETS.toString()));
+    }
+
+    private boolean returnsFromHelpActivity() {
+        return (calledActivity.equals(PEKISLIB_ACTIVITIES.HELP.toString()));
     }
 
 }

@@ -215,7 +215,7 @@ public class InputButtonsActivity extends Activity {
             append = getSHPappend();
             if (validReturnFromCalledActivity) {
                 validReturnFromCalledActivity = false;
-                if (returnsFromHelp()) {
+                if (returnsFromHelpActivity()) {
                     //  NOP
                 }
             }
@@ -725,7 +725,7 @@ public class InputButtonsActivity extends Activity {
         startActivityForResult(callingIntent, PEKISLIB_ACTIVITIES.HELP.ordinal());
     }
 
-    private boolean returnsFromHelp() {
+    private boolean returnsFromHelpActivity() {
         return (calledActivity.equals(PEKISLIB_ACTIVITIES.HELP.toString()));
     }
 

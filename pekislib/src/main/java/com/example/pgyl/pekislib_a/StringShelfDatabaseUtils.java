@@ -78,6 +78,10 @@ public class StringShelfDatabaseUtils {
         return stringShelfDatabase.selectFieldByIdOrCreate(tableName, TABLE_IDS.DEFAULT.toString(), index);
     }
 
+    public static void setDefaults(StringShelfDatabase stringShelfDatabase, String tableName, String[] values) {
+        stringShelfDatabase.insertOrReplaceRowById(tableName, TABLE_IDS.DEFAULT.toString(), values);
+    }
+
     public static String getLabelIdName() {
         return TABLE_IDS.LABEL.toString();
     }

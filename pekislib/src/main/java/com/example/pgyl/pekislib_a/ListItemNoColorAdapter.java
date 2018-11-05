@@ -7,13 +7,13 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class ListItemNormalAdapter extends ArrayAdapter<String> {
+public class ListItemNoColorAdapter extends ArrayAdapter<String> {
     //region Variables
     private final Context context;
     private final String[] values;
     //endregion
 
-    public ListItemNormalAdapter(Context context, String[] values) {
+    public ListItemNoColorAdapter(Context context, String[] values) {
         super(context, R.layout.listitemnormal, values);
 
         this.context = context;

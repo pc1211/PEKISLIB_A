@@ -19,8 +19,6 @@ public class Constants {
         }
     }
 
-    public static final int OFF_VALUE = 0;
-    public static final int ON_VALUE = 1;
     public static final int DUMMY_VALUE = -1;
     public static final int NOT_FOUND = -1;
     public static final int UNDEFINED = -1;
