@@ -7,9 +7,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.Arrays;
 
-//  Les champs de toutes les tables sont toujours _id, ID, DATA1, DATA2, DATA3, ... selon le nombre de champs spécifié lors du createTable
+//  Les champs de toutes les tables sont toujours _id, ID, DATA1, DATA2, DATA3, ... selon le nombre de champs spécifié lors du createTableIfNotExists
 //  Le champ _id est la véritable clé primaire, mais invisible pour l'utilisateur
-//  Le champ ID est la clé primaire apparente pour l'utilisateur (cf contrainte UNIQUE sur le champ ID au createTable)
+//  Le champ ID est la clé primaire apparente pour l'utilisateur (cf contrainte UNIQUE sur le champ ID au createTableIfNotExists)
 public class StringShelfDatabase extends SQLiteOpenHelper {
 
     //region Constantes
@@ -47,7 +47,7 @@ public class StringShelfDatabase extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onCreate(SQLiteDatabase database) {  //  Tables créées uniquement après appel de createTable
+    public void onCreate(SQLiteDatabase database) {  //  Tables créées uniquement après appel de createTableIfNotExists
         //  NOP
     }
 
@@ -89,8 +89,8 @@ public class StringShelfDatabase extends SQLiteOpenHelper {
         return ret;
     }
 
-    public void createTable(String tableName, int tableFieldsCount) {
-        ssdb.execSQL(sqlForCreateTable(tableName, tableFieldsCount));
+    public void createTableIfNotExists(String tableName, int tableFieldsCount) {
+        ssdb.execSQL(sqlForCreateTableIfNotExists(tableName, tableFieldsCount));
     }
 
     public String[][] selectRows(String tableName, String whereCondition) {
@@ -173,7 +173,7 @@ public class StringShelfDatabase extends SQLiteOpenHelper {
         return ret;
     }
 
-    private String sqlForCreateTable(String tableName, int tableUserFieldsCount) {
+    private String sqlForCreateTableIfNotExists(String tableName, int tableUserFieldsCount) {
         String fieldNamesAndTypes = FIELDS._id.toString() + " INTEGER PRIMARY KEY, ";   //  Champ _id
         fieldNamesAndTypes = fieldNamesAndTypes + FIELDS.ID.toString() + " TEXT NOT NULL UNIQUE, ";   //  Champ ID
         for (int j = 1; j <= (tableUserFieldsCount - 1); j = j + 1) {
@@ -182,7 +182,7 @@ public class StringShelfDatabase extends SQLiteOpenHelper {
                 fieldNamesAndTypes = fieldNamesAndTypes + ", ";
             }
         }
-        return "CREATE TABLE " + tableName + " ( " + fieldNamesAndTypes + " )";
+        return "CREATE TABLE IF NOT EXISTS " + tableName + " ( " + fieldNamesAndTypes + " )";
     }
 
     private String sqlForSelectUserRows(String tableName, String whereCondition) {
@@ -204,7 +204,7 @@ public class StringShelfDatabase extends SQLiteOpenHelper {
     private String sqlForInsertOrReplaceUserRow(String tableName, String[] userRow) {   //  Fonctionne grâce à la contrainte UNIQUE sur le champ ID
         String fieldNames = "";
         String fieldValues = "";
-        int d = 0;
+        int dataFieldCount = 0;
         for (int j = 0; j <= (userRow.length - 1); j = j + 1) {
             String fieldName = "";
             String fieldValue = userRow[j];
@@ -214,8 +214,8 @@ public class StringShelfDatabase extends SQLiteOpenHelper {
             if (j == FIELDS.ID.USER_INDEX()) {
                 fieldName = FIELDS.ID.toString();
             } else {
-                d = d + 1;
-                fieldName = FIELDS.DATA.toString() + d;
+                dataFieldCount = dataFieldCount + 1;
+                fieldName = FIELDS.DATA.toString() + dataFieldCount;
             }
             fieldNames = fieldNames + fieldName;
             fieldValues = fieldValues + "'" + fieldValue + "'";
