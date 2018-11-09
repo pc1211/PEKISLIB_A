@@ -10,18 +10,30 @@ import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
 
+import java.util.EnumMap;
+
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
 
 public final class StateView extends View {
     //region Constantes
-    private final String COLOR_ON_DEFAULT = "FF0000";
-    private final String COLOR_OFF_DEFAULT = "808080";
+    public enum STATES {
+        ON("FF0000"), OFF("808080");
+
+        private String colorDefaultValue;
+
+        STATES(String colorDefaultValue) {
+            this.colorDefaultValue = colorDefaultValue;
+        }
+
+        public String DEFAULT_COLOR() {
+            return colorDefaultValue;
+        }
+    }
+
     //endregion
     //region Variables
-    private int colorOn;
-    private int colorOff;
-    private int color;
-    private boolean state;
+    private EnumMap<STATES, Integer> stateColorsMap;
+    private STATES state;
     private RectF canvasRect;
     private Paint paint;
     private int cornerRadius;
@@ -33,12 +45,11 @@ public final class StateView extends View {
     }
 
     public void init() {
-        state = false;
-        colorOn = Color.parseColor(COLOR_PREFIX + COLOR_ON_DEFAULT);
-        colorOff = Color.parseColor(COLOR_PREFIX + COLOR_OFF_DEFAULT);
+        state = STATES.OFF;
         paint = new Paint();
         paint.setAntiAlias(true);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+        setupStateColorsMap();
     }
 
     @Override
@@ -53,38 +64,32 @@ public final class StateView extends View {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         paint = null;
+        stateColorsMap.clear();
+        stateColorsMap = null;
     }
 
-    public void setStateOn() {
-        state = true;
-        invalidate();
+    public void setState(STATES state) {
+        this.state = state;
     }
 
-    public void setStateOff() {
-        state = false;
-        invalidate();
-    }
-
-    public void setColorON(String color) {
-        colorOn = Color.parseColor(COLOR_PREFIX + color);
-    }
-
-    public void setColorOFF(String color) {
-        colorOff = Color.parseColor(COLOR_PREFIX + color);
+    public void setStateColor(STATES state, String color) {
+        stateColorsMap.put(state, Color.parseColor(COLOR_PREFIX + color));
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        if (state) {
-            color = colorOn;
-        } else {
-            color = colorOff;
-        }
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
-        paint.setColor(color);
+        paint.setColor(stateColorsMap.get(state));
         canvas.drawRoundRect(canvasRect, cornerRadius, cornerRadius, paint);
+    }
+
+    private void setupStateColorsMap() {
+        stateColorsMap = new EnumMap<STATES, Integer>(STATES.class);
+        for (STATES stateValue : STATES.values()) {
+            stateColorsMap.put(stateValue, Color.parseColor(COLOR_PREFIX + stateValue.DEFAULT_COLOR()));
+        }
     }
 
 }

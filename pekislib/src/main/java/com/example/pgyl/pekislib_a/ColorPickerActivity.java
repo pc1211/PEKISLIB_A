@@ -1,6 +1,5 @@
 package com.example.pgyl.pekislib_a;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -26,8 +25,8 @@ import static com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITIES;
 import static com.example.pgyl.pekislib_a.Constants.SHP_FILE_NAME_SUFFIX;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_TITLE;
-import static com.example.pgyl.pekislib_a.PresetsActivity.PRESETS_ACTIVITY_IS_COLOR_TYPE;
 import static com.example.pgyl.pekislib_a.PresetsActivity.PRESETS_ACTIVITY_EXTRA_KEYS;
+import static com.example.pgyl.pekislib_a.PresetsActivity.PRESETS_ACTIVITY_IS_COLOR_TYPE;
 import static com.example.pgyl.pekislib_a.StringShelfDatabase.TABLE_DATA_INDEX;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.ACTIVITY_START_STATUS;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.TABLE_EXTRA_KEYS;
@@ -103,8 +102,7 @@ public class ColorPickerActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
-        ActionBar actionBar = getActionBar();
-        actionBar.setTitle(getIntent().getStringExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString()));
+        getActionBar().setTitle(getIntent().getStringExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString()));
         setupOrientationLayout();
         setupButtons();
         setupColorWheelView();
@@ -147,15 +145,13 @@ public class ColorPickerActivity extends Activity {
                 if (returnsFromPresetsActivity()) {
                     colors = getCurrentPresetInPresetsActivity(stringShelfDatabase, tableName);
                 }
-                if (returnsFromHelpActivity()) {
-                    //  NOP
-                }
             }
         }
+
         setupColorWheelViewColors();
         setupColorWheelViewRobot();
-        updateButtonTexts();
-        updateSeekBars();
+        updateDisplayButtonTexts();
+        updateDisplaySeekBars();
         colorWheelView.invalidate();
     }
 
@@ -173,10 +169,6 @@ public class ColorPickerActivity extends Activity {
             if (resultCode == RESULT_OK) {
                 validReturnFromCalledActivity = true;
             }
-        }
-        if (requestCode == PEKISLIB_ACTIVITIES.HELP.ordinal()) {
-            calledActivity = PEKISLIB_ACTIVITIES.HELP.toString();
-            validReturnFromCalledActivity = true;
         }
     }
 
@@ -240,8 +232,8 @@ public class ColorPickerActivity extends Activity {
 
     private void onWheelColorIndexChange(int newColorIndex) {      //  La rotation de la roue fait passer à une autre couleur
         colorIndex = newColorIndex + 1;                            //  colors stocke le 1er élément (ID)
-        updateButtonTexts();
-        updateSeekBars();
+        updateDisplayButtonTexts();
+        updateDisplaySeekBars();
     }
 
     private void onSeekBarProgressChanged(boolean fromUser) {
@@ -257,7 +249,7 @@ public class ColorPickerActivity extends Activity {
         }
     }
 
-    private void updateButtonTexts() {
+    private void updateDisplayButtonTexts() {
         final String SYMBOL_NEXT = " >";               //  Pour signifier qu'on peut passer au suivant en poussant sur le bouton
 
         int index = COMMANDS.NEXT.ordinal();
@@ -266,7 +258,7 @@ public class ColorPickerActivity extends Activity {
         buttons[index].setText(colors[colorIndex]);
     }
 
-    private void updateSeekBars() {
+    private void updateDisplaySeekBars() {
         for (PRIMARY_COLORS primaryColor : PRIMARY_COLORS.values()) {
             int index = primaryColor.INDEX();
             seekbars[index].setProgress(Integer.parseInt(colors[colorIndex].substring(2 * index, 2 * (index + 1)), 16));
@@ -291,11 +283,6 @@ public class ColorPickerActivity extends Activity {
         } else {
             setContentView(R.layout.colorpicker_l);
         }
-    }
-
-    private void setupColorWheelViewColors() {
-        colorWheelView.setColors(Arrays.copyOfRange(colors, TABLE_DATA_INDEX, colors.length));   //  colorWheelView ne stocke pas le 1er élément (ID)
-        colorWheelView.setColorIndex(colorIndex - 1);
     }
 
     private void setupButtons() {
@@ -325,6 +312,17 @@ public class ColorPickerActivity extends Activity {
                 Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+    }
+
+    private void setupColorWheelView() {
+        colorWheelView = findViewById(R.id.COLORS_VIEW);
+        colorWheelView.setOnColorIndexChangeListener(new ColorWheelView.onColorIndexChangeListener() {
+            @Override
+            public void onColorIndexChange(int colorIndex) {
+                onWheelColorIndexChange(colorIndex);
+            }
+        });
+        colorWheelView.enableMarker();
     }
 
     private void setupSeekbars() {
@@ -369,31 +367,18 @@ public class ColorPickerActivity extends Activity {
         }
     }
 
-    private void setupColorWheelView() {
-        colorWheelView = findViewById(R.id.COLORS_VIEW);
-        colorWheelView.setOnColorIndexChangeListener(new ColorWheelView.onColorIndexChangeListener() {
-            @Override
-            public void onColorIndexChange(int colorIndex) {
-                onWheelColorIndexChange(colorIndex);
-            }
-        });
-        colorWheelView.enableMarker();
-    }
-
-    private void setupColorWheelViewRobot() {
-        colorWheelViewRobot = new ColorWheelViewRobot(colorWheelView);
-    }
-
     private void setupStringShelfDatabase() {
         stringShelfDatabase = new StringShelfDatabase(this);
         stringShelfDatabase.open();
     }
 
-    private void launchHelpActivity() {
-        Intent callingIntent = new Intent(this, HelpActivity.class);
-        callingIntent.putExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString(), HELP_ACTIVITY_TITLE);
-        callingIntent.putExtra(HELP_ACTIVITY_EXTRA_KEYS.HTML_ID.toString(), R.raw.helpcolorpickeractivity);
-        startActivityForResult(callingIntent, PEKISLIB_ACTIVITIES.HELP.ordinal());
+    private void setupColorWheelViewColors() {
+        colorWheelView.setColors(Arrays.copyOfRange(colors, TABLE_DATA_INDEX, colors.length));   //  colorWheelView ne stocke pas le 1er élément (ID)
+        colorWheelView.setColorIndex(colorIndex - 1);
+    }
+
+    private void setupColorWheelViewRobot() {
+        colorWheelViewRobot = new ColorWheelViewRobot(colorWheelView);
     }
 
     private void launchInputButtonsActivity() {
@@ -417,16 +402,19 @@ public class ColorPickerActivity extends Activity {
         startActivityForResult(callingIntent, PEKISLIB_ACTIVITIES.PRESETS.ordinal());
     }
 
+    private void launchHelpActivity() {
+        Intent callingIntent = new Intent(this, HelpActivity.class);
+        callingIntent.putExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString(), HELP_ACTIVITY_TITLE);
+        callingIntent.putExtra(HELP_ACTIVITY_EXTRA_KEYS.HTML_ID.toString(), R.raw.helpcolorpickeractivity);
+        startActivity(callingIntent);
+    }
+
     private boolean returnsFromInputButtonsActivity() {
         return (calledActivity.equals(PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString()));
     }
 
     private boolean returnsFromPresetsActivity() {
         return (calledActivity.equals(PEKISLIB_ACTIVITIES.PRESETS.toString()));
-    }
-
-    private boolean returnsFromHelpActivity() {
-        return (calledActivity.equals(PEKISLIB_ACTIVITIES.HELP.toString()));
     }
 
 }

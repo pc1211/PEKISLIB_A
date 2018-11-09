@@ -124,6 +124,7 @@ public class PresetsActivity extends Activity {
 
         setupStringShelfDatabase();
         setupPresetsHandler();
+        setupButtonColors();
         preset = getCurrentPresetInPresetsActivity(stringShelfDatabase, tableName);
         labelNames = getLabels(stringShelfDatabase, tableName);
         keyboards = getKeyboards(stringShelfDatabase, tableName);
@@ -144,13 +145,10 @@ public class PresetsActivity extends Activity {
                         presetsHandler.setPresetColumn(selectIndex, columnIndex, preset[columnIndex]);
                     }
                 }
-                if (returnsFromHelpActivity()) {
-                    //  NOP
-                }
             }
         }
-        setupButtonColors();
-        updateButtonTexts();
+        updateDisplayButtonColors();
+        updateDisplayButtonTexts();
         rebuildPresets();
     }
 
@@ -162,10 +160,6 @@ public class PresetsActivity extends Activity {
             if (resultCode == RESULT_OK) {
                 validReturnFromCalledActivity = true;
             }
-        }
-        if (requestCode == PEKISLIB_ACTIVITIES.HELP.ordinal()) {
-            calledActivity = PEKISLIB_ACTIVITIES.HELP.toString();
-            validReturnFromCalledActivity = true;
         }
     }
 
@@ -218,7 +212,7 @@ public class PresetsActivity extends Activity {
             k = 1;
         }
         columnIndex = k;
-        updateButtonTexts();
+        updateDisplayButtonTexts();
     }
 
     private void onButtonClickCancel() {
@@ -239,7 +233,7 @@ public class PresetsActivity extends Activity {
     private void onButtonClickAdd() {
         presetsHandler.createNewPreset(preset);
         rebuildDisplay();
-        updateColorButton(COMMANDS.FIELD);
+        updateDisplayButtonColor(COMMANDS.FIELD);
     }
 
     private void onButtonClickRemove() {
@@ -260,7 +254,7 @@ public class PresetsActivity extends Activity {
             dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialogInterface) {    // OK pour modifier UI sous-jacente à la boîte de dialogue
-                    updateColorButton(COMMANDS.FIELD);
+                    updateDisplayButtonColor(COMMANDS.FIELD);
                 }
             });
             dialog.show();
@@ -272,7 +266,7 @@ public class PresetsActivity extends Activity {
     private void onButtonClickDeselect() {
         if (selectIndex != SELECT_INDEX_DEFAULT_VALUE) {
             selectIndex = SELECT_INDEX_DEFAULT_VALUE;
-            updateColorButton(COMMANDS.FIELD);
+            updateDisplayButtonColor(COMMANDS.FIELD);
         } else {
             Toast.makeText(this, "A preset must be selected in the list", Toast.LENGTH_LONG).show();
         }
@@ -284,7 +278,7 @@ public class PresetsActivity extends Activity {
             presetsHandler.setPresetColumn(selectIndex, columnIndex, preset[columnIndex]);
             rebuildPresets();
         }
-        updateButtonTexts();
+        updateDisplayButtonTexts();
     }
 
     private void onPresetClick(int pos) {
@@ -292,12 +286,12 @@ public class PresetsActivity extends Activity {
             preset = presetsHandler.getPreset(pos);
             selectIndex = pos;
             columnIndex = COLUMN_INDEX_DEFAULT_VALUE;
-            updateButtonTexts();
-            updateColorButton(COMMANDS.FIELD);
+            updateDisplayButtonTexts();
+            updateDisplayButtonColor(COMMANDS.FIELD);
         }
     }
 
-    private void updateButtonTexts() {
+    private void updateDisplayButtonTexts() {
         final String SYMBOL_NEXT = " >";   //  Pour signifier qu'on peut passer au champ suivant en poussant sur le bouton
 
         String fieldText = preset[columnIndex];
@@ -310,7 +304,7 @@ public class PresetsActivity extends Activity {
         buttons[index].setText(labelNames[columnIndex] + SYMBOL_NEXT);
     }
 
-    private void updateColorButton(COMMANDS command) {
+    private void updateDisplayButtonColor(COMMANDS command) {
         final String SPECIAL_FIELD_UNPRESSED_COLOR = "FF9A22";
         final String SPECIAL_FIELD_PRESSED_COLOR = "995400";
 
@@ -327,11 +321,17 @@ public class PresetsActivity extends Activity {
         buttons[index].updateColor();
     }
 
+    private void updateDisplayButtonColors() {
+        for (COMMANDS command : COMMANDS.values()) {
+            updateDisplayButtonColor(command);
+        }
+    }
+
     private void rebuildDisplay() {
         selectIndex = SELECT_INDEX_DEFAULT_VALUE;
         columnIndex = COLUMN_INDEX_DEFAULT_VALUE;
         rebuildPresets();
-        updateButtonTexts();
+        updateDisplayButtonTexts();
     }
 
     private void rebuildPresets() {
@@ -381,24 +381,6 @@ public class PresetsActivity extends Activity {
         }
     }
 
-    private void setupButtonColors() {
-        final String OK_UNPRESSED_COLOR_DEFAULT = "668CFF";
-        final String OK_PRESSED_COLOR_DEFAULT = "0040FF";
-
-        for (COMMANDS command : COMMANDS.values()) {
-            String unpressedColor = BUTTON_STATES.UNPRESSED.DEFAULT_COLOR();
-            String pressedColor = BUTTON_STATES.PRESSED.DEFAULT_COLOR();
-            if (command.equals(COMMANDS.OK)) {
-                unpressedColor = OK_UNPRESSED_COLOR_DEFAULT;
-                pressedColor = OK_PRESSED_COLOR_DEFAULT;
-            }
-            int index = command.ordinal();
-            buttons[index].setUnpressedColor(unpressedColor);
-            buttons[index].setPressedColor(pressedColor);
-            updateColorButton(command);
-        }
-    }
-
     private void setupButtons() {
         final String BUTTON_XML_PREFIX = "BTN_";
 
@@ -438,22 +420,32 @@ public class PresetsActivity extends Activity {
         });
     }
 
+    private void setupStringShelfDatabase() {
+        stringShelfDatabase = new StringShelfDatabase(this);
+        stringShelfDatabase.open();
+    }
+
     private void setupPresetsHandler() {
         presetsHandler = new PresetsHandler(stringShelfDatabase);
         presetsHandler.setSeparator(getIntent().getStringExtra(PRESETS_ACTIVITY_EXTRA_KEYS.SEPARATOR.toString()));
         presetsHandler.setTableName(tableName);
     }
 
-    private void setupStringShelfDatabase() {
-        stringShelfDatabase = new StringShelfDatabase(this);
-        stringShelfDatabase.open();
-    }
+    private void setupButtonColors() {
+        final String OK_UNPRESSED_COLOR_DEFAULT = "668CFF";
+        final String OK_PRESSED_COLOR_DEFAULT = "0040FF";
 
-    private void launchHelpActivity() {
-        Intent callingIntent = new Intent(this, HelpActivity.class);
-        callingIntent.putExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString(), HELP_ACTIVITY_TITLE);
-        callingIntent.putExtra(HELP_ACTIVITY_EXTRA_KEYS.HTML_ID.toString(), R.raw.helppresetsactivity);
-        startActivityForResult(callingIntent, PEKISLIB_ACTIVITIES.HELP.ordinal());
+        for (COMMANDS command : COMMANDS.values()) {
+            String unpressedColor = BUTTON_STATES.UNPRESSED.DEFAULT_COLOR();
+            String pressedColor = BUTTON_STATES.PRESSED.DEFAULT_COLOR();
+            if (command.equals(COMMANDS.OK)) {
+                unpressedColor = OK_UNPRESSED_COLOR_DEFAULT;
+                pressedColor = OK_PRESSED_COLOR_DEFAULT;
+            }
+            int index = command.ordinal();
+            buttons[index].setUnpressedColor(unpressedColor);
+            buttons[index].setPressedColor(pressedColor);
+        }
     }
 
     private void launchInputButtonsActivity() {
@@ -465,12 +457,15 @@ public class PresetsActivity extends Activity {
         startActivityForResult(callingIntent, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.ordinal());
     }
 
-    private boolean returnsFromInputButtonsActivity() {
-        return (calledActivity.equals(PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString()));
+    private void launchHelpActivity() {
+        Intent callingIntent = new Intent(this, HelpActivity.class);
+        callingIntent.putExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString(), HELP_ACTIVITY_TITLE);
+        callingIntent.putExtra(HELP_ACTIVITY_EXTRA_KEYS.HTML_ID.toString(), R.raw.helppresetsactivity);
+        startActivity(callingIntent);
     }
 
-    private boolean returnsFromHelpActivity() {
-        return (calledActivity.equals(PEKISLIB_ACTIVITIES.HELP.toString()));
+    private boolean returnsFromInputButtonsActivity() {
+        return (calledActivity.equals(PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString()));
     }
 
 }

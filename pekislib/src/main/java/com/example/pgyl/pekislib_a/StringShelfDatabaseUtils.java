@@ -6,8 +6,6 @@ public class StringShelfDatabaseUtils {
 
     private enum PEKISLIB_TABLES {ACTIVITY_INFOS}
 
-    private enum TABLE_IDS {CURRENT, DEFAULT, LABEL, KEYBOARD, REGEXP, MIN, MAX, TIMEUNIT}
-
     private enum TABLE_ACTIVITY_INFOS_DATA_FIELDS {
         START_STATUS(1);
 
@@ -21,6 +19,8 @@ public class StringShelfDatabaseUtils {
             return valueIndex;
         }
     }
+
+    public enum TABLE_IDS {CURRENT, DEFAULT, LABEL, KEYBOARD, REGEXP, MIN, MAX, TIMEUNIT}
 
     public enum ACTIVITY_START_STATUS {COLD, HOT}
 
@@ -79,34 +79,6 @@ public class StringShelfDatabaseUtils {
 
     public static void setDefaults(StringShelfDatabase stringShelfDatabase, String tableName, String[] values) {
         stringShelfDatabase.insertOrReplaceRowById(tableName, TABLE_IDS.DEFAULT.toString(), values);
-    }
-
-    public static String getLabelIdName() {
-        return TABLE_IDS.LABEL.toString();
-    }
-
-    public static String getKeyboardIdName() {
-        return TABLE_IDS.KEYBOARD.toString();
-    }
-
-    public static String getRegexpIdName() {
-        return TABLE_IDS.REGEXP.toString();
-    }
-
-    public static String getMaxIdName() {
-        return TABLE_IDS.MAX.toString();
-    }
-
-    public static String getTimeUnitIdName() {
-        return TABLE_IDS.TIMEUNIT.toString();
-    }
-
-    public static String getDefaultIdName() {
-        return TABLE_IDS.DEFAULT.toString();
-    }
-
-    public static String getCurrentIdName() {
-        return TABLE_IDS.CURRENT.toString();
     }
 
     public static int getActivityInfosStartStatusIndex() {

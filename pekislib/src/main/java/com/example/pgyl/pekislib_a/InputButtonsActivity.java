@@ -27,7 +27,6 @@ import static android.view.View.VISIBLE;
 import static com.example.pgyl.pekislib_a.Constants.ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.Constants.ERROR_VALUE;
 import static com.example.pgyl.pekislib_a.Constants.NOT_FOUND;
-import static com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITIES;
 import static com.example.pgyl.pekislib_a.Constants.SHP_FILE_NAME_SUFFIX;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_TITLE;
@@ -78,8 +77,6 @@ public class InputButtonsActivity extends Activity {
             return valueLandscapeButtonTexts;
         }
     }
-
-    public enum ORIENTATIONS {PORTRAIT, LANDSCAPE}
 
     private enum COMMANDS {
         CANCEL("Cancel"), OK("OK");
@@ -148,8 +145,6 @@ public class InputButtonsActivity extends Activity {
     private Button[] keyboardButtons;
     private Button[] buttons;
     private TextView lbldisplay;
-    private boolean validReturnFromCalledActivity;
-    private String calledActivity;
     private StringShelfDatabase stringShelfDatabase;
     private String shpFileName;
     //endregion
@@ -164,7 +159,6 @@ public class InputButtonsActivity extends Activity {
         setupOrientationLayout();
         setupButtons();
         setupKeyboardButtons();
-        validReturnFromCalledActivity = false;
     }
 
     @Override
@@ -194,7 +188,7 @@ public class InputButtonsActivity extends Activity {
         if ((keyboard.equals(KEYBOARDS.TIME_HMS)) || (keyboard.equals(KEYBOARDS.TIME_XHMS))) {
             timeUnit = TIMEUNITS.valueOf(getTimeUnit(stringShelfDatabase, tableName, columnIndex));
         }
-        buttonTexts = getButtonTexts(keyboard, getOrientation());
+        buttonTexts = getButtonTexts(keyboard, getResources().getConfiguration());
         pages = ((buttonTexts.length - 1) / BUTTONS_PER_PAGE) + 1;
         pageButtonTexts = getPageButtonTexts(buttonTexts, BUTTONS_PER_PAGE, pages);
 
@@ -213,25 +207,10 @@ public class InputButtonsActivity extends Activity {
             pageIndex = getSHPcurrentPageIndex();
             caze = getSHPcurrentCase();
             append = getSHPappend();
-            if (validReturnFromCalledActivity) {
-                validReturnFromCalledActivity = false;
-                if (returnsFromHelpActivity()) {
-                    //  NOP
-                }
-            }
         }
         lbldisplay.setText(editString);
-        setButtonTexts();
+        updateDisplayButtonTexts();
         setupTextSizes();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent returnIntent) {
-        validReturnFromCalledActivity = false;
-        if (requestCode == PEKISLIB_ACTIVITIES.HELP.ordinal()) {
-            calledActivity = PEKISLIB_ACTIVITIES.HELP.toString();
-            validReturnFromCalledActivity = true;
-        }
     }
 
     @Override
@@ -317,7 +296,7 @@ public class InputButtonsActivity extends Activity {
             if (buttonText.equals(SPECIAL_BUTTONS.NEXTP.toString())) {
                 pageIndex = (pageIndex + 1) % pages;
             }
-            setButtonTexts();
+            updateDisplayButtonTexts();
         } else {
             String curString = editString;
             if (buttonText.equals(SPECIAL_BUTTONS.BACK.toString())) {
@@ -342,7 +321,7 @@ public class InputButtonsActivity extends Activity {
         }
     }
 
-    private void setButtonTexts() {
+    private void updateDisplayButtonTexts() {
         int lastPageMaxIndex = ((buttonTexts.length - 1) % BUTTONS_PER_PAGE);
         for (int i = 0; i <= (BUTTONS_PER_PAGE - 1); i = i + 1) { // Affectation des textes, styles
             if ((pageIndex < (pages - 1)) || ((pageIndex == (pages - 1)) && (i <= lastPageMaxIndex))) {  // Dernière page éventuellement incomplète
@@ -377,6 +356,20 @@ public class InputButtonsActivity extends Activity {
                 keyboardButtons[i].setVisibility(INVISIBLE);
             }
         }
+    }
+
+    public void updateDisplayResizeLbldisplayText() {
+        final double DISPLAY_RELATIVE_TEXT_SIZE = 0.5;  // Ratio souhaité entre textSize de lbldisplay et sa hauteur
+
+        float ts = (float) (DISPLAY_RELATIVE_TEXT_SIZE * lbldisplay.getHeight());
+        lbldisplay.setTextSize(TypedValue.COMPLEX_UNIT_PX, ts);
+    }
+
+    public void updateDisplayResizeButtonText(Button button) {
+        final double BUTTON_RELATIVE_TEXT_SIZE = 0.4;   //  Ratio souhaité entre textSize d'un bouton et sa hauteur
+
+        float ts = (float) (BUTTON_RELATIVE_TEXT_SIZE * button.getHeight());
+        button.setTextSize(TypedValue.COMPLEX_UNIT_PX, ts);
     }
 
     private String currentCase(String str) {  //  Transforme la chaîne selon la casse courante
@@ -569,22 +562,10 @@ public class InputButtonsActivity extends Activity {
         return ret;
     }
 
-    private ORIENTATIONS getOrientation() {
-        ORIENTATIONS ret;
-
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            ret = ORIENTATIONS.PORTRAIT;
-        } else {
-            ret = ORIENTATIONS.LANDSCAPE;
-        }
-        return ret;
-    }
-
-
-    private String[] getButtonTexts(KEYBOARDS keyboard, ORIENTATIONS orientation) {
+    private String[] getButtonTexts(KEYBOARDS keyboard, Configuration configuration) {
         String[] ret;
 
-        if (orientation.equals(ORIENTATIONS.PORTRAIT)) {
+        if (getResources().getConfiguration().equals(Configuration.ORIENTATION_PORTRAIT)) {
             ret = keyboard.PORTRAIT_BUTTON_TEXTS();
         } else {
             ret = keyboard.LANDSCAPE_BUTTON_TEXTS();
@@ -617,7 +598,7 @@ public class InputButtonsActivity extends Activity {
     }
 
     private void setupOrientationLayout() {
-        if (getOrientation().equals(ORIENTATIONS.PORTRAIT)) {
+        if (getResources().getConfiguration().equals(Configuration.ORIENTATION_PORTRAIT)) {
             setContentView(R.layout.inputbuttons_p);
         } else {
             setContentView(R.layout.inputbuttons_l);
@@ -690,7 +671,7 @@ public class InputButtonsActivity extends Activity {
         lbldisplay.post(new Runnable() {   // UI Dimensions sont alors seulement connues
             @Override
             public void run() {
-                resizeLbldisplayText();
+                updateDisplayResizeLbldisplayText();
             }
         });
         for (int i = 0; i <= (BUTTONS_PER_PAGE - 1); i = i + 1) {
@@ -698,35 +679,17 @@ public class InputButtonsActivity extends Activity {
             keyboardButtons[q].post(new Runnable() {
                 @Override
                 public void run() {
-                    resizeButtonText(keyboardButtons[q]);
+                    updateDisplayResizeButtonText(keyboardButtons[q]);
                 }
             });
         }
-    }
-
-    public void resizeLbldisplayText() {
-        final double DISPLAY_RELATIVE_TEXT_SIZE = 0.5;  // Ratio souhaité entre textSize de lbldisplay et sa hauteur
-
-        float ts = (float) (DISPLAY_RELATIVE_TEXT_SIZE * lbldisplay.getHeight());
-        lbldisplay.setTextSize(TypedValue.COMPLEX_UNIT_PX, ts);
-    }
-
-    public void resizeButtonText(Button button) {
-        final double BUTTON_RELATIVE_TEXT_SIZE = 0.4;   //  Ratio souhaité entre textSize d'un bouton et sa hauteur
-
-        float ts = (float) (BUTTON_RELATIVE_TEXT_SIZE * button.getHeight());
-        button.setTextSize(TypedValue.COMPLEX_UNIT_PX, ts);
     }
 
     private void launchHelpActivity() {
         Intent callingIntent = new Intent(this, HelpActivity.class);
         callingIntent.putExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString(), HELP_ACTIVITY_TITLE);
         callingIntent.putExtra(HELP_ACTIVITY_EXTRA_KEYS.HTML_ID.toString(), R.raw.helpinputbuttonsactivity);
-        startActivityForResult(callingIntent, PEKISLIB_ACTIVITIES.HELP.ordinal());
-    }
-
-    private boolean returnsFromHelpActivity() {
-        return (calledActivity.equals(PEKISLIB_ACTIVITIES.HELP.toString()));
+        startActivity(callingIntent);
     }
 
 }
