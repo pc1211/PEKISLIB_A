@@ -188,7 +188,7 @@ public class InputButtonsActivity extends Activity {
         if ((keyboard.equals(KEYBOARDS.TIME_HMS)) || (keyboard.equals(KEYBOARDS.TIME_XHMS))) {
             timeUnit = TIMEUNITS.valueOf(getTimeUnit(stringShelfDatabase, tableName, columnIndex));
         }
-        buttonTexts = getButtonTexts(keyboard, getResources().getConfiguration());
+        buttonTexts = getButtonTexts(keyboard);
         pages = ((buttonTexts.length - 1) / BUTTONS_PER_PAGE) + 1;
         pageButtonTexts = getPageButtonTexts(buttonTexts, BUTTONS_PER_PAGE, pages);
 
@@ -562,15 +562,8 @@ public class InputButtonsActivity extends Activity {
         return ret;
     }
 
-    private String[] getButtonTexts(KEYBOARDS keyboard, Configuration configuration) {
-        String[] ret;
-
-        if (getResources().getConfiguration().equals(Configuration.ORIENTATION_PORTRAIT)) {
-            ret = keyboard.PORTRAIT_BUTTON_TEXTS();
-        } else {
-            ret = keyboard.LANDSCAPE_BUTTON_TEXTS();
-        }
-        return ret;
+    private String[] getButtonTexts(KEYBOARDS keyboard) {
+        return ((getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) ? keyboard.PORTRAIT_BUTTON_TEXTS() : keyboard.LANDSCAPE_BUTTON_TEXTS());
     }
 
     private int getSHPcurrentPageIndex() {
@@ -598,7 +591,7 @@ public class InputButtonsActivity extends Activity {
     }
 
     private void setupOrientationLayout() {
-        if (getResources().getConfiguration().equals(Configuration.ORIENTATION_PORTRAIT)) {
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             setContentView(R.layout.inputbuttons_p);
         } else {
             setContentView(R.layout.inputbuttons_l);
