@@ -43,29 +43,17 @@ public final class CustomButton extends Button {
     }
 
     public void setUnpressedColor(String color) {
-        if (color != null) {
-            unpressedColor = Color.parseColor(COLOR_PREFIX + color);
-        } else {
-            unpressedColor = UNDEFINED;
-        }
+        unpressedColor = ((color != null) ? Color.parseColor(COLOR_PREFIX + color) : UNDEFINED);
     }
 
     public void setPressedColor(String color) {
-        if (color != null) {
-            pressedColor = Color.parseColor(COLOR_PREFIX + color);
-        } else {
-            pressedColor = UNDEFINED;
-        }
+        pressedColor = ((color != null) ? Color.parseColor(COLOR_PREFIX + color) : UNDEFINED);
     }
 
     public void updateColor() {
         int color;
 
-        if (buttonState.equals(BUTTON_STATES.UNPRESSED)) {
-            color = unpressedColor;
-        } else {
-            color = pressedColor;
-        }
+        color = ((buttonState.equals(BUTTON_STATES.UNPRESSED)) ? unpressedColor : pressedColor);
         if (color != UNDEFINED) {
             drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
         } else {

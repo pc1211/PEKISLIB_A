@@ -12,7 +12,7 @@ import android.widget.ImageButton;
 
 import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
-import static com.example.pgyl.pekislib_a.Constants.NOT_FOUND;
+import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
 
 public final class CustomImageButton extends ImageButton {
     //region Variables
@@ -31,8 +31,8 @@ public final class CustomImageButton extends ImageButton {
 
     public void init() {
         drawable = getBackground().getConstantState().newDrawable().mutate();
-        unpressedColor = NOT_FOUND;
-        pressedColor = NOT_FOUND;
+        unpressedColor = UNDEFINED;
+        pressedColor = UNDEFINED;
         buttonState = BUTTON_STATES.UNPRESSED;
         setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -43,30 +43,18 @@ public final class CustomImageButton extends ImageButton {
     }
 
     public void setUnpressedColor(String color) {
-        if (color != null) {
-            unpressedColor = Color.parseColor(COLOR_PREFIX + color);
-        } else {
-            unpressedColor = NOT_FOUND;
-        }
+        unpressedColor = ((color != null) ? Color.parseColor(COLOR_PREFIX + color) : UNDEFINED);
     }
 
     public void setPressedColor(String color) {
-        if (color != null) {
-            pressedColor = Color.parseColor(COLOR_PREFIX + color);
-        } else {
-            pressedColor = NOT_FOUND;
-        }
+        pressedColor = ((color != null) ? Color.parseColor(COLOR_PREFIX + color) : UNDEFINED);
     }
 
     public void updateColor() {
         int color;
 
-        if (buttonState.equals(BUTTON_STATES.UNPRESSED)) {
-            color = unpressedColor;
-        } else {
-            color = pressedColor;
-        }
-        if (color != NOT_FOUND) {
+        color = ((buttonState.equals(BUTTON_STATES.UNPRESSED)) ? unpressedColor : pressedColor);
+        if (color != UNDEFINED) {
             drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
         } else {
             drawable.clearColorFilter();
