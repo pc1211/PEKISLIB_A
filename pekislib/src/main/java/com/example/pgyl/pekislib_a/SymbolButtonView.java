@@ -163,22 +163,14 @@ public final class SymbolButtonView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        int fi;
-        int bi;
-
         super.onDraw(canvas);
 
-        if (buttonState.equals(BUTTON_STATES.PRESSED)) {
-            fi = backColorIndex;
-            bi = alternateColorIndex;
-        } else {
-            fi = frontColorIndex;
-            bi = backColorIndex;
-        }
+        int frontStateColorIndex = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? backColorIndex : frontColorIndex);
+        int backStateColorIndex = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? alternateColorIndex : backColorIndex);
         viewCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
         viewCanvas.drawBitmap(symbolBitmap, 0, 0, null);
-        viewCanvas.drawColor(Color.parseColor(COLOR_PREFIX + colors[fi]), PorterDuff.Mode.SRC_IN);
-        backPaint.setColor(Color.parseColor(COLOR_PREFIX + colors[bi]));
+        viewCanvas.drawColor(Color.parseColor(COLOR_PREFIX + colors[frontStateColorIndex]), PorterDuff.Mode.SRC_IN);
+        backPaint.setColor(Color.parseColor(COLOR_PREFIX + colors[backStateColorIndex]));
         viewCanvas.drawRoundRect(symbolCellCanvasRect, backCornerRadius, backCornerRadius, backPaint);
         canvas.drawBitmap(viewBitmap, 0, 0, null);
     }

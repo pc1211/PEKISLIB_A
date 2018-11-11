@@ -3,20 +3,29 @@ package com.example.pgyl.pekislib_a;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.widget.Toast;
 
 import java.util.Locale;
 
 public class MiscUtils {
 
-    public static void msgBox(String msg, Context context) {        //  Ex:  msgBox("ERROR: Invalid number",this)
+    public static void msgBox(String string, Context context) {        //  Ex:  msgBox("ERROR: Invalid number", this)
         AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
-        dlgAlert.setMessage(msg);
+        dlgAlert.setMessage(string);
         dlgAlert.setTitle("Info");
         dlgAlert.setPositiveButton("OK", null);
         dlgAlert.setCancelable(true);
         dlgAlert.create().show();
         //dlgAlert.setPositiveButton("OK",new DialogInterface.OnClickListener()
         //    {public void onClick(DialogInterface dialog, int which) {}});
+    }
+
+    public static void toastLong(String string, Context context) {    //  Ex: toastLong("Info", this)
+        Toast.makeText(context, string, Toast.LENGTH_LONG).show();
+    }
+
+    public static void toastShort(String string, Context context) {
+        Toast.makeText(context, string, Toast.LENGTH_SHORT).show();
     }
 
     public static void beep(Context context) {   //  Ex: beep(this)

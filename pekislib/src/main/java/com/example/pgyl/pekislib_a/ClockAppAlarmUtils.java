@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import java.util.Calendar;
 
+import static com.example.pgyl.pekislib_a.MiscUtils.toastLong;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.TIME_HMS_SEPARATOR;
 
 public class ClockAppAlarmUtils {
@@ -29,13 +30,13 @@ public class ClockAppAlarmUtils {
             intent.putExtra(AlarmClock.EXTRA_SKIP_UI, true);    //  Ne pas afficher Clock App
             if (intent.resolveActivity(context.getPackageManager()) != null) {
                 ret = true;
-                Toast.makeText(context, errorMsg, Toast.LENGTH_LONG).show();
+                toastLong(errorMsg, context);
                 context.startActivity(intent);
             }
         }
         if (!ret) {
             errorMsg = "Error " + errorMsg;
-            Toast.makeText(context, errorMsg, Toast.LENGTH_LONG).show();
+            toastLong(errorMsg, context);
         }
         return ret;
     }

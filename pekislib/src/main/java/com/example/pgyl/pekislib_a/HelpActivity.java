@@ -6,7 +6,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 import android.webkit.WebView;
-import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,6 +13,7 @@ import java.io.InputStream;
 
 import static com.example.pgyl.pekislib_a.Constants.ERROR_VALUE;
 import static com.example.pgyl.pekislib_a.MiscUtils.msgBox;
+import static com.example.pgyl.pekislib_a.MiscUtils.toastLong;
 
 public class HelpActivity extends Activity {
     //region Constantes
@@ -59,7 +59,7 @@ public class HelpActivity extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.HELP) {
-            Toast.makeText(this, "No help on Help !", Toast.LENGTH_SHORT).show();
+            toastLong("No help on Help !", this);
             return true;
         }
         return super.onOptionsItemSelected(item);

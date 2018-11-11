@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,6 +26,7 @@ import static com.example.pgyl.pekislib_a.Constants.SHP_FILE_NAME_SUFFIX;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_TITLE;
 import static com.example.pgyl.pekislib_a.InputButtonsActivity.KEYBOARDS;
+import static com.example.pgyl.pekislib_a.MiscUtils.toastLong;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.ACTIVITY_START_STATUS;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.TABLE_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentPresetInPresetsActivity;
@@ -259,7 +259,7 @@ public class PresetsActivity extends Activity {
             });
             dialog.show();
         } else {
-            Toast.makeText(this, "A preset must be selected in the list", Toast.LENGTH_LONG).show();
+            toastLong("A preset must be selected in the list", this);
         }
     }
 
@@ -268,7 +268,7 @@ public class PresetsActivity extends Activity {
             selectIndex = SELECT_INDEX_DEFAULT_VALUE;
             updateDisplayButtonColor(COMMANDS.FIELD);
         } else {
-            Toast.makeText(this, "A preset must be selected in the list", Toast.LENGTH_LONG).show();
+            toastLong("A preset must be selected in the list", this);
         }
     }
 

@@ -329,37 +329,23 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
 
     @Override
     protected void onDraw(Canvas canvas) {
-        int fi;
-        int bi;
-        int ai;
-        int colorIndex;
-
         super.onDraw(canvas);
 
         drawing = true;
-        if (buttonState.equals(BUTTON_STATES.PRESSED)) {
-            fi = backColorIndex;
-            bi = frontColorIndex;
-            ai = frontColorIndex;
-        } else {
-            fi = frontColorIndex;
-            bi = backColorIndex;
-            ai = alternateColorIndex;
-        }
+
+        int frontStateColorIndex = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? backColorIndex : frontColorIndex);
+        int backStateColorIndex = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? frontColorIndex : backColorIndex);
+        int alternateStateColorIndex = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? frontColorIndex : alternateColorIndex);
         viewCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
         for (int i = 0; i <= (gridHeight - 1); i = i + 1) {
             for (int j = 0; j <= (gridWidth - 1); j = j + 1) {
-                if (grid[i][j] == 1) {
-                    colorIndex = fi;
-                } else {
-                    colorIndex = bi;
-                }
-                dotPaint.setColor(Color.parseColor(COLOR_PREFIX + colors[colorIndex]));
+                int dotColorIndex = ((grid[i][j] == 1) ? frontStateColorIndex : backStateColorIndex);
+                dotPaint.setColor(Color.parseColor(COLOR_PREFIX + colors[dotColorIndex]));
                 dotPoint.set(gridMargins.left + (float) gridStartX + (float) j * dotCellSize, gridMargins.top + (float) i * dotCellSize);
                 viewCanvas.drawRect(dotPoint.x, dotPoint.y, dotPoint.x + dotSize, dotPoint.y + dotSize, dotPaint);
             }
         }
-        viewCanvasBackPaint.setColor(Color.parseColor(COLOR_PREFIX + colors[ai]));
+        viewCanvasBackPaint.setColor(Color.parseColor(COLOR_PREFIX + colors[alternateStateColorIndex]));
         viewCanvas.drawRoundRect(viewCanvasRect, backCornerRadius, backCornerRadius, viewCanvasBackPaint);
         canvas.drawBitmap(viewBitmap, 0, 0, null);
         drawing = false;
