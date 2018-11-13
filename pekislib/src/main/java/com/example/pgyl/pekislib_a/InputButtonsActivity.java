@@ -47,7 +47,7 @@ import static com.example.pgyl.pekislib_a.TimeDateUtils.convertHmsToMs;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.convertMsToHms;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.convertMsToXhms;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.convertXhmsToMs;
-import static com.example.pgyl.pekislib_a.TimeDateUtils.ddmmyyyy;
+import static com.example.pgyl.pekislib_a.TimeDateUtils.ddMMyyyy;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.formattedStringTimeDate;
 
 public class InputButtonsActivity extends Activity {
@@ -418,7 +418,7 @@ public class InputButtonsActivity extends Activity {
             ret = String.valueOf(convertXhmsToMs(candidate));
         }
         if (keyboard.equals(KEYBOARDS.DATE_JJMMAAAA)) {
-            ret = formattedStringTimeDate(candidate, ddmmyyyy);
+            ret = formattedStringTimeDate(candidate, ddMMyyyy);
         }
         return ret;
     }
@@ -489,11 +489,11 @@ public class InputButtonsActivity extends Activity {
     private String parseDATEJJMMAAAA(String sed, String smin, String smax) {
         String ret = noErrorMessage();
         try {
-            Date d = ddmmyyyy.parse(sed);
-            if (d.compareTo(ddmmyyyy.parse(smin)) < 0) {   //  Date inférieure au minimum
+            Date d = ddMMyyyy.parse(sed);
+            if (d.compareTo(ddMMyyyy.parse(smin)) < 0) {   //  Date inférieure au minimum
                 ret = errorMessageMin(smin);
             }
-            if (d.compareTo(ddmmyyyy.parse(smax)) > 0) {   //  Date supérieure au maximum
+            if (d.compareTo(ddMMyyyy.parse(smax)) > 0) {   //  Date supérieure au maximum
                 ret = errorMessageMax(smax);
             }
         } catch (ParseException ex) {

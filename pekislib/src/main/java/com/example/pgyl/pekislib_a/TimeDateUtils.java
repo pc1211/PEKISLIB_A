@@ -30,9 +30,8 @@ public class TimeDateUtils {
         public long cs;
     }
 
-    public static final SimpleDateFormat ddmmyyyy = new SimpleDateFormat("dd/MM/yyyy");
-    public static final SimpleDateFormat hhmm = new SimpleDateFormat("hh:mm");
-    public static final String[] days = {"??", "Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"};
+    public static final SimpleDateFormat ddMMyyyy = new SimpleDateFormat("dd/MM/yyyy");
+    public static final SimpleDateFormat HHmm = new SimpleDateFormat("HH:mm");
 
     public static long midnightTimeMillis() {
         Calendar calendar = Calendar.getInstance();
@@ -44,6 +43,21 @@ public class TimeDateUtils {
         calendar.clear();
         calendar = null;
         return ret;
+    }
+
+    public static String formattedStringTimeDate(String string, SimpleDateFormat sdf) {
+        String ret = "";
+        try {
+            Date fdate = sdf.parse(string);
+            ret = sdf.format(fdate);
+        } catch (ParseException ex) {
+            //   NOP
+        }
+        return ret;
+    }
+
+    public static String formattedCalendarTimeDate(Calendar calendar, SimpleDateFormat sdf) {
+        return sdf.format(calendar.getTime());
     }
 
     public static String convertMsToHms(long ms, TIMEUNITS timeUnit) {    //   n (en ms) -> HH:MM:SS.CC (format "hmsc")
@@ -222,21 +236,6 @@ public class TimeDateUtils {
             ret.cs = c;
         }
         return ret;
-    }
-
-    public static String formattedStringTimeDate(String string, SimpleDateFormat sdf) {
-        String ret = "";
-        try {
-            Date fdate = sdf.parse(string);
-            ret = sdf.format(fdate);
-        } catch (ParseException ex) {
-            //   NOP
-        }
-        return ret;
-    }
-
-    public static String formattedCalendarTimeDate(Calendar calendar, SimpleDateFormat sdf) {
-        return sdf.format(calendar.getTime());
     }
 
 }

@@ -9,18 +9,18 @@ import java.util.Calendar;
 
 import static com.example.pgyl.pekislib_a.MiscUtils.toastLong;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.formattedCalendarTimeDate;
-import static com.example.pgyl.pekislib_a.TimeDateUtils.hhmm;
+import static com.example.pgyl.pekislib_a.TimeDateUtils.HHmm;
 
 public class ClockAppAlarmUtils {
 
     public static boolean setClockAppAlarm(Context context, long timeExp, String message) {
         boolean ret = false;
         Calendar calendar = Calendar.getInstance();    // Calendar => OK Time Zone
-        String timeNowAsHHMM = formattedCalendarTimeDate(calendar, hhmm);
+        String timeNowAsHHMM = formattedCalendarTimeDate(calendar, HHmm);
         calendar.setTimeInMillis(timeExp);
-        String timeExpAsHHMM = formattedCalendarTimeDate(calendar, hhmm);
-        int hourExp = Calendar.HOUR_OF_DAY;
-        int minExp = Calendar.MINUTE;
+        String timeExpAsHHMM = formattedCalendarTimeDate(calendar, HHmm);
+        int hourExp = calendar.get(Calendar.HOUR_OF_DAY);
+        int minExp = calendar.get(Calendar.MINUTE);
         calendar.clear();
         calendar = null;
         String errorMsg = "Setting Clock App alarm on " + timeExpAsHHMM;
