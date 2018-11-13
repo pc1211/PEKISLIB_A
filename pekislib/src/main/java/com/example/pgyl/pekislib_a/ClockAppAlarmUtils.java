@@ -8,24 +8,26 @@ import android.widget.Toast;
 import java.util.Calendar;
 
 import static com.example.pgyl.pekislib_a.MiscUtils.toastLong;
-import static com.example.pgyl.pekislib_a.TimeDateUtils.TIME_HMS_SEPARATOR;
+import static com.example.pgyl.pekislib_a.TimeDateUtils.formattedCalendarTimeDate;
+import static com.example.pgyl.pekislib_a.TimeDateUtils.hhmm;
 
 public class ClockAppAlarmUtils {
 
     public static boolean setClockAppAlarm(Context context, long timeExp, String message) {
         boolean ret = false;
         Calendar calendar = Calendar.getInstance();    // Calendar => OK Time Zone
-        int nowHour = calendar.get(Calendar.HOUR_OF_DAY);
-        int nowMinutes = calendar.get(Calendar.MINUTE);
+        String timeNowAsHHMM = formattedCalendarTimeDate(calendar, hhmm);
         calendar.setTimeInMillis(timeExp);
-        int expHour = calendar.get(Calendar.HOUR_OF_DAY);
-        int expMinutes = calendar.get(Calendar.MINUTE);
+        String timeExpAsHHMM = formattedCalendarTimeDate(calendar, hhmm);
+        int hourExp = Calendar.HOUR_OF_DAY;
+        int minExp = Calendar.MINUTE;
+        calendar.clear();
         calendar = null;
-        String errorMsg = "Setting Clock App alarm on " + String.format("%02d", expHour) + TIME_HMS_SEPARATOR + String.format("%02d", expMinutes);
-        if ((nowHour != expHour) || (nowMinutes != expMinutes)) {
+        String errorMsg = "Setting Clock App alarm on " + timeExpAsHHMM;
+        if (!timeExpAsHHMM.equals(timeNowAsHHMM)) {
             Intent intent = new Intent(AlarmClock.ACTION_SET_ALARM);
-            intent.putExtra(AlarmClock.EXTRA_HOUR, expHour);
-            intent.putExtra(AlarmClock.EXTRA_MINUTES, expMinutes);
+            intent.putExtra(AlarmClock.EXTRA_HOUR, hourExp);
+            intent.putExtra(AlarmClock.EXTRA_MINUTES, minExp);
             intent.putExtra(AlarmClock.EXTRA_MESSAGE, message);
             intent.putExtra(AlarmClock.EXTRA_SKIP_UI, true);    //  Ne pas afficher Clock App
             if (intent.resolveActivity(context.getPackageManager()) != null) {

@@ -6,10 +6,10 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 
-public class BeeperIntentService extends IntentService {
+public class BeepIntentService extends IntentService {
 
-    public BeeperIntentService() {
-        super(BeeperIntentService.class.getSimpleName());
+    public BeepIntentService() {
+        super(BeepIntentService.class.getSimpleName());
     }
 
     @Override

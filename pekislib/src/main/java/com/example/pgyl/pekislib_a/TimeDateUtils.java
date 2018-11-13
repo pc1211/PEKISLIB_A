@@ -10,22 +10,16 @@ import static com.example.pgyl.pekislib_a.Constants.NOT_FOUND;
 
 public class TimeDateUtils {
     public enum TIMEUNITS {
-        HOURS100(100 * 60 * 60 * 1000, "100h"), DAY(24 * 60 * 60 * 1000, "d"), HOUR(60 * 60 * 1000, "h"), MIN(60 * 1000, "m"), SEC(1000, "s"), CS(10, "c");
+        HOURS100(100 * 60 * 60 * 1000), DAY(24 * 60 * 60 * 1000), HOUR(60 * 60 * 1000), MIN(60 * 1000), SEC(1000), CS(10);
 
         private long valueDurationMs;
-        private String valueSymbol;
 
-        TIMEUNITS(long valueDurationMs, String valueSymbol) {
+        TIMEUNITS(long valueDurationMs) {
             this.valueDurationMs = valueDurationMs;
-            this.valueSymbol = valueSymbol;
         }
 
         public long MS() {
             return valueDurationMs;
-        }
-
-        public String SYMBOL() {
-            return valueSymbol;
         }
     }
 
@@ -36,9 +30,8 @@ public class TimeDateUtils {
         public long cs;
     }
 
-    public static final String TIME_HMS_SEPARATOR = ":";
-    public static final String TIME_CS_SEPARATOR = ".";
     public static final SimpleDateFormat ddmmyyyy = new SimpleDateFormat("dd/MM/yyyy");
+    public static final SimpleDateFormat hhmm = new SimpleDateFormat("hh:mm");
     public static final String[] days = {"??", "Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"};
 
     public static long midnightTimeMillis() {
@@ -48,6 +41,7 @@ public class TimeDateUtils {
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
         long ret = calendar.getTimeInMillis();
+        calendar.clear();
         calendar = null;
         return ret;
     }
@@ -61,15 +55,15 @@ public class TimeDateUtils {
         if (!timeUnit.equals(TIMEUNITS.HOUR)) {  //  => MIN, SEC ou CS
             n = n - h * TIMEUNITS.HOUR.MS();
             long m = n / TIMEUNITS.MIN.MS();
-            ret = ret + TIME_HMS_SEPARATOR + String.format("%02d", m);
+            ret = ret + ":" + String.format("%02d", m);
             if (!timeUnit.equals(TIMEUNITS.MIN)) {  //  => SEC ou CS
                 n = n - m * TIMEUNITS.MIN.MS();
                 long s = n / TIMEUNITS.SEC.MS();
-                ret = ret + TIME_HMS_SEPARATOR + String.format("%02d", s);
+                ret = ret + ":" + String.format("%02d", s);
                 if (!timeUnit.equals(TIMEUNITS.SEC)) {  //  => CS
                     n = n - s * TIMEUNITS.SEC.MS();
                     long c = n / TIMEUNITS.CS.MS();
-                    ret = ret + TIME_CS_SEPARATOR + String.format("%02d", c);
+                    ret = ret + "." + String.format("%02d", c);
                 }
             }
         }
@@ -81,19 +75,19 @@ public class TimeDateUtils {
         long tums = timeUnit.MS();
         long n = tums * ((ms + (tums / 2)) / tums);  //  Arrondir à l'unité nécessaire
         long h = n / TIMEUNITS.HOUR.MS();
-        ret = ret + h + TIMEUNITS.HOUR.SYMBOL();
+        ret = ret + h + "h";
         if (!timeUnit.equals(TIMEUNITS.HOUR)) {  //  => MIN, SEC ou CS
             n = n - h * TIMEUNITS.HOUR.MS();
             long m = n / TIMEUNITS.MIN.MS();
-            ret = ret + m + TIMEUNITS.MIN.SYMBOL();
+            ret = ret + m + "m";
             if (!timeUnit.equals(TIMEUNITS.MIN)) {  //  => SEC ou CS
                 n = n - m * TIMEUNITS.MIN.MS();
                 long s = n / TIMEUNITS.SEC.MS();
-                ret = ret + s + TIMEUNITS.SEC.SYMBOL();
+                ret = ret + s + "s";
                 if (!timeUnit.equals(TIMEUNITS.SEC)) {  //  => CS
                     n = n - s * TIMEUNITS.SEC.MS();
                     long c = n / TIMEUNITS.CS.MS();
-                    ret = ret + c + TIMEUNITS.CS.SYMBOL();
+                    ret = ret + c + "c";
                 }
             }
         }
@@ -119,19 +113,19 @@ public class TimeDateUtils {
         long retc = 0;
         TimeUnitsStruc ret = null;
         try {
-            int i = str.indexOf(TIME_HMS_SEPARATOR);
+            int i = str.indexOf(":");
             if (i == NOT_FOUND) { //  => H
                 h = Long.parseLong(str);
             } else {   //  1er ":" trouvé => H:M
                 h = Long.parseLong(str.substring(0, i));
                 str = str.substring(i + 1);
-                i = str.indexOf(TIME_HMS_SEPARATOR);
+                i = str.indexOf(":");
                 if (i == NOT_FOUND) {
                     m = Long.parseLong(str);
                 } else {  //  2e ":" trouvé => H:M:S
                     m = Long.parseLong(str.substring(0, i));
                     str = str.substring(i + 1);
-                    i = str.indexOf(TIME_CS_SEPARATOR);
+                    i = str.indexOf(".");
                     if (i == NOT_FOUND) {
                         s = Long.parseLong(str);
                     } else { //  "." trouvé => H:M:S.C
@@ -174,25 +168,25 @@ public class TimeDateUtils {
         TimeUnitsStruc ret = null;
         try {
             int k = NOT_FOUND;
-            int i = str.indexOf(TIMEUNITS.HOUR.SYMBOL());
+            int i = str.indexOf("h");
             if (i != NOT_FOUND) {
                 h = Long.parseLong(str.substring(k + 1, i));
                 k = i;
                 tu = TIMEUNITS.HOUR;
             }
-            i = str.indexOf(TIMEUNITS.MIN.SYMBOL());
+            i = str.indexOf("m");
             if (i != NOT_FOUND) {
                 m = Long.parseLong(str.substring(k + 1, i));
                 k = i;
                 tu = TIMEUNITS.MIN;
             }
-            i = str.indexOf(TIMEUNITS.SEC.SYMBOL());
+            i = str.indexOf("s");
             if (i != NOT_FOUND) {
                 s = Long.parseLong(str.substring(k + 1, i));
                 k = i;
                 tu = TIMEUNITS.SEC;
             }
-            i = str.indexOf(TIMEUNITS.CS.SYMBOL());
+            i = str.indexOf("c");
             if (i != NOT_FOUND) {
                 c = Long.parseLong(str.substring(k + 1, i));
                 k = i;
@@ -230,59 +224,19 @@ public class TimeDateUtils {
         return ret;
     }
 
-    public static String normalizedDate(String date) {
+    public static String formattedStringTimeDate(String string, SimpleDateFormat sdf) {
         String ret = "";
         try {
-            Date fdate = ddmmyyyy.parse(date);
-            ret = ddmmyyyy.format(fdate);
+            Date fdate = sdf.parse(string);
+            ret = sdf.format(fdate);
         } catch (ParseException ex) {
             //   NOP
         }
         return ret;
     }
 
-    public static String dateNow() {
-        Calendar c = Calendar.getInstance();
-        return ddmmyyyy.format(c.getTime());
-    }
-
-    public static String getDayOfWeek(String date) {
-        String ret = "";
-        try {
-            Date fdate = ddmmyyyy.parse(date);
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(fdate);
-            ret = days[calendar.get(Calendar.DAY_OF_WEEK)];
-        } catch (ParseException ex) {
-            //   NOP
-        }
-        return ret;
-    }
-
-    public static String dateAdd(String date, int diffDays) {  //  Ajouter un nombre de jours à une date
-        String ret = "";
-        try {
-            Date fdate = ddmmyyyy.parse(date);
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(fdate);
-            calendar.add(Calendar.DAY_OF_MONTH, diffDays);
-            ret = ddmmyyyy.format(calendar.getTime());
-        } catch (ParseException ex) {
-            //   NOP
-        }
-        return ret;
-    }
-
-    public static String diffDays(String date1, String date2) {  //  Calculer la différence de jours entre 2 dates
-        String ret = "";
-        try {
-            Date fdate1 = ddmmyyyy.parse(date1);
-            Date fdate2 = ddmmyyyy.parse(date2);
-            ret = String.valueOf(Math.abs(Math.round((fdate2.getTime() - fdate1.getTime()) / (double) TIMEUNITS.DAY.MS())));
-        } catch (ParseException ex) {
-            //   NOP
-        }
-        return ret;
+    public static String formattedCalendarTimeDate(Calendar calendar, SimpleDateFormat sdf) {
+        return sdf.format(calendar.getTime());
     }
 
 }

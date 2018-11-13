@@ -29,7 +29,7 @@ public class MiscUtils {
     }
 
     public static void beep(Context context) {   //  Ex: beep(this)
-        context.startService(new Intent(context, BeeperIntentService.class));
+        context.startService(new Intent(context, BeepIntentService.class));
     }
 
     public static String capitalize(String string) {
