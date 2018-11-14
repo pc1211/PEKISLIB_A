@@ -19,16 +19,10 @@ public class StringShelfDatabase extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "ssDB";
 
     private enum FIELDS {
-        _id(0), ID(1), DATA(2);
-
-        private int valueIndex;
-
-        FIELDS(int valueIndex) {
-            this.valueIndex = valueIndex;
-        }
+        _id, ID, DATA;
 
         public int INDEX() {
-            return valueIndex;
+            return ordinal();
         }
 
         public int USER_INDEX() {
@@ -66,14 +60,7 @@ public class StringShelfDatabase extends SQLiteOpenHelper {
     }
 
     public String getFieldName(int fieldIndex) {
-        String ret;
-
-        if (fieldIndex == FIELDS.ID.USER_INDEX()) {
-            ret = FIELDS.ID.toString();
-        } else {
-            ret = FIELDS.DATA.toString() + fieldIndex;
-        }
-        return ret;
+        return ((fieldIndex == FIELDS.ID.USER_INDEX()) ? FIELDS.ID.toString() : FIELDS.DATA.toString() + String.valueOf(fieldIndex));
     }
 
     public boolean tableExists(String tableName) {
