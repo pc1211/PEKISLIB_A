@@ -11,7 +11,7 @@ import static com.example.pgyl.pekislib_a.StringShelfDatabase.TABLE_ID_INDEX;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getKeyboards;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getTimeUnits;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.TIMEUNITS;
-import static com.example.pgyl.pekislib_a.TimeDateUtils.convertMsToHms;
+import static com.example.pgyl.pekislib_a.TimeDateUtils.msToHms;
 
 public class PresetsHandler {
     //region Constantes
@@ -54,7 +54,7 @@ public class PresetsHandler {
 
     public void setTableName(String tableName) {
         this.tableName = tableName;
-        presets = convertPresetRowsToPresets(getPresetRows());
+        presets = presetRowsToPresets(getPresetRows());
         keyboards = getKeyboards(stringShelfDatabase, tableName);
         timeUnits = getTimeUnits(stringShelfDatabase, tableName);
     }
@@ -132,7 +132,7 @@ public class PresetsHandler {
         for (int j = TABLE_DATA_INDEX; j <= (preset.length - 1); j = j + 1) {   //  Exclure le champ ID
             String s = preset[j];
             if ((keyboards[j].equals(InputButtonsActivity.KEYBOARDS.TIME_HMS.toString())) || (keyboards[j].equals(InputButtonsActivity.KEYBOARDS.TIME_XHMS.toString()))) {
-                s = convertMsToHms(Long.parseLong(s), TIMEUNITS.valueOf(timeUnits[j]));
+                s = msToHms(Long.parseLong(s), TIMEUNITS.valueOf(timeUnits[j]));
             }
             ret = ret + s;
             if (j < (preset.length - 1)) {
@@ -155,7 +155,7 @@ public class PresetsHandler {
         return ret;
     }
 
-    private ArrayList<String[]> convertPresetRowsToPresets(String[][] presetRows) {
+    private ArrayList<String[]> presetRowsToPresets(String[][] presetRows) {
         ArrayList<String[]> ret = new ArrayList<String[]>();
         if (presetRows != null) {
             for (int i = 0; i <= (presetRows.length - 1); i = i + 1) {
@@ -165,7 +165,7 @@ public class PresetsHandler {
         return ret;
     }
 
-    private String[][] convertPresetsToPresetRows(ArrayList<String[]> presets) {
+    private String[][] presetsToPresetRows(ArrayList<String[]> presets) {
         String[][] ret = null;
         if (!presets.isEmpty()) {
             ret = presets.toArray(new String[presets.size()][presets.get(0).length]);
@@ -174,12 +174,12 @@ public class PresetsHandler {
     }
 
     private String whereConditionForPresets() {
-        return stringShelfDatabase.getFieldName(0) + " LIKE '" + PRESET_ID + "%'";
+        return stringShelfDatabase.getFieldName(TABLE_ID_INDEX) + " LIKE '" + PRESET_ID + "%'";
     }
 
     private void savePresets() {
         stringShelfDatabase.deleteRows(tableName, whereConditionForPresets());
-        stringShelfDatabase.insertOrReplaceRows(tableName, convertPresetsToPresetRows(presets));
+        stringShelfDatabase.insertOrReplaceRows(tableName, presetsToPresetRows(presets));
     }
 
     private String[][] getPresetRows() {

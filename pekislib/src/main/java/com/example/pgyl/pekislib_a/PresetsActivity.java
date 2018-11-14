@@ -41,7 +41,7 @@ import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentStr
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatusInInputButtonsActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatusInPresetsActivity;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.TIMEUNITS;
-import static com.example.pgyl.pekislib_a.TimeDateUtils.convertMsToHms;
+import static com.example.pgyl.pekislib_a.TimeDateUtils.msToHms;
 
 public class PresetsActivity extends Activity {
     //region Constantes
@@ -296,7 +296,7 @@ public class PresetsActivity extends Activity {
 
         String fieldText = preset[columnIndex];
         if ((keyboards[columnIndex].equals(KEYBOARDS.TIME_HMS.toString())) || (keyboards[columnIndex].equals(KEYBOARDS.TIME_XHMS.toString()))) {
-            fieldText = convertMsToHms(Long.parseLong(fieldText), TIMEUNITS.valueOf(timeUnits[columnIndex]));
+            fieldText = msToHms(Long.parseLong(fieldText), TIMEUNITS.valueOf(timeUnits[columnIndex]));
         }
         int index = COMMANDS.FIELD.ordinal();
         buttons[index].setText(fieldText);

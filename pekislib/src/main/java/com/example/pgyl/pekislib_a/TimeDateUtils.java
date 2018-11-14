@@ -60,7 +60,7 @@ public class TimeDateUtils {
         return sdf.format(calendar.getTime());
     }
 
-    public static String convertMsToHms(long ms, TIMEUNITS timeUnit) {    //   n (en ms) -> HH:MM:SS.CC (format "hmsc")
+    public static String msToHms(long ms, TIMEUNITS timeUnit) {    //   n (en ms) -> HH:MM:SS.CC (format "hmsc")
         String ret = "";
         long p = timeUnit.MS();
         long n = p * ((ms + (p / 2)) / p);  //  Arrondir à l'unité nécessaire
@@ -84,7 +84,7 @@ public class TimeDateUtils {
         return ret;
     }
 
-    public static String convertMsToXhms(long ms, TIMEUNITS timeUnit) {    //   n (en ms) -> p.ex. 3m, 20s, 2m30s, 1h2s, 8s7c, ... (format "xhmsc")
+    public static String msToXhms(long ms, TIMEUNITS timeUnit) {    //   n (en ms) -> p.ex. 3m, 20s, 2m30s, 1h2s, 8s7c, ... (format "xhmsc")
         String ret = "";
         long tums = timeUnit.MS();
         long n = tums * ((ms + (tums / 2)) / tums);  //  Arrondir à l'unité nécessaire
@@ -108,9 +108,9 @@ public class TimeDateUtils {
         return ret;
     }
 
-    public static long convertHmsToMs(String hms) {
+    public static long hmsToMs(String hms) {
         long ret = ERROR_VALUE;
-        TimeUnitsStruc tus = convertHmsToTimeUnitsStruc(hms);
+        TimeUnitsStruc tus = hmsToTimeUnitsStruc(hms);
         if (tus != null) {
             ret = tus.hour * TIMEUNITS.HOUR.MS() + tus.min * TIMEUNITS.MIN.MS() + tus.sec * TIMEUNITS.SEC.MS() + tus.cs * TIMEUNITS.CS.MS();
             tus = null;
@@ -118,7 +118,7 @@ public class TimeDateUtils {
         return ret;
     }
 
-    public static TimeUnitsStruc convertHmsToTimeUnitsStruc(String hms) {
+    public static TimeUnitsStruc hmsToTimeUnitsStruc(String hms) {
         String str = hms;
         long h = 0;
         long m = 0;
@@ -161,9 +161,9 @@ public class TimeDateUtils {
         return ret;
     }
 
-    public static long convertXhmsToMs(String xhms) {
+    public static long xhmsToMs(String xhms) {
         long ret = ERROR_VALUE;
-        TimeUnitsStruc tus = convertXhmsToTimeUnitsStruc(xhms);
+        TimeUnitsStruc tus = xhmsToTimeUnitsStruc(xhms);
         if (tus != null) {
             ret = tus.hour * TIMEUNITS.HOUR.MS() + tus.min * TIMEUNITS.MIN.MS() + tus.sec * TIMEUNITS.SEC.MS() + tus.cs * TIMEUNITS.CS.MS();
             tus = null;
@@ -171,7 +171,7 @@ public class TimeDateUtils {
         return ret;
     }
 
-    public static TimeUnitsStruc convertXhmsToTimeUnitsStruc(String xhms) {
+    public static TimeUnitsStruc xhmsToTimeUnitsStruc(String xhms) {
         String str = xhms;
         long h = 0;
         long m = 0;
