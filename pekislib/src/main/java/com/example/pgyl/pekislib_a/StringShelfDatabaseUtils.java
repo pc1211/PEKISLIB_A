@@ -32,6 +32,10 @@ public class StringShelfDatabaseUtils {
     public static String getActivityInfosTableName() {
         return PEKISLIB_TABLES.ACTIVITY_INFOS.toString();
     }
+
+    public static int getActivityInfosStartStatusIndex() {
+        return TABLE_ACTIVITY_INFOS_DATA_FIELDS.START_STATUS.INDEX();
+    }
     //endregion
 
     //region TABLE_IDS
@@ -67,16 +71,12 @@ public class StringShelfDatabaseUtils {
         return stringShelfDatabase.selectFieldByIdOrCreate(tableName, TABLE_IDS.REGEXP.toString(), index);
     }
 
-    public static String getDefault(StringShelfDatabase stringShelfDatabase, String tableName, int index) {
-        return stringShelfDatabase.selectFieldByIdOrCreate(tableName, TABLE_IDS.DEFAULT.toString(), index);
+    public static String[] getDefaults(StringShelfDatabase stringShelfDatabase, String tableName) {
+        return stringShelfDatabase.selectRowByIdOrCreate(tableName, TABLE_IDS.DEFAULT.toString());
     }
 
     public static void setDefaults(StringShelfDatabase stringShelfDatabase, String tableName, String[] values) {
         stringShelfDatabase.insertOrReplaceRowById(tableName, TABLE_IDS.DEFAULT.toString(), values);
-    }
-
-    public static int getActivityInfosStartStatusIndex() {
-        return TABLE_ACTIVITY_INFOS_DATA_FIELDS.START_STATUS.INDEX();
     }
     //endregion
 

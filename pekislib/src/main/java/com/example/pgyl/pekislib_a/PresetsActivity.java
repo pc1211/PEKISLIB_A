@@ -31,7 +31,7 @@ import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.ACTIVITY_STAR
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.TABLE_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentPresetInPresetsActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentStringInInputButtonsActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getDefault;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getDefaults;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getKeyboards;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getLabels;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getTimeUnits;
@@ -69,7 +69,7 @@ public class PresetsActivity extends Activity {
         SELECT_INDEX, COLUMN_INDEX
     }
 
-    private final int SELECT_INDEX_DEFAULT_VALUE = NOT_FOUND;
+    private final int LIST_INDEX_DEFAULT_VALUE = NOT_FOUND;
     private final int COLUMN_INDEX_DEFAULT_VALUE = 1;
     //endregion
     //region Variables
@@ -78,9 +78,10 @@ public class PresetsActivity extends Activity {
     private String[] labelNames;
     private String[] keyboards;
     private String[] timeUnits;
+    private String[] defaults;
     private String tableName;
     private boolean isColorType;
-    private int selectIndex;
+    private int listIndex;
     private int columnIndex;
     private CustomButton[] buttons;
     private ListView listView;
@@ -129,20 +130,21 @@ public class PresetsActivity extends Activity {
         labelNames = getLabels(stringShelfDatabase, tableName);
         keyboards = getKeyboards(stringShelfDatabase, tableName);
         timeUnits = getTimeUnits(stringShelfDatabase, tableName);
+        defaults = getDefaults(stringShelfDatabase, tableName);
 
         if (isColdStartStatusInPresetsActivity(stringShelfDatabase)) {
             setStartStatusInPresetsActivity(stringShelfDatabase, ACTIVITY_START_STATUS.HOT);
-            selectIndex = SELECT_INDEX_DEFAULT_VALUE;
+            listIndex = LIST_INDEX_DEFAULT_VALUE;
             columnIndex = COLUMN_INDEX_DEFAULT_VALUE;
         } else {
-            selectIndex = getSHPselectIndex();
+            listIndex = getSHPselectIndex();
             columnIndex = getSHPcolumnIndex();
             if (validReturnFromCalledActivity) {
                 validReturnFromCalledActivity = false;
                 if (returnsFromInputButtonsActivity()) {
                     preset[columnIndex] = getCurrentStringInInputButtonsActivity(stringShelfDatabase, tableName, columnIndex);
-                    if (selectIndex != SELECT_INDEX_DEFAULT_VALUE) {
-                        presetsHandler.setPresetColumn(selectIndex, columnIndex, preset[columnIndex]);
+                    if (listIndex != LIST_INDEX_DEFAULT_VALUE) {
+                        presetsHandler.setPresetColumn(listIndex, columnIndex, preset[columnIndex]);
                     }
                 }
             }
@@ -237,7 +239,7 @@ public class PresetsActivity extends Activity {
     }
 
     private void onButtonClickRemove() {
-        if (selectIndex != SELECT_INDEX_DEFAULT_VALUE) {
+        if (listIndex != LIST_INDEX_DEFAULT_VALUE) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Remove preset");
             builder.setMessage("Are you sure?");
@@ -245,7 +247,7 @@ public class PresetsActivity extends Activity {
             builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int id) {
-                    presetsHandler.removePreset(selectIndex);
+                    presetsHandler.removePreset(listIndex);
                     rebuildDisplay();
                 }
             });
@@ -264,8 +266,8 @@ public class PresetsActivity extends Activity {
     }
 
     private void onButtonClickDeselect() {
-        if (selectIndex != SELECT_INDEX_DEFAULT_VALUE) {
-            selectIndex = SELECT_INDEX_DEFAULT_VALUE;
+        if (listIndex != LIST_INDEX_DEFAULT_VALUE) {
+            listIndex = LIST_INDEX_DEFAULT_VALUE;
             updateDisplayButtonColor(COMMANDS.FIELD);
         } else {
             toastLong("A preset must be selected in the list", this);
@@ -273,9 +275,9 @@ public class PresetsActivity extends Activity {
     }
 
     private void onButtonClickDefault() {
-        preset[columnIndex] = getDefault(stringShelfDatabase, tableName, columnIndex);
-        if (selectIndex != SELECT_INDEX_DEFAULT_VALUE) {
-            presetsHandler.setPresetColumn(selectIndex, columnIndex, preset[columnIndex]);
+        preset[columnIndex] = defaults[columnIndex];
+        if (listIndex != LIST_INDEX_DEFAULT_VALUE) {
+            presetsHandler.setPresetColumn(listIndex, columnIndex, preset[columnIndex]);
             rebuildPresets();
         }
         updateDisplayButtonTexts();
@@ -284,7 +286,7 @@ public class PresetsActivity extends Activity {
     private void onPresetClick(int pos) {
         if (presetsHandler.getCount() > 0) {
             preset = presetsHandler.getPreset(pos);
-            selectIndex = pos;
+            listIndex = pos;
             columnIndex = COLUMN_INDEX_DEFAULT_VALUE;
             updateDisplayButtonTexts();
             updateDisplayButtonColor(COMMANDS.FIELD);
@@ -310,7 +312,7 @@ public class PresetsActivity extends Activity {
 
         int index = command.ordinal();
         if (command.equals(COMMANDS.FIELD)) {
-            if (selectIndex != SELECT_INDEX_DEFAULT_VALUE) {
+            if (listIndex != LIST_INDEX_DEFAULT_VALUE) {
                 buttons[index].setUnpressedColor(SPECIAL_FIELD_UNPRESSED_COLOR);
                 buttons[index].setPressedColor(SPECIAL_FIELD_PRESSED_COLOR);
             } else {
@@ -328,17 +330,17 @@ public class PresetsActivity extends Activity {
     }
 
     private void rebuildDisplay() {
-        selectIndex = SELECT_INDEX_DEFAULT_VALUE;
+        listIndex = LIST_INDEX_DEFAULT_VALUE;
         columnIndex = COLUMN_INDEX_DEFAULT_VALUE;
         rebuildPresets();
         updateDisplayButtonTexts();
     }
 
     private void rebuildPresets() {
-        if (selectIndex != SELECT_INDEX_DEFAULT_VALUE) {
-            String presetId = presetsHandler.getPresetId(selectIndex);
+        if (listIndex != LIST_INDEX_DEFAULT_VALUE) {
+            String presetId = presetsHandler.getPresetId(listIndex);
             presetsHandler.sortPresets();
-            selectIndex = presetsHandler.getIndex(presetId);
+            listIndex = presetsHandler.getIndex(presetId);
         } else {
             presetsHandler.sortPresets();
         }
@@ -357,7 +359,7 @@ public class PresetsActivity extends Activity {
 
     private int getSHPselectIndex() {
         SharedPreferences shp = getSharedPreferences(shpFileName, MODE_PRIVATE);
-        return shp.getInt(SHP_KEY_NAMES.SELECT_INDEX.toString(), SELECT_INDEX_DEFAULT_VALUE);
+        return shp.getInt(SHP_KEY_NAMES.SELECT_INDEX.toString(), LIST_INDEX_DEFAULT_VALUE);
     }
 
     private int getSHPcolumnIndex() {
@@ -368,7 +370,7 @@ public class PresetsActivity extends Activity {
     private void savePreferences() {
         SharedPreferences shp = getSharedPreferences(shpFileName, MODE_PRIVATE);
         SharedPreferences.Editor shpEditor = shp.edit();
-        shpEditor.putInt(SHP_KEY_NAMES.SELECT_INDEX.toString(), selectIndex);
+        shpEditor.putInt(SHP_KEY_NAMES.SELECT_INDEX.toString(), listIndex);
         shpEditor.putInt(SHP_KEY_NAMES.COLUMN_INDEX.toString(), columnIndex);
         shpEditor.commit();
     }
