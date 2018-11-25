@@ -448,7 +448,6 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         super.onDraw(canvas);
 
         drawing = true;
-
         int frontStateColorIndex = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? backColorIndex : frontColorIndex);
         int backStateColorIndex = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? frontColorIndex : backColorIndex);
         int alternateStateColorIndex = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? frontColorIndex : alternateColorIndex);
