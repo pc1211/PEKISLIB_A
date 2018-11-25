@@ -279,7 +279,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         appendText(text, dotMatrixFont);
     }
 
-    public void appendText(String text, DotMatrixFont dotMatrixFont) {
+    public void appendText(String text, DotMatrixFont dotMatrixFont) {   //  A partir de symbolPos
         Symbol symbol;
 
         for (int j = 0; j <= (text.length() - 1); j = j + 1) {
@@ -288,9 +288,17 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
             if (symbol == null) {
                 symbol = defaultFont.getCharMap().get(ch);
             }
-            drawSymbol(symbol);
+            drawSymbol(symbol);    //  Afficher symbole √† partir de SymbolPos
         }
         symbol = null;
+    }
+
+    public Point getSymbolPos() {
+        return symbolPos;
+    }
+
+    public void setSymbolPos(int x, int y) {
+        symbolPos.set(x, y);
     }
 
     public DotMatrixFont getDefautFont() {
