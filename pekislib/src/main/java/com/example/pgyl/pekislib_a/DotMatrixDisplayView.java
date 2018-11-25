@@ -31,10 +31,6 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
     private onCustomClickListener mOnCustomClickListener;
 
     //region Constantes
-    public enum SCROLL_DIRECTIONS {
-        LEFT, TOP, RIGHT, BOTTOM
-    }
-
     private enum DEFAULT_SYMBOLS_DATA {  //  En matrice 5x7 ou autre
         ASCII_20(' ', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}}),
         ASCII_21('!', new int[][]{{0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 1, 0, 0}}),
@@ -451,7 +447,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         viewCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
         for (int i = 0; i <= (displayRect.width() - 1); i = i + 1) {
             for (int j = 0; j <= (displayRect.height() - 1); j = j + 1) {
-                int dotColorIndex = ((grid[j][i] == 1) ? frontStateColorIndex : backStateColorIndex);
+                int dotColorIndex = ((grid[j][i] == ON_VALUE) ? frontStateColorIndex : backStateColorIndex);
                 dotPaint.setColor(Color.parseColor(COLOR_PREFIX + colors[dotColorIndex]));
                 dotPoint.set(gridMargins.left + (float) gridStartX + (float) i * dotCellSize, gridMargins.top + (float) j * dotCellSize);
                 viewCanvas.drawRect(dotPoint.x, dotPoint.y, dotPoint.x + dotSize, dotPoint.y + dotSize, dotPaint);
@@ -471,8 +467,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
             for (int j = 0; j <= (defaultFont.getHeight() - 1); j = j + 1) {
                 int symbolDotY = symbolPos.y + j;
                 if ((symbolDotX <= (totalRect.width() - 1)) && (symbolDotY <= (totalRect.height() - 1))) {   //  Clip
-                    if (symbolData[j][i] == 1) {
-                        grid[symbolDotY][symbolDotX] = 1;
+                    if (symbolData[j][i] == ON_VALUE) {
+                        grid[symbolDotY][symbolDotX] = ON_VALUE;
                     }
                 }
             }
