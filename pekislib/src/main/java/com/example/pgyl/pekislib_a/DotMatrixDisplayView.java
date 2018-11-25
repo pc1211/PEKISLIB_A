@@ -15,12 +15,9 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-
 import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
+import static com.example.pgyl.pekislib_a.DotMatrixFont.Symbol;
 
 public final class DotMatrixDisplayView extends View {  //  Affichage de caractères dans une grille de carrés avec coordonnées (x,y)  ((0,0) étant en haut à gauche de la grille)
     public interface onCustomClickListener {
@@ -34,25 +31,111 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     private onCustomClickListener mOnCustomClickListener;
 
     //region Constantes
-    private enum SYMBOLS {  //  En matrice 5x7 ou autre
-        ZERO('0', new int[][]{{0, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 1, 1}, {1, 0, 1, 0, 1}, {1, 1, 0, 0, 1}, {1, 0, 0, 0, 1}, {0, 1, 1, 1, 0}}),
-        ONE('1', new int[][]{{0, 0, 1, 0, 0}, {0, 1, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 1, 1, 1, 0}}),
-        TWO('2', new int[][]{{0, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {0, 0, 0, 0, 1}, {0, 0, 0, 1, 0}, {0, 0, 1, 0, 0}, {0, 1, 0, 0, 0}, {1, 1, 1, 1, 1}}),
-        THREE('3', new int[][]{{1, 1, 1, 1, 1}, {0, 0, 0, 1, 0}, {0, 0, 1, 0, 0}, {0, 0, 0, 1, 0}, {0, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {0, 1, 1, 1, 0}}),
-        FOUR('4', new int[][]{{0, 0, 0, 1, 0}, {0, 0, 1, 1, 0}, {0, 1, 0, 1, 0}, {1, 0, 0, 1, 0}, {1, 1, 1, 1, 1}, {0, 0, 0, 1, 0}, {0, 0, 0, 1, 0}}),
-        FIVE('5', new int[][]{{1, 1, 1, 1, 1}, {1, 0, 0, 0, 0}, {1, 1, 1, 1, 0}, {0, 0, 0, 0, 1}, {0, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {0, 1, 1, 1, 0}}),
-        SIX('6', new int[][]{{0, 0, 1, 1, 0}, {0, 1, 0, 0, 0}, {1, 0, 0, 0, 0}, {1, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {0, 1, 1, 1, 0}}),
-        SEVEN('7', new int[][]{{1, 1, 1, 1, 1}, {0, 0, 0, 0, 1}, {0, 0, 0, 1, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}}),
-        EIGHT('8', new int[][]{{0, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {0, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {0, 1, 1, 1, 0}}),
-        NINE('9', new int[][]{{0, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {0, 1, 1, 1, 1}, {0, 0, 0, 0, 1}, {0, 0, 0, 1, 0}, {0, 1, 1, 0, 0}}),
-        DOT('.', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 1}}),
-        DOUBLE_DOT(':', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}});
+    public enum SCROLL_DIRECTIONS {
+        LEFT, TOP, RIGHT, BOTTOM
+    }
+
+    private enum DEFAULT_SYMBOLS_DATA {  //  En matrice 5x7 ou autre
+        ASCII_20(' ', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}}),
+        ASCII_21('!', new int[][]{{0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 1, 0, 0}}),
+        ASCII_22('\'', new int[][]{{0, 1, 0, 1, 0}, {0, 1, 0, 1, 0}, {0, 1, 0, 1, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}}),
+        ASCII_23('#', new int[][]{{0, 1, 0, 1, 0}, {0, 1, 0, 1, 0}, {1, 1, 1, 1, 1}, {0, 1, 0, 1, 0}, {1, 1, 1, 1, 1}, {0, 1, 0, 1, 0}, {0, 1, 0, 1, 0}}),
+        ASCII_24('$', new int[][]{{0, 0, 1, 0, 0}, {0, 1, 1, 1, 1}, {1, 0, 1, 0, 0}, {0, 1, 1, 1, 0}, {0, 0, 1, 0, 1}, {1, 1, 1, 1, 0}, {0, 0, 1, 0, 0}}),
+        ASCII_25('%', new int[][]{{1, 1, 0, 0, 0}, {1, 1, 0, 0, 1}, {0, 0, 0, 1, 0}, {0, 0, 1, 0, 0}, {0, 1, 0, 0, 0}, {1, 0, 0, 1, 1}, {0, 0, 0, 1, 1}}),
+        ASCII_27('\"', new int[][]{{0, 1, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 1, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}}),
+        ASCII_28('(', new int[][]{{0, 0, 0, 1, 0}, {0, 0, 1, 0, 0}, {0, 1, 0, 0, 0}, {0, 1, 0, 0, 0}, {0, 1, 0, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 0, 1, 0}}),
+        ASCII_29(')', new int[][]{{0, 0, 0, 1, 0}, {0, 0, 1, 0, 0}, {0, 1, 0, 0, 0}, {0, 1, 0, 0, 0}, {0, 1, 0, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 0, 1, 0}}),
+        ASCII_2A('*', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 1, 0, 0}, {1, 0, 1, 0, 1}, {0, 1, 1, 1, 0}, {1, 0, 1, 0, 1}, {0, 0, 1, 0, 0}, {0, 0, 0, 0, 0}}),
+        ASCII_2B('+', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {1, 1, 1, 1, 1}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 0, 0, 0}}),
+        ASCII_2C(',', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 1, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 1, 0, 0, 0}}),
+        ASCII_2D('-', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {1, 1, 1, 1, 1}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}}),
+        ASCII_2E('.', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 1, 1, 0, 0}, {0, 1, 1, 0, 0}}),
+        ASCII_2F('/', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 1}, {0, 0, 0, 1, 0}, {0, 0, 1, 0, 0}, {0, 1, 0, 0, 0}, {1, 0, 0, 0, 0}, {0, 0, 0, 0, 0}}),
+        ASCII_30('0', new int[][]{{0, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 1, 1}, {1, 0, 1, 0, 1}, {1, 1, 0, 0, 1}, {1, 0, 0, 0, 1}, {0, 1, 1, 1, 0}}),
+        ASCII_31('1', new int[][]{{0, 0, 1, 0, 0}, {0, 1, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 1, 1, 1, 0}}),
+        ASCII_32('2', new int[][]{{0, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {0, 0, 0, 0, 1}, {0, 0, 0, 1, 0}, {0, 0, 1, 0, 0}, {0, 1, 0, 0, 0}, {1, 1, 1, 1, 1}}),
+        ASCII_33('3', new int[][]{{1, 1, 1, 1, 1}, {0, 0, 0, 1, 0}, {0, 0, 1, 0, 0}, {0, 0, 0, 1, 0}, {0, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {0, 1, 1, 1, 0}}),
+        ASCII_34('4', new int[][]{{0, 0, 0, 1, 0}, {0, 0, 1, 1, 0}, {0, 1, 0, 1, 0}, {1, 0, 0, 1, 0}, {1, 1, 1, 1, 1}, {0, 0, 0, 1, 0}, {0, 0, 0, 1, 0}}),
+        ASCII_35('5', new int[][]{{1, 1, 1, 1, 1}, {1, 0, 0, 0, 0}, {1, 1, 1, 1, 0}, {0, 0, 0, 0, 1}, {0, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {0, 1, 1, 1, 0}}),
+        ASCII_36('6', new int[][]{{0, 0, 1, 1, 0}, {0, 1, 0, 0, 0}, {1, 0, 0, 0, 0}, {1, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {0, 1, 1, 1, 0}}),
+        ASCII_37('7', new int[][]{{1, 1, 1, 1, 1}, {0, 0, 0, 0, 1}, {0, 0, 0, 1, 0}, {0, 0, 1, 0, 0}, {0, 1, 0, 0, 0}, {0, 1, 0, 0, 0}, {0, 1, 0, 0, 0}}),
+        ASCII_38('8', new int[][]{{0, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {0, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {0, 1, 1, 1, 0}}),
+        ASCII_39('9', new int[][]{{0, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {0, 1, 1, 1, 1}, {0, 0, 0, 0, 1}, {0, 0, 0, 1, 0}, {0, 1, 1, 0, 0}}),
+        ASCII_3A(':', new int[][]{{0, 0, 0, 0, 0}, {0, 1, 1, 0, 0}, {0, 1, 1, 0, 0}, {0, 0, 0, 0, 0}, {0, 1, 1, 0, 0}, {0, 1, 1, 0, 0}, {0, 0, 0, 0, 0}}),
+        ASCII_3B(';', new int[][]{{0, 0, 0, 0, 0}, {0, 1, 1, 0, 0}, {0, 1, 1, 0, 0}, {0, 0, 0, 0, 0}, {0, 1, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 1, 0, 0, 0}}),
+        ASCII_3C('<', new int[][]{{0, 0, 0, 1, 0}, {0, 0, 1, 0, 0}, {0, 1, 0, 0, 0}, {1, 0, 0, 0, 0}, {0, 1, 0, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 0, 1, 0}}),
+        ASCII_3D('=', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {1, 1, 1, 1, 1}, {0, 0, 0, 0, 0}, {1, 1, 1, 1, 1}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}}),
+        ASCII_3E('>', new int[][]{{0, 1, 0, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 0, 1, 0}, {0, 0, 0, 0, 1}, {0, 0, 0, 1, 0}, {0, 0, 1, 0, 0}, {0, 1, 0, 0, 0}}),
+        ASCII_3F('?', new int[][]{{0, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {0, 0, 0, 0, 1}, {0, 0, 0, 1, 0}, {0, 0, 1, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 1, 0, 0}}),
+        ASCII_40('@', new int[][]{{0, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {0, 0, 0, 0, 1}, {0, 1, 1, 0, 1}, {1, 0, 1, 0, 1}, {1, 0, 1, 0, 1}, {0, 1, 1, 1, 0}}),
+        ASCII_41('A', new int[][]{{0, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 1, 1, 1, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}}),
+        ASCII_42('B', new int[][]{{1, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 1, 1, 1, 0}}),
+        ASCII_43('C', new int[][]{{0, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 0}, {1, 0, 0, 0, 0}, {1, 0, 0, 0, 0}, {1, 0, 0, 0, 1}, {0, 1, 1, 1, 0}}),
+        ASCII_44('D', new int[][]{{1, 1, 1, 0, 0}, {1, 0, 0, 1, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 1, 0}, {1, 1, 1, 0, 0}}),
+        ASCII_45('E', new int[][]{{1, 1, 1, 1, 1}, {1, 0, 0, 0, 0}, {1, 0, 0, 0, 0}, {1, 1, 1, 1, 0}, {1, 0, 0, 0, 0}, {1, 0, 0, 0, 0}, {1, 1, 1, 1, 1}}),
+        ASCII_46('F', new int[][]{{1, 1, 1, 1, 1}, {1, 0, 0, 0, 0}, {1, 0, 0, 0, 0}, {1, 1, 1, 1, 0}, {1, 0, 0, 0, 0}, {1, 0, 0, 0, 0}, {1, 0, 0, 0, 0}}),
+        ASCII_47('G', new int[][]{{0, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 0}, {1, 0, 1, 1, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {0, 1, 1, 1, 1}}),
+        ASCII_48('H', new int[][]{{1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 1, 1, 1, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}}),
+        ASCII_49('I', new int[][]{{0, 1, 1, 1, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 1, 1, 1, 0}}),
+        ASCII_4A('J', new int[][]{{0, 0, 1, 1, 1}, {0, 0, 0, 1, 0}, {0, 0, 0, 1, 0}, {0, 0, 0, 1, 0}, {0, 0, 0, 1, 0}, {1, 0, 0, 1, 0}, {0, 1, 1, 0, 0}}),
+        ASCII_4B('K', new int[][]{{1, 0, 0, 0, 1}, {1, 0, 0, 1, 0}, {1, 0, 1, 0, 0}, {1, 1, 0, 0, 0}, {1, 0, 1, 0, 0}, {1, 0, 0, 1, 0}, {1, 0, 0, 0, 1}}),
+        ASCII_4C('L', new int[][]{{1, 0, 0, 0, 0}, {1, 0, 0, 0, 0}, {1, 0, 0, 0, 0}, {1, 0, 0, 0, 0}, {1, 0, 0, 0, 0}, {1, 0, 0, 0, 0}, {1, 1, 1, 1, 1}}),
+        ASCII_4D('M', new int[][]{{1, 0, 0, 0, 1}, {1, 1, 0, 1, 1}, {1, 0, 1, 0, 1}, {1, 0, 1, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}}),
+        ASCII_4E('N', new int[][]{{1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 1, 0, 0, 1}, {1, 0, 1, 0, 1}, {1, 0, 0, 1, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}}),
+        ASCII_4F('O', new int[][]{{0, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {0, 1, 1, 1, 0}}),
+        ASCII_50('P', new int[][]{{1, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 1, 1, 1, 0}, {1, 0, 0, 0, 0}, {1, 0, 0, 0, 0}, {1, 0, 0, 0, 0}}),
+        ASCII_51('Q', new int[][]{{0, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 1, 0, 1}, {1, 0, 0, 1, 0}, {0, 1, 1, 0, 1}}),
+        ASCII_52('R', new int[][]{{1, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 1, 1, 1, 0}, {1, 0, 1, 0, 0}, {1, 0, 0, 1, 0}, {1, 0, 0, 0, 1}}),
+        ASCII_53('S', new int[][]{{0, 1, 1, 1, 1}, {1, 0, 0, 0, 0}, {1, 0, 0, 0, 0}, {0, 1, 1, 1, 0}, {0, 0, 0, 0, 1}, {0, 0, 0, 0, 1}, {1, 1, 1, 1, 0}}),
+        ASCII_54('T', new int[][]{{1, 1, 1, 1, 1}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}}),
+        ASCII_55('U', new int[][]{{1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {0, 1, 1, 1, 0}}),
+        ASCII_56('V', new int[][]{{1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {0, 1, 0, 1, 0}, {0, 0, 1, 0, 0}}),
+        ASCII_57('W', new int[][]{{1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 1, 0, 1}, {1, 0, 1, 0, 1}, {1, 0, 1, 0, 1}, {0, 1, 0, 1, 0}}),
+        ASCII_58('X', new int[][]{{1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {0, 1, 0, 1, 0}, {0, 0, 1, 0, 0}, {0, 1, 0, 1, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}}),
+        ASCII_59('Y', new int[][]{{1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {0, 1, 0, 1, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}}),
+        ASCII_5A('Z', new int[][]{{1, 1, 1, 1, 1}, {0, 0, 0, 0, 1}, {0, 0, 0, 1, 0}, {0, 0, 1, 0, 0}, {0, 1, 0, 0, 0}, {1, 0, 0, 0, 0}, {1, 1, 1, 1, 1}}),
+        ASCII_5B('[', new int[][]{{0, 1, 1, 1, 0}, {0, 1, 0, 0, 0}, {0, 1, 0, 0, 0}, {0, 1, 0, 0, 0}, {0, 1, 0, 0, 0}, {0, 1, 0, 0, 0}, {0, 1, 1, 1, 0}}),
+        ASCII_5C('\\', new int[][]{{0, 0, 0, 0, 0}, {1, 0, 0, 0, 0}, {0, 1, 0, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 0, 1, 0}, {0, 0, 0, 0, 1}, {0, 0, 0, 0, 0}}),
+        ASCII_5D(']', new int[][]{{0, 1, 1, 1, 0}, {0, 0, 0, 1, 0}, {0, 0, 0, 1, 0}, {0, 0, 0, 1, 0}, {0, 0, 0, 1, 0}, {0, 0, 0, 1, 0}, {0, 1, 1, 1, 0}}),
+        ASCII_5E('^', new int[][]{{0, 0, 1, 0, 0}, {0, 1, 0, 1, 0}, {1, 0, 0, 0, 1}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}}),
+        ASCII_5F('_', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {1, 1, 1, 1, 1}}),
+        ASCII_60('`', new int[][]{{0, 1, 0, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 0, 1, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}}),
+        ASCII_61('a', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 1, 1, 1, 0}, {0, 0, 0, 0, 1}, {0, 1, 1, 1, 1}, {1, 0, 0, 0, 1}, {0, 1, 1, 1, 1}}),
+        ASCII_62('b', new int[][]{{1, 0, 0, 0, 0}, {1, 0, 0, 0, 0}, {1, 0, 0, 0, 0}, {1, 0, 1, 1, 0}, {1, 1, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 1, 1, 1, 0}}),
+        ASCII_63('c', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 1, 1, 1, 0}, {1, 0, 0, 0, 0}, {1, 0, 0, 0, 0}, {1, 0, 0, 0, 1}, {0, 1, 1, 1, 0}}),
+        ASCII_64('d', new int[][]{{0, 0, 0, 0, 1}, {0, 0, 0, 0, 1}, {0, 0, 0, 0, 1}, {0, 1, 1, 0, 1}, {1, 0, 0, 1, 1}, {1, 0, 0, 0, 1}, {0, 1, 1, 1, 1}}),
+        ASCII_65('e', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {1, 1, 1, 1, 1}, {1, 0, 0, 0, 0}, {0, 1, 1, 1, 0}}),
+        ASCII_66('f', new int[][]{{0, 0, 1, 1, 0}, {0, 1, 0, 0, 1}, {0, 1, 0, 0, 0}, {1, 1, 1, 0, 0}, {0, 1, 0, 0, 0}, {0, 1, 0, 0, 0}, {0, 1, 0, 0, 0}}),
+        ASCII_67('g', new int[][]{{0, 0, 0, 0, 0}, {0, 1, 1, 1, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {0, 1, 1, 1, 1}, {0, 0, 0, 0, 1}, {0, 1, 1, 1, 0}}),
+        ASCII_68('h', new int[][]{{1, 0, 0, 0, 0}, {1, 0, 0, 0, 0}, {1, 0, 1, 1, 0}, {1, 1, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}}),
+        ASCII_69('i', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}}),
+        ASCII_6A('j', new int[][]{{0, 0, 0, 1, 0}, {0, 0, 0, 0, 0}, {0, 0, 1, 1, 0}, {0, 0, 0, 1, 0}, {0, 0, 0, 1, 0}, {1, 0, 0, 1, 0}, {0, 1, 1, 0, 0}}),
+        ASCII_6B('k', new int[][]{{1, 0, 0, 0, 0}, {1, 0, 0, 0, 0}, {1, 0, 0, 1, 0}, {1, 0, 1, 0, 0}, {1, 1, 0, 0, 0}, {1, 0, 1, 0, 0}, {1, 0, 0, 1, 0}}),
+        ASCII_6C('l', new int[][]{{0, 1, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 1, 1, 1, 0}}),
+        ASCII_6D('m', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {1, 1, 0, 1, 0}, {1, 0, 1, 0, 1}, {1, 0, 1, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}}),
+        ASCII_6E('n', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {1, 0, 1, 1, 0}, {1, 1, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}}),
+        ASCII_6F('o', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {0, 1, 1, 1, 0}}),
+        ASCII_70('p', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {1, 1, 1, 1, 0}, {1, 0, 0, 0, 1}, {1, 1, 1, 1, 0}, {1, 0, 0, 0, 0}, {1, 0, 0, 0, 0}}),
+        ASCII_71('q', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 1, 1, 0, 1}, {1, 0, 0, 1, 1}, {0, 1, 1, 1, 1}, {0, 0, 0, 0, 1}, {0, 0, 0, 0, 1}}),
+        ASCII_72('r', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {1, 0, 1, 1, 0}, {1, 1, 0, 0, 1}, {1, 0, 0, 0, 0}, {1, 0, 0, 0, 0}, {1, 0, 0, 0, 0}}),
+        ASCII_73('s', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 1, 1, 1, 0}, {1, 0, 0, 0, 0}, {0, 1, 1, 1, 0}, {0, 0, 0, 0, 1}, {1, 1, 1, 1, 0}}),
+        ASCII_74('t', new int[][]{{0, 1, 0, 0, 0}, {0, 1, 0, 0, 0}, {1, 1, 1, 0, 0}, {0, 1, 0, 0, 0}, {0, 1, 0, 0, 0}, {0, 1, 0, 0, 1}, {0, 0, 1, 1, 0}}),
+        ASCII_75('u', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 1, 1}, {0, 1, 1, 0, 1}}),
+        ASCII_76('v', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {0, 1, 0, 1, 0}, {0, 0, 1, 0, 0}}),
+        ASCII_77('w', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 1, 0, 1}, {1, 0, 1, 0, 1}, {0, 1, 0, 1, 0}}),
+        ASCII_78('x', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {1, 0, 0, 0, 1}, {0, 1, 0, 1, 0}, {0, 0, 1, 0, 0}, {0, 1, 0, 1, 0}, {1, 0, 0, 0, 1}}),
+        ASCII_79('y', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {0, 1, 1, 1, 1}, {0, 0, 0, 0, 1}, {0, 1, 1, 1, 0}}),
+        ASCII_7A('z', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {1, 1, 1, 1, 1}, {0, 0, 0, 1, 0}, {0, 0, 1, 0, 0}, {0, 1, 0, 0, 0}, {1, 1, 1, 1, 1}}),
+        ASCII_7B('{', new int[][]{{0, 0, 0, 1, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 1, 0, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 0, 1, 0}}),
+        ASCII_7C('|', new int[][]{{0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}}),
+        ASCII_7D('}', new int[][]{{0, 1, 0, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 0, 1, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 1, 0, 0, 0}}),
+        ASCII_7E('~', new int[][]{{0, 0, 0, 0, 0}, {0, 1, 0, 0, 0}, {1, 0, 1, 0, 1}, {1, 0, 1, 0, 1}, {0, 0, 0, 1, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}}),
+        ASCII_7F('⌂', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 1, 0, 0}, {0, 1, 0, 1, 0}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {1, 1, 1, 1, 1}});
 
         private Character valueChar;
         private int[][] valueData;
-        private static Map<Character, SYMBOLS> map;
 
-        SYMBOLS(Character valueChar, int[][] valueData) {
+        DEFAULT_SYMBOLS_DATA(Character valueChar, int[][] valueData) {
             this.valueChar = valueChar;
             this.valueData = valueData;
         }
@@ -60,31 +143,19 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         public int[][] DATA() {
             return valueData;
         }
-
-        public static SYMBOLS getSymbolByChar(Character ch) {
-            if (map == null) {
-                map = new HashMap<Character, SYMBOLS>();
-                for (SYMBOLS symbol : SYMBOLS.values()) {
-                    map.put(symbol.valueChar, symbol);
-                }
-            }
-            return map.get(ch);
-        }
     }
 
+    final int ON_VALUE = 1;
+    final int OFF_VALUE = 0;
     //endregion
     //region Variables
-    private EnumMap<SYMBOLS, Point> symbolPosInitialOffsetsMap;
-    private EnumMap<SYMBOLS, Point> symbolPosFinalOffsetsMap;
+    private DotMatrixFont defaultFont;
     private int[][] grid;
-    private int gridWidth;
-    private int gridHeight;
+    private Rect displayRect;
+    private Rect totalRect;
     private RectF gridMarginCoeffs;
     private RectF gridMargins;
     private int gridStartX;
-    private int symbolHeight;
-    private int symbolWidth;
-    private int symbolRightMargin;
     private Point symbolPos;
     private float dotCellSize;
     private float dotSize;
@@ -113,18 +184,21 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
 
     private void init() {
         final RectF GRID_MARGIN_SIZE_COEFFS_DEFAULT = new RectF(0.02f, 0.02f, 0.02f, 0.02f);   //  Marge autour de la grille (% de largeur totale)
-        final Point SYMBOL_POS_DEFAULT = new Point(0, 0);  //  Position du prochain symbole à afficher (en coordonnées de la grille (x,y), (0,0) étant le carré en haut à gauche)
-        final int SYMBOL_RIGHT_MARGIN_DEFAULT = 0;
-        final float DOT_RIGHT_MARGIN_COEFF_DEFAULT = 0.2f;       //  Distance entre carrés (% de largeur d'un carré)
+        final float GRID_DOT_RIGHT_MARGIN_COEFF_DEFAULT = 0.2f;   //  Distance entre carrés (% de largeur d'un carré)
+        final Point SYMBOL_POS_DEFAULT = new Point(0, 0);   //  Position du prochain symbole à afficher (en coordonnées de la grille (x,y), (0,0) étant le carré en haut à gauche)
+        final int DOT_MATRIX_FONT_SYMBOL_RIGHT_MARGIN = 1;        //  1 colonne vide à droite de chaque symbole
 
-        symbolPosInitialOffsetsMap = new EnumMap<SYMBOLS, Point>(SYMBOLS.class);
-        symbolPosFinalOffsetsMap = new EnumMap<SYMBOLS, Point>(SYMBOLS.class);
         gridMarginCoeffs = GRID_MARGIN_SIZE_COEFFS_DEFAULT;
-        symbolWidth = SYMBOLS.ZERO.DATA()[0].length;
-        symbolHeight = SYMBOLS.ZERO.DATA().length;
-        symbolRightMargin = SYMBOL_RIGHT_MARGIN_DEFAULT;    // Distance entre symboles (en nombre de carrés)
+        dotRightMarginCoeff = GRID_DOT_RIGHT_MARGIN_COEFF_DEFAULT;
+        defaultFont = new DotMatrixFont();
+        for (DEFAULT_SYMBOLS_DATA defaultSymbolData : DEFAULT_SYMBOLS_DATA.values()) {
+            defaultFont.addSymbol(defaultSymbolData.valueChar, defaultSymbolData.DATA());
+        }
+        defaultFont.setWidth(DEFAULT_SYMBOLS_DATA.ASCII_20.DATA()[0].length);   //  Tous les caractères ont la même largeur et hauteur
+        defaultFont.setHeight(DEFAULT_SYMBOLS_DATA.ASCII_20.DATA().length);
+        defaultFont.setRightMargin(DOT_MATRIX_FONT_SYMBOL_RIGHT_MARGIN);
         symbolPos = SYMBOL_POS_DEFAULT;
-        dotRightMarginCoeff = DOT_RIGHT_MARGIN_COEFF_DEFAULT;
+
         dotPoint = new PointF();
         dotPaint = new Paint();
         dotPaint.setAntiAlias(true);
@@ -146,10 +220,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
 
-        symbolPosInitialOffsetsMap.clear();
-        symbolPosInitialOffsetsMap = null;
-        symbolPosFinalOffsetsMap.clear();
-        symbolPosFinalOffsetsMap = null;
+        defaultFont.close();
+        defaultFont = null;
         grid = null;
         viewCanvasBackPaint = null;
         dotPaint = null;
@@ -166,7 +238,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         int ws = wm;   // Largeur souhaitée = Largeur proposée
 
         calculateDimensions(wm);
-        int h = (int) (gridMargins.top + dotCellSize * ((float) gridHeight - 1) + dotSize + gridMargins.bottom + 0.5f);
+        int h = (int) (gridMargins.top + dotCellSize * ((float) displayRect.height() - 1) + dotSize + gridMargins.bottom + 0.5f);
         int hs = h;    // Hauteur souhaitée
 
         int w = ws;
@@ -199,46 +271,42 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         backCornerRadius = (Math.min(w, h) * BACK_CORNER_RADIUS) / 200;
     }
 
-    public void setGridDimensions(int gridWidth, int gridHeight) {   //  Largeur et hauteur de la grille (en nombre de carrés)
-        this.gridWidth = gridWidth;
-        this.gridHeight = gridHeight;
-        grid = new int[gridHeight][gridWidth];
-        fillGridOff();
+    public void setGridDimensions(Rect displayRect, Rect totalRect) {   //  Largeur et hauteur de la grille affichée et au total(en nombre de carrés)
+        this.displayRect = displayRect;
+        this.totalRect = totalRect;
+        grid = new int[totalRect.height() + 1][totalRect.width() + 1];  //  +1 ligne et colonne pour permettre stockage temporaire lors d'un scroll
+        fillRectOff(totalRect);
     }
 
-    public void drawText(int x, int y, String text) {
+    public void displayText(int x, int y, String text, DotMatrixFont dotMatrixFont) {
         symbolPos.set(x, y);
+        appendText(text, dotMatrixFont);
+    }
+
+    public void appendText(String text, DotMatrixFont dotMatrixFont) {
+        Symbol symbol;
+
         for (int j = 0; j <= (text.length() - 1); j = j + 1) {
-            drawSymbol(SYMBOLS.getSymbolByChar(text.charAt(j)));
+            Character ch = text.charAt(j);
+            symbol = dotMatrixFont.getCharMap().get(ch);
+            if (symbol == null) {
+                symbol = defaultFont.getCharMap().get(ch);
+            }
+            drawSymbol(symbol);
         }
+        symbol = null;
     }
 
-    public void fillGridOn() {
-        fillRect(0, 0, gridWidth, gridHeight, 1);
+    public DotMatrixFont getDefautFont() {
+        return defaultFont;
     }
 
-    public void fillGridOff() {
-        fillRect(0, 0, gridWidth, gridHeight, 0);
+    public Rect getDisplayRect() {
+        return displayRect;
     }
 
-    public void fillRectOn(int x, int y, int width, int height) {
-        fillRect(x, y, width, height, 1);
-    }
-
-    public void fillRectOff(int x, int y, int width, int height) {
-        fillRect(x, y, width, height, 0);
-    }
-
-    public void setDotOn(int x, int y) {
-        grid[y][x] = 1;
-    }
-
-    public void setDotOff(int x, int y) {
-        grid[y][x] = 0;
-    }
-
-    public void setSymbolRightMargin(int symbolRightMargin) {   //  Marge droite pour chaque symbole (en nombre de carrés)
-        this.symbolRightMargin = symbolRightMargin;
+    public Rect getTotalRect() {
+        return totalRect;
     }
 
     public void setGridMarginCoeffs(RectF gridMarginCoeffs) {   //  Marges autour de la grille (en % de largeur totale)
@@ -249,24 +317,20 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         this.dotRightMarginCoeff = dotRightMarginCoeff;
     }
 
-    public void setAllSymbolCompressionsOn() {
-        for (SYMBOLS symbol : SYMBOLS.values()) {
-            setSymbolCompressionOnBySymbol(symbol);
-        }
+    public void fillRectOn(Rect rect) {
+        fillRect(rect, ON_VALUE);
     }
 
-    public void setAllSymbolCompressionsOff() {
-        for (SYMBOLS symbol : SYMBOLS.values()) {
-            setSymbolCompressionOffBySymbol(symbol);
-        }
+    public void fillRectOff(Rect rect) {
+        fillRect(rect, OFF_VALUE);
     }
 
-    public void setSymbolCompressionOn(Character ch) {
-        setSymbolCompressionOnBySymbol(SYMBOLS.getSymbolByChar(ch));
+    public void setDotOn(int x, int y) {
+        grid[y][x] = ON_VALUE;
     }
 
-    public void setSymbolCompressionOff(Character ch) {
-        setSymbolCompressionOffBySymbol(SYMBOLS.getSymbolByChar(ch));
+    public void setDotOff(int x, int y) {
+        grid[y][x] = OFF_VALUE;
     }
 
     public void setColors(String[] colors) {
@@ -285,16 +349,64 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         alternateColorIndex = colorIndex;
     }
 
-    public int getSymbolWidth() {   // Nombre de colonnes d'un symbole (en nombre de carrés)
-        return symbolWidth;
-    }
-
-    public int getSymbolHeight() {   // Nombre de lignes d'un symbole (en nombre de carrés)
-        return symbolHeight;
-    }
-
     public boolean isDrawing() {
         return drawing;
+    }
+
+    public void scrollLeft(Rect scrollRect) {
+        for (int j = scrollRect.top; j <= scrollRect.bottom; j = j + 1) {
+            grid[j][totalRect.width()] = grid[j][totalRect.left];    //  Stockage temporaire dans la colonne supplémentaire
+        }
+        for (int i = scrollRect.left; i <= scrollRect.right; i = i + 1) {
+            for (int j = scrollRect.top; j <= scrollRect.bottom; j = j + 1) {
+                grid[j][i] = grid[j][i + 1];
+            }
+        }
+        for (int j = scrollRect.top; j <= scrollRect.bottom; j = j + 1) {
+            grid[j][scrollRect.right] = grid[j][totalRect.width()];
+        }
+    }
+
+    public void scrollRight(Rect scrollRect) {
+        for (int j = scrollRect.top; j <= scrollRect.bottom; j = j + 1) {
+            grid[j][totalRect.width()] = grid[j][totalRect.right];    //  Stockage temporaire dans la colonne supplémentaire
+        }
+        for (int i = scrollRect.left; i <= scrollRect.right; i = i + 1) {
+            for (int j = scrollRect.top; j <= scrollRect.bottom; j = j + 1) {
+                grid[j][i] = grid[j][i - 1];
+            }
+        }
+        for (int j = scrollRect.top; j <= scrollRect.bottom; j = j + 1) {
+            grid[j][scrollRect.left] = grid[j][totalRect.width()];
+        }
+    }
+
+    public void scrollTop(Rect scrollRect) {
+        for (int i = scrollRect.left; i <= scrollRect.right; i = i + 1) {
+            grid[totalRect.height()][i] = grid[totalRect.top][i];    //  Stockage temporaire dans la ligne supplémentaire
+        }
+        for (int i = scrollRect.left; i <= scrollRect.right; i = i + 1) {
+            for (int j = scrollRect.top; j <= scrollRect.bottom; j = j + 1) {
+                grid[j][i] = grid[j + 1][i];
+            }
+        }
+        for (int i = scrollRect.left; i <= scrollRect.right; i = i + 1) {
+            grid[scrollRect.bottom][i] = grid[totalRect.height()][i];
+        }
+    }
+
+    public void scrollBottom(Rect scrollRect) {
+        for (int i = scrollRect.left; i <= scrollRect.right; i = i + 1) {
+            grid[totalRect.height()][i] = grid[totalRect.bottom][i];    //  Stockage temporaire dans la ligne supplémentaire
+        }
+        for (int i = scrollRect.left; i <= scrollRect.right; i = i + 1) {
+            for (int j = scrollRect.top; j <= scrollRect.bottom; j = j + 1) {
+                grid[j][i] = grid[j - 1][i];
+            }
+        }
+        for (int i = scrollRect.left; i <= scrollRect.right; i = i + 1) {
+            grid[scrollRect.top][i] = grid[totalRect.height()][i];
+        }
     }
 
     private boolean onButtonTouch(View v, MotionEvent event) {
@@ -337,11 +449,11 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         int backStateColorIndex = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? frontColorIndex : backColorIndex);
         int alternateStateColorIndex = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? frontColorIndex : alternateColorIndex);
         viewCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
-        for (int i = 0; i <= (gridHeight - 1); i = i + 1) {
-            for (int j = 0; j <= (gridWidth - 1); j = j + 1) {
-                int dotColorIndex = ((grid[i][j] == 1) ? frontStateColorIndex : backStateColorIndex);
+        for (int i = 0; i <= (displayRect.width() - 1); i = i + 1) {
+            for (int j = 0; j <= (displayRect.height() - 1); j = j + 1) {
+                int dotColorIndex = ((grid[j][i] == 1) ? frontStateColorIndex : backStateColorIndex);
                 dotPaint.setColor(Color.parseColor(COLOR_PREFIX + colors[dotColorIndex]));
-                dotPoint.set(gridMargins.left + (float) gridStartX + (float) j * dotCellSize, gridMargins.top + (float) i * dotCellSize);
+                dotPoint.set(gridMargins.left + (float) gridStartX + (float) i * dotCellSize, gridMargins.top + (float) j * dotCellSize);
                 viewCanvas.drawRect(dotPoint.x, dotPoint.y, dotPoint.x + dotSize, dotPoint.y + dotSize, dotPaint);
             }
         }
@@ -351,70 +463,36 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         drawing = false;
     }
 
-    private void drawSymbol(SYMBOLS symbol) {
-        Point symbolPosInitialOffset = symbolPosInitialOffsetsMap.get(symbol);
-        int[][] data = symbol.DATA();
-        symbolPos.set(symbolPos.x + symbolPosInitialOffset.x, symbolPos.y + symbolPosInitialOffset.y);  //  Appliquer un décalage avant l'affichage du symbole
-        for (int i = 0; i <= (symbolHeight - 1); i = i + 1) {
-            for (int j = 0; j <= (symbolWidth - 1); j = j + 1) {
-                if (data[i][j] == 1) {
-                    grid[symbolPos.y + i][symbolPos.x + j] = 1;
+    private void drawSymbol(Symbol symbol) {
+        int[][] symbolData = symbol.data;
+        symbolPos.set(symbolPos.x + symbol.posInitialOffset.x, symbolPos.y + symbol.posInitialOffset.y);  //  Appliquer un décalage avant l'affichage du symbole
+        for (int i = 0; i <= (defaultFont.getWidth() - 1); i = i + 1) {
+            int symbolDotX = symbolPos.x + i;
+            for (int j = 0; j <= (defaultFont.getHeight() - 1); j = j + 1) {
+                int symbolDotY = symbolPos.y + j;
+                if ((symbolDotX <= (totalRect.width() - 1)) && (symbolDotY <= (totalRect.height() - 1))) {   //  Clip
+                    if (symbolData[j][i] == 1) {
+                        grid[symbolDotY][symbolDotX] = 1;
+                    }
                 }
             }
         }
-        Point symbolPosFinalOffset = symbolPosFinalOffsetsMap.get(symbol);
-        symbolPos.set(symbolPos.x + symbolPosFinalOffset.x, symbolPos.y + symbolPosFinalOffset.y);  //  Prêt pour l'affichage du symbole suivant
+        symbolPos.set(symbolPos.x + symbol.posFinalOffset.x, symbolPos.y + symbol.posFinalOffset.y);  //  Prêt pour l'affichage du symbole suivant
     }
 
     private void calculateDimensions(int viewWidth) {  // Ajustement à un entier pour éviter le dessin d'une grille irrrégulière dans la largeur ou hauteur de ses éléments
         gridMargins = new RectF((int) ((float) viewWidth * gridMarginCoeffs.left + 0.5f), (int) ((float) viewWidth * gridMarginCoeffs.top + 0.5f), (int) ((float) viewWidth * gridMarginCoeffs.right + 0.5f), (int) ((float) viewWidth * gridMarginCoeffs.bottom + 0.5f));
-        dotCellSize = (int) (((float) viewWidth - (gridMargins.left + gridMargins.right)) / (float) gridWidth);
+        dotCellSize = (int) (((float) viewWidth - (gridMargins.left + gridMargins.right)) / (float) displayRect.width());
         dotSize = (int) (dotCellSize / (1 + dotRightMarginCoeff) + 0.5f);
-        gridStartX = (int) (((float) viewWidth - (gridMargins.left + (float) gridWidth * dotCellSize + gridMargins.right)) / 2 + 0.5f);
+        gridStartX = (int) (((float) viewWidth - (gridMargins.left + (float) displayRect.width() * dotCellSize + gridMargins.right)) / 2 + 0.5f);
     }
 
-    private void fillRect(int x, int y, int width, int height, int value) {
-        for (int i = y; i <= (y + height - 1); i = i + 1) {
-            for (int j = x; j <= (x + width - 1); j = j + 1) {
-                grid[i][j] = value;
+    private void fillRect(Rect rect, int value) {
+        for (int i = rect.left; i <= rect.right; i = i + 1) {
+            for (int j = rect.top; j <= rect.bottom; j = j + 1) {
+                grid[j][i] = value;
             }
         }
-    }
-
-    private void setSymbolCompressionOnBySymbol(SYMBOLS symbol) {
-        if ((symbol.equals(SYMBOLS.DOT)) || (symbol.equals(SYMBOLS.DOUBLE_DOT))) {
-            if (symbol.equals(SYMBOLS.DOT)) {
-                setDotCompressionOn();
-            }
-            if (symbol.equals(SYMBOLS.DOUBLE_DOT)) {
-                setDoubleDotCompressionOn();
-            }
-        } else {
-            setSymbolCompressionOffBySymbol(symbol);
-        }
-    }
-
-    private void setSymbolCompressionOffBySymbol(SYMBOLS symbol) {
-        symbolPosInitialOffsetsMap.put(symbol, new Point(0, 0));
-        symbolPosFinalOffsetsMap.put(symbol, new Point(symbolWidth + symbolRightMargin, 0));  //  Se déplacer d'une position vers la droite, marge droite comprise
-    }
-
-    private void setDotCompressionOn() {
-        int dx = -symbolWidth + 1 - symbolRightMargin;
-        int dy = 1;
-        symbolPosInitialOffsetsMap.put(SYMBOLS.DOT, new Point(dx, dy));  //  Pour afficher '.' dans la marge droite du symbole précédent, sur une ligne supplémentaire
-        dx = -dx;
-        dy = -dy;
-        symbolPosFinalOffsetsMap.put(SYMBOLS.DOT, new Point(dx, dy));    //  Pour l'affichage du prochain symbole
-    }
-
-    private void setDoubleDotCompressionOn() {
-        int dx = -symbolWidth / 2;
-        int dy = 0;
-        symbolPosInitialOffsetsMap.put(SYMBOLS.DOUBLE_DOT, new Point(dx, dy));   //  Pour afficher ':' dans la 1e colonne disponible après le symbole précédent, avec une marge droite
-        dx = -dx + 1 + symbolRightMargin;
-        dy = -dy;
-        symbolPosFinalOffsetsMap.put(SYMBOLS.DOUBLE_DOT, new Point(dx, dy));     //  Pour l'affichage du prochain symbole
     }
 
 }
