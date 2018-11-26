@@ -65,7 +65,7 @@ public class DotMatrixFont {
         for (Map.Entry<Character, DotMatrixSymbol> entry : charMap.entrySet()) {
             symbol = entry.getValue();
             posFinalOffset = symbol.getPosFinalOffset();
-            posFinalOffset.x = posFinalOffset.x + rightMargin - this.rightMargin;  //  S'adapter à la nouvelle marge droite
+            posFinalOffset.x = posFinalOffset.x + rightMargin - this.rightMargin;  //  Adapter chaque symbole à la nouvelle marge droite
             entry.setValue(symbol);
         }
         symbol = null;

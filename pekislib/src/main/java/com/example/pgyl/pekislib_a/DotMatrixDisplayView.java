@@ -30,7 +30,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     private onCustomClickListener mOnCustomClickListener;
 
     //region Constantes
-    private enum DEFAULT_SYMBOLS_DATA {  //  En matrice 5x7 ou autre
+    private enum DEFAULT_FONT_SYMBOLS_DATA {  //  En matrice 5x7 ou autre
         ASCII_20(' ', new int[][]{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}}),
         ASCII_21('!', new int[][]{{0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 1, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 1, 0, 0}}),
         ASCII_22('\'', new int[][]{{0, 1, 0, 1, 0}, {0, 1, 0, 1, 0}, {0, 1, 0, 1, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}}),
@@ -130,7 +130,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         private Character valueChar;
         private int[][] valueData;
 
-        DEFAULT_SYMBOLS_DATA(Character valueChar, int[][] valueData) {
+        DEFAULT_FONT_SYMBOLS_DATA(Character valueChar, int[][] valueData) {
             this.valueChar = valueChar;
             this.valueData = valueData;
         }
@@ -181,17 +181,11 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         final RectF GRID_MARGIN_SIZE_COEFFS_DEFAULT = new RectF(0.02f, 0.02f, 0.02f, 0.02f);   //  Marge autour de la grille (% de largeur totale)
         final float GRID_DOT_RIGHT_MARGIN_COEFF_DEFAULT = 0.2f;   //  Distance entre carrés (% de largeur d'un carré)
         final Point DEFAULT_FONT_SYMBOL_POS_DEFAULT = new Point(0, 0);   //  Position du prochain symbole à afficher (en coordonnées de la grille (x,y), (0,0) étant le carré en haut à gauche)
-        final int DEFAULT_FONT_SYMBOL_RIGHT_MARGIN = 1;        //  1 colonne vide à droite de chaque symbole
 
         gridMarginCoeffs = GRID_MARGIN_SIZE_COEFFS_DEFAULT;
         dotRightMarginCoeff = GRID_DOT_RIGHT_MARGIN_COEFF_DEFAULT;
         symbolPos = DEFAULT_FONT_SYMBOL_POS_DEFAULT;
-        defaultFont = new DotMatrixFont();
-        for (DEFAULT_SYMBOLS_DATA defaultSymbolData : DEFAULT_SYMBOLS_DATA.values()) {
-            defaultFont.addSymbol(defaultSymbolData.valueChar, defaultSymbolData.DATA());
-        }
-        defaultFont.setRightMargin(DEFAULT_FONT_SYMBOL_RIGHT_MARGIN);
-
+        setupDefaultFont();
         dotPoint = new PointF();
         dotPaint = new Paint();
         dotPaint.setAntiAlias(true);
@@ -480,6 +474,14 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         symbolPos.set(symbolPos.x + symbol.getPosFinalOffset().x, symbolPos.y + symbol.getPosFinalOffset().y);  //  Prêt pour l'affichage du symbole suivant
     }
 
+    private void fillRect(Rect rect, int value) {
+        for (int i = rect.left; i <= rect.right; i = i + 1) {
+            for (int j = rect.top; j <= rect.bottom; j = j + 1) {
+                grid[j][i] = value;
+            }
+        }
+    }
+
     private void calculateDimensions(int viewWidth) {  // Ajustement à un entier pour éviter le dessin d'une grille irrrégulière dans la largeur ou hauteur de ses éléments
         gridMargins = new RectF((int) ((float) viewWidth * gridMarginCoeffs.left + 0.5f), (int) ((float) viewWidth * gridMarginCoeffs.top + 0.5f), (int) ((float) viewWidth * gridMarginCoeffs.right + 0.5f), (int) ((float) viewWidth * gridMarginCoeffs.bottom + 0.5f));
         dotCellSize = (int) (((float) viewWidth - (gridMargins.left + gridMargins.right)) / (float) displayRect.width());
@@ -487,12 +489,14 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         gridStartX = (int) (((float) viewWidth - (gridMargins.left + (float) displayRect.width() * dotCellSize + gridMargins.right)) / 2 + 0.5f);
     }
 
-    private void fillRect(Rect rect, int value) {
-        for (int i = rect.left; i <= rect.right; i = i + 1) {
-            for (int j = rect.top; j <= rect.bottom; j = j + 1) {
-                grid[j][i] = value;
-            }
+    private void setupDefaultFont() {
+        final int DEFAULT_FONT_SYMBOL_RIGHT_MARGIN = 1;        //  1 colonne vide à droite de chaque symbole
+
+        defaultFont = new DotMatrixFont();
+        for (DEFAULT_FONT_SYMBOLS_DATA defaultFontSymbolData : DEFAULT_FONT_SYMBOLS_DATA.values()) {
+            defaultFont.addSymbol(defaultFontSymbolData.valueChar, defaultFontSymbolData.DATA());
         }
+        defaultFont.setRightMargin(DEFAULT_FONT_SYMBOL_RIGHT_MARGIN);
     }
 
 }
