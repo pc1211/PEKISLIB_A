@@ -17,7 +17,6 @@ import android.view.View;
 
 import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
-import static com.example.pgyl.pekislib_a.DotMatrixFont.Symbol;
 
 public final class DotMatrixDisplayView extends View {  //  Affichage de caractères dans une grille de carrés avec coordonnées (x,y)  ((0,0) étant en haut à gauche de la grille)
     public interface onCustomClickListener {
@@ -181,19 +180,17 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     private void init() {
         final RectF GRID_MARGIN_SIZE_COEFFS_DEFAULT = new RectF(0.02f, 0.02f, 0.02f, 0.02f);   //  Marge autour de la grille (% de largeur totale)
         final float GRID_DOT_RIGHT_MARGIN_COEFF_DEFAULT = 0.2f;   //  Distance entre carrés (% de largeur d'un carré)
-        final Point SYMBOL_POS_DEFAULT = new Point(0, 0);   //  Position du prochain symbole à afficher (en coordonnées de la grille (x,y), (0,0) étant le carré en haut à gauche)
-        final int DOT_MATRIX_FONT_SYMBOL_RIGHT_MARGIN = 1;        //  1 colonne vide à droite de chaque symbole
+        final Point DEFAULT_FONT_SYMBOL_POS_DEFAULT = new Point(0, 0);   //  Position du prochain symbole à afficher (en coordonnées de la grille (x,y), (0,0) étant le carré en haut à gauche)
+        final int DEFAULT_FONT_SYMBOL_RIGHT_MARGIN = 1;        //  1 colonne vide à droite de chaque symbole
 
         gridMarginCoeffs = GRID_MARGIN_SIZE_COEFFS_DEFAULT;
         dotRightMarginCoeff = GRID_DOT_RIGHT_MARGIN_COEFF_DEFAULT;
+        symbolPos = DEFAULT_FONT_SYMBOL_POS_DEFAULT;
         defaultFont = new DotMatrixFont();
         for (DEFAULT_SYMBOLS_DATA defaultSymbolData : DEFAULT_SYMBOLS_DATA.values()) {
             defaultFont.addSymbol(defaultSymbolData.valueChar, defaultSymbolData.DATA());
         }
-        defaultFont.setWidth(DEFAULT_SYMBOLS_DATA.ASCII_20.DATA()[0].length);   //  Tous les caractères ont la même largeur et hauteur
-        defaultFont.setHeight(DEFAULT_SYMBOLS_DATA.ASCII_20.DATA().length);
-        defaultFont.setRightMargin(DOT_MATRIX_FONT_SYMBOL_RIGHT_MARGIN);
-        symbolPos = SYMBOL_POS_DEFAULT;
+        defaultFont.setRightMargin(DEFAULT_FONT_SYMBOL_RIGHT_MARGIN);
 
         dotPoint = new PointF();
         dotPaint = new Paint();
@@ -280,7 +277,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     }
 
     public void appendText(String text, DotMatrixFont dotMatrixFont) {   //  A partir de symbolPos
-        Symbol symbol;
+        DotMatrixSymbol symbol;
 
         for (int j = 0; j <= (text.length() - 1); j = j + 1) {
             Character ch = text.charAt(j);
@@ -466,12 +463,12 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         drawing = false;
     }
 
-    private void drawSymbol(Symbol symbol) {
-        int[][] symbolData = symbol.data;
-        symbolPos.set(symbolPos.x + symbol.posInitialOffset.x, symbolPos.y + symbol.posInitialOffset.y);  //  Appliquer un décalage avant l'affichage du symbole
-        for (int i = 0; i <= (defaultFont.getWidth() - 1); i = i + 1) {
+    private void drawSymbol(DotMatrixSymbol symbol) {
+        int[][] symbolData = symbol.getData();
+        symbolPos.set(symbolPos.x + symbol.getPosInitialOffset().x, symbolPos.y + symbol.getPosInitialOffset().y);  //  Appliquer un décalage avant l'affichage du symbole
+        for (int i = 0; i <= (symbol.getWidth() - 1); i = i + 1) {
             int symbolDotX = symbolPos.x + i;
-            for (int j = 0; j <= (defaultFont.getHeight() - 1); j = j + 1) {
+            for (int j = 0; j <= (symbol.getHeight() - 1); j = j + 1) {
                 int symbolDotY = symbolPos.y + j;
                 if ((symbolDotX <= (totalRect.width() - 1)) && (symbolDotY <= (totalRect.height() - 1))) {   //  Clip
                     if (symbolData[j][i] == ON_VALUE) {
@@ -480,7 +477,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                 }
             }
         }
-        symbolPos.set(symbolPos.x + symbol.posFinalOffset.x, symbolPos.y + symbol.posFinalOffset.y);  //  Prêt pour l'affichage du symbole suivant
+        symbolPos.set(symbolPos.x + symbol.getPosFinalOffset().x, symbolPos.y + symbol.getPosFinalOffset().y);  //  Prêt pour l'affichage du symbole suivant
     }
 
     private void calculateDimensions(int viewWidth) {  // Ajustement à un entier pour éviter le dessin d'une grille irrrégulière dans la largeur ou hauteur de ses éléments
