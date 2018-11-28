@@ -40,7 +40,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
     private RectF gridMargins;
     private int gridStartX;
     private Rect displayRect;
-    private Rect totalRect;
+    private Rect extendedRect;
     private Point symbolPos;
     private float dotCellSize;
     private float dotSize;
@@ -148,11 +148,11 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         backCornerRadius = (Math.min(w, h) * BACK_CORNER_RADIUS) / 200;
     }
 
-    public void setGridDimensions(Rect displayRect, Rect totalRect) {   //  Largeur et hauteur de la grille affich√©e et au total(en nombre de carr√©s)
+    public void setGridDimensions(Rect displayRect, Rect extendedRect) {   //  Largeur et hauteur de la grille affich√©e et au total(en nombre de carr√©s)
         this.displayRect = displayRect;
-        this.totalRect = totalRect;
-        grid = new int[totalRect.height() + 1][totalRect.width() + 1];  //  +1 ligne et colonne pour permettre stockage temporaire lors d'un scroll
-        fillRectOff(totalRect);
+        this.extendedRect = extendedRect;
+        grid = new int[extendedRect.height() + 1][extendedRect.width() + 1];  //  +1 ligne et colonne pour permettre stockage temporaire lors d'un scroll
+        fillRectOff(extendedRect);
     }
 
     public void displayText(int x, int y, String text, DotMatrixFont dotMatrixFont) {
@@ -232,7 +232,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
 
     public void scrollLeft(Rect scrollRect) {
         for (int j = scrollRect.top; j <= scrollRect.bottom - 1; j = j + 1) {
-            grid[j][totalRect.width()] = grid[j][totalRect.left];    //  Stockage temporaire dans la colonne suppl√©mentaire
+            grid[j][extendedRect.width()] = grid[j][extendedRect.left];    //  Stockage temporaire dans la colonne suppl√©mentaire
         }
         for (int i = scrollRect.left; i <= scrollRect.right - 1; i = i + 1) {
             for (int j = scrollRect.top; j <= scrollRect.bottom - 1; j = j + 1) {
@@ -240,13 +240,13 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
             }
         }
         for (int j = scrollRect.top; j <= scrollRect.bottom - 1; j = j + 1) {
-            grid[j][scrollRect.right] = grid[j][totalRect.width()];
+            grid[j][scrollRect.right] = grid[j][extendedRect.width()];
         }
     }
 
     public void scrollRight(Rect scrollRect) {
         for (int j = scrollRect.top; j <= scrollRect.bottom - 1; j = j + 1) {
-            grid[j][totalRect.width()] = grid[j][totalRect.right];    //  Stockage temporaire dans la colonne suppl√©mentaire
+            grid[j][extendedRect.width()] = grid[j][extendedRect.right];    //  Stockage temporaire dans la colonne suppl√©mentaire
         }
         for (int i = scrollRect.left; i <= scrollRect.right - 1; i = i + 1) {
             for (int j = scrollRect.top; j <= scrollRect.bottom - 1; j = j + 1) {
@@ -254,13 +254,13 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
             }
         }
         for (int j = scrollRect.top; j <= scrollRect.bottom - 1; j = j + 1) {
-            grid[j][scrollRect.left] = grid[j][totalRect.width()];
+            grid[j][scrollRect.left] = grid[j][extendedRect.width()];
         }
     }
 
     public void scrollTop(Rect scrollRect) {
         for (int i = scrollRect.left; i <= scrollRect.right - 1; i = i + 1) {
-            grid[totalRect.height()][i] = grid[totalRect.top][i];    //  Stockage temporaire dans la ligne suppl√©mentaire
+            grid[extendedRect.height()][i] = grid[extendedRect.top][i];    //  Stockage temporaire dans la ligne suppl√©mentaire
         }
         for (int i = scrollRect.left; i <= scrollRect.right - 1; i = i + 1) {
             for (int j = scrollRect.top; j <= scrollRect.bottom - 1; j = j + 1) {
@@ -268,13 +268,13 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
             }
         }
         for (int i = scrollRect.left; i <= scrollRect.right - 1; i = i + 1) {
-            grid[scrollRect.bottom][i] = grid[totalRect.height()][i];
+            grid[scrollRect.bottom][i] = grid[extendedRect.height()][i];
         }
     }
 
     public void scrollBottom(Rect scrollRect) {
         for (int i = scrollRect.left; i <= scrollRect.right - 1; i = i + 1) {
-            grid[totalRect.height()][i] = grid[totalRect.bottom][i];    //  Stockage temporaire dans la ligne suppl√©mentaire
+            grid[extendedRect.height()][i] = grid[extendedRect.bottom][i];    //  Stockage temporaire dans la ligne suppl√©mentaire
         }
         for (int i = scrollRect.left; i <= scrollRect.right - 1; i = i + 1) {
             for (int j = scrollRect.top; j <= scrollRect.bottom - 1; j = j + 1) {
@@ -282,7 +282,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
             }
         }
         for (int i = scrollRect.left; i <= scrollRect.right - 1; i = i + 1) {
-            grid[scrollRect.top][i] = grid[totalRect.height()][i];
+            grid[scrollRect.top][i] = grid[extendedRect.height()][i];
         }
     }
 
