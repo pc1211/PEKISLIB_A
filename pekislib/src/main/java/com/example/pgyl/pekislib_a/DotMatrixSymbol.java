@@ -3,51 +3,43 @@ package com.example.pgyl.pekislib_a;
 import android.graphics.Point;
 
 public class DotMatrixSymbol {
+    private Character ch;             //  Caractère représenté
     private int[][] data;             //  Données de forme du symbole
     private Point posInitialOffset;   //  Repositionnement du symbole avant affichage
     private Point posFinalOffset;     //  Repositionnement pour le prochain symbole à afficher
     private int width;                //  Largeur du symbole
     private int height;               //  Hauteur du symbole
 
-    public DotMatrixSymbol() {
+    public DotMatrixSymbol(Character ch, int[][] data) {
+        this.ch = ch;
+        this.data = data;
         init();
     }
 
     private void init() {
-        width = 0;
-        height = 0;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public void setData(int[][] data) {
         height = data.length;
+        width = 0;
         for (int i = 0; i <= (height - 1); i = i + 1) {
             if (data[i].length > width) {      //   Chercher la largeur max. du symbole
                 width = data[i].length;
             }
         }
-        this.data = data;
-        posInitialOffset = new Point(0, 0);    //  Par défaut, pas de repositionnement avant affichage du symbole
-        posFinalOffset = new Point(width, 0);     //  Par défault, après affichage du symbole, se déplacer d'une position vers la droite sans marge droite
     }
 
-    public int[][] getData() {
+    public Character getCh() {   //  Pas de set
+        return ch;
+    }
+
+    public int[][] getData() {   //  Pour le set, cf constructor()
         return data;
+    }
+
+    public int getWidth() {    //  Pour le set, cf init()
+        return width;
+    }
+
+    public int getHeight() {   //  Pour le set, cf init()
+        return height;
     }
 
     public Point getPosInitialOffset() {

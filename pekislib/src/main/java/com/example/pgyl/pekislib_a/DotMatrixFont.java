@@ -16,10 +16,10 @@ public class DotMatrixFont {
     }
 
     private void init() {
-        final int SYMBOL_RIGHT_MARGIN_DEFAULT = 0;
+        final int RIGHT_MARGIN_DEFAULT = 0;
 
         charMap = new HashMap<Character, DotMatrixSymbol>();
-        rightMargin = SYMBOL_RIGHT_MARGIN_DEFAULT;
+        rightMargin = RIGHT_MARGIN_DEFAULT;
         width = 0;
         height = 0;
     }
@@ -35,23 +35,24 @@ public class DotMatrixFont {
 
     public int getWidth() {
         return width;
-    }    //  Pas de set car dépend des symboles
+    }    //  Pour le set, cf setSymbols
 
     public int getHeight() {
         return height;
-    }    //  Pas de set car dépend des symboles
+    }    //  Pour le set, cf setSymbols
 
-    public void addSymbol(Character ch, int[][] data) {
-        DotMatrixSymbol symbol = new DotMatrixSymbol();
-        symbol.setData(data);
-        charMap.put(ch, symbol);
-        if (symbol.getWidth() > width) {   //  Chercher la largeur max. des symboles
-            width = symbol.getWidth();
+    public void setSymbols(DotMatrixSymbol[] symbols) {
+        for (int i = 0; i <= (symbols.length - 1); i = i + 1) {
+            charMap.put(symbols[i].getCh(), symbols[i]);
+            symbols[i].setPosInitialOffset(new Point(0, 0));
+            symbols[i].setPosFinalOffset(new Point(symbols[i].getWidth() + rightMargin, 0));
+            if (symbols[i].getWidth() > width) {
+                width = symbols[i].getWidth();
+            }
+            if (symbols[i].getHeight() > height) {
+                height = symbols[i].getHeight();
+            }
         }
-        if (symbol.getHeight() > height) {   //  Chercher la hauteur max. des symboles
-            height = symbol.getHeight();
-        }
-        symbol = null;
     }
 
     public int getRightMargin() {
@@ -60,16 +61,25 @@ public class DotMatrixFont {
 
     public void setRightMargin(int rightMargin) {   //  Marge droite pour chaque symbole (en nombre de carrés)
         DotMatrixSymbol symbol;
-        Point posFinalOffset;
 
         for (Map.Entry<Character, DotMatrixSymbol> entry : charMap.entrySet()) {
             symbol = entry.getValue();
-            posFinalOffset = symbol.getPosFinalOffset();
-            posFinalOffset.x = posFinalOffset.x + rightMargin - this.rightMargin;  //  Adapter chaque symbole à la nouvelle marge droite
-            entry.setValue(symbol);
+            symbol.getPosFinalOffset().x = symbol.getWidth() + rightMargin;  //  Adapter chaque symbole à la nouvelle marge droite
         }
         symbol = null;
         this.rightMargin = rightMargin;
+    }
+
+    public int getTextWidth(String text) {   // Largeur nécessaire pour afficher un texte (symboles avec marge droite comprise)
+        DotMatrixSymbol symbol;
+
+        int textWidth = 0;
+        for (int i = 0; i <= (text.length() - 1); i = i + 1) {
+            symbol = charMap.get(text.charAt(i));
+            textWidth = textWidth + symbol.getPosInitialOffset().x + symbol.getPosFinalOffset().x;
+        }
+        symbol = null;
+        return textWidth;
     }
 
 }
