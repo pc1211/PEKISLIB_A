@@ -1,7 +1,13 @@
 package com.example.pgyl.pekislib_a;
 
 public class Constants {
-    public enum PEKISLIB_ACTIVITIES {PRESETS, INPUT_BUTTONS, COLOR_PICKER, HELP}
+    public enum PEKISLIB_ACTIVITIES {
+        PRESETS, INPUT_BUTTONS, COLOR_PICKER, HELP;
+
+        public int INDEX() {
+            return ordinal();
+        }
+    }
 
     public enum ACTIVITY_EXTRA_KEYS {TITLE}
 

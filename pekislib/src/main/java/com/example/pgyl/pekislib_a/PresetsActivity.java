@@ -57,6 +57,10 @@ public class PresetsActivity extends Activity {
         public String TEXT() {
             return valueText;
         }
+
+        public int INDEX() {
+            return ordinal();
+        }
     }
 
     public enum PRESETS_ACTIVITY_EXTRA_KEYS {
@@ -157,7 +161,7 @@ public class PresetsActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent returnIntent) {
         validReturnFromCalledActivity = false;
-        if (requestCode == PEKISLIB_ACTIVITIES.INPUT_BUTTONS.ordinal()) {
+        if (requestCode == PEKISLIB_ACTIVITIES.INPUT_BUTTONS.INDEX()) {
             calledActivity = PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString();
             if (resultCode == RESULT_OK) {
                 validReturnFromCalledActivity = true;
@@ -300,27 +304,24 @@ public class PresetsActivity extends Activity {
         if ((keyboards[columnIndex].equals(KEYBOARDS.TIME_HMS.toString())) || (keyboards[columnIndex].equals(KEYBOARDS.TIME_XHMS.toString()))) {
             fieldText = msToHms(Long.parseLong(fieldText), TIMEUNITS.valueOf(timeUnits[columnIndex]));
         }
-        int index = COMMANDS.FIELD.ordinal();
-        buttons[index].setText(fieldText);
-        index = COMMANDS.NEXT.ordinal();
-        buttons[index].setText(labelNames[columnIndex] + SYMBOL_NEXT);
+        buttons[COMMANDS.FIELD.INDEX()].setText(fieldText);
+        buttons[COMMANDS.NEXT.INDEX()].setText(labelNames[columnIndex] + SYMBOL_NEXT);
     }
 
     private void updateDisplayButtonColor(COMMANDS command) {
         final String SPECIAL_FIELD_UNPRESSED_COLOR = "FF9A22";
         final String SPECIAL_FIELD_PRESSED_COLOR = "995400";
 
-        int index = command.ordinal();
         if (command.equals(COMMANDS.FIELD)) {
             if (listIndex != LIST_INDEX_DEFAULT_VALUE) {
-                buttons[index].setUnpressedColor(SPECIAL_FIELD_UNPRESSED_COLOR);
-                buttons[index].setPressedColor(SPECIAL_FIELD_PRESSED_COLOR);
+                buttons[command.INDEX()].setUnpressedColor(SPECIAL_FIELD_UNPRESSED_COLOR);
+                buttons[command.INDEX()].setPressedColor(SPECIAL_FIELD_PRESSED_COLOR);
             } else {
-                buttons[index].setUnpressedColor(BUTTON_STATES.UNPRESSED.DEFAULT_COLOR());
-                buttons[index].setPressedColor(BUTTON_STATES.PRESSED.DEFAULT_COLOR());
+                buttons[command.INDEX()].setUnpressedColor(BUTTON_STATES.UNPRESSED.DEFAULT_COLOR());
+                buttons[command.INDEX()].setPressedColor(BUTTON_STATES.PRESSED.DEFAULT_COLOR());
             }
         }
-        buttons[index].updateColor();
+        buttons[command.INDEX()].updateColor();
     }
 
     private void updateDisplayButtonColors() {
@@ -390,11 +391,10 @@ public class PresetsActivity extends Activity {
         Class rid = R.id.class;
         for (COMMANDS command : COMMANDS.values()) {
             try {
-                int index = command.ordinal();
-                buttons[index] = findViewById(rid.getField(BUTTON_XML_PREFIX + command.toString()).getInt(rid));   //  1, 2, 3 ... dans le XML
-                buttons[index].setText(command.TEXT());
+                buttons[command.INDEX()] = findViewById(rid.getField(BUTTON_XML_PREFIX + command.toString()).getInt(rid));   //  1, 2, 3 ... dans le XML
+                buttons[command.INDEX()].setText(command.TEXT());
                 final COMMANDS fcommand = command;
-                buttons[index].setOnClickListener(new View.OnClickListener() {
+                buttons[command.INDEX()].setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         onButtonClick(fcommand);
@@ -444,9 +444,8 @@ public class PresetsActivity extends Activity {
                 unpressedColor = OK_UNPRESSED_COLOR_DEFAULT;
                 pressedColor = OK_PRESSED_COLOR_DEFAULT;
             }
-            int index = command.ordinal();
-            buttons[index].setUnpressedColor(unpressedColor);
-            buttons[index].setPressedColor(pressedColor);
+            buttons[command.INDEX()].setUnpressedColor(unpressedColor);
+            buttons[command.INDEX()].setPressedColor(pressedColor);
         }
     }
 
@@ -456,7 +455,7 @@ public class PresetsActivity extends Activity {
         callingIntent.putExtra(TABLE_EXTRA_KEYS.TABLE.toString(), tableName);
         callingIntent.putExtra(TABLE_EXTRA_KEYS.INDEX.toString(), columnIndex);
         callingIntent.putExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString(), labelNames[columnIndex]);
-        startActivityForResult(callingIntent, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.ordinal());
+        startActivityForResult(callingIntent, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.INDEX());
     }
 
     private void launchHelpActivity() {

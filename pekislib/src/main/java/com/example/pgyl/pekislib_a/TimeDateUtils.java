@@ -110,7 +110,8 @@ public class TimeDateUtils {
 
     public static long hmsToMs(String hms) {
         long ret = ERROR_VALUE;
-        TimeUnitsStruc tus = hmsToTimeUnitsStruc(hms);
+        TimeUnitsStruc tus = new TimeUnitsStruc();
+        hmsToTimeUnitsStruc(hms, tus);
         if (tus != null) {
             ret = tus.hour * TIMEUNITS.HOUR.MS() + tus.min * TIMEUNITS.MIN.MS() + tus.sec * TIMEUNITS.SEC.MS() + tus.cs * TIMEUNITS.CS.MS();
             tus = null;
@@ -118,14 +119,13 @@ public class TimeDateUtils {
         return ret;
     }
 
-    public static TimeUnitsStruc hmsToTimeUnitsStruc(String hms) {
+    public static void hmsToTimeUnitsStruc(String hms, TimeUnitsStruc tus) {
         String str = hms;
         long h = 0;
         long m = 0;
         long s = 0;
         long c = 0;
-        long retc = 0;
-        TimeUnitsStruc ret = null;
+        int retc = 0;
         try {
             int i = str.indexOf(":");
             if (i == NOT_FOUND) { //  => H
@@ -152,18 +152,19 @@ public class TimeDateUtils {
             retc = ERROR_VALUE;
         }
         if (retc != ERROR_VALUE) {
-            ret = new TimeUnitsStruc();
-            ret.hour = h;
-            ret.min = m;
-            ret.sec = s;
-            ret.cs = c;
+            tus.hour = h;
+            tus.min = m;
+            tus.sec = s;
+            tus.cs = c;
+        } else {
+            tus = null;
         }
-        return ret;
     }
 
     public static long xhmsToMs(String xhms) {
         long ret = ERROR_VALUE;
-        TimeUnitsStruc tus = xhmsToTimeUnitsStruc(xhms);
+        TimeUnitsStruc tus = new TimeUnitsStruc();
+        xhmsToTimeUnitsStruc(xhms, tus);
         if (tus != null) {
             ret = tus.hour * TIMEUNITS.HOUR.MS() + tus.min * TIMEUNITS.MIN.MS() + tus.sec * TIMEUNITS.SEC.MS() + tus.cs * TIMEUNITS.CS.MS();
             tus = null;
@@ -171,15 +172,14 @@ public class TimeDateUtils {
         return ret;
     }
 
-    public static TimeUnitsStruc xhmsToTimeUnitsStruc(String xhms) {
+    public static void xhmsToTimeUnitsStruc(String xhms, TimeUnitsStruc tus) {
         String str = xhms;
         long h = 0;
         long m = 0;
         long s = 0;
         long c = 0;
-        long retc = 0;
+        int retc = 0;
         TIMEUNITS tu = null;   // Contiendra la dernière unité précisée p.ex. 2m30 => m; 2h30s => s
-        TimeUnitsStruc ret = null;
         try {
             int k = NOT_FOUND;
             int i = str.indexOf("h");
@@ -229,13 +229,13 @@ public class TimeDateUtils {
             retc = ERROR_VALUE;
         }
         if (retc != ERROR_VALUE) {
-            ret = new TimeUnitsStruc();
-            ret.hour = h;
-            ret.min = m;
-            ret.sec = s;
-            ret.cs = c;
+            tus.hour = h;
+            tus.min = m;
+            tus.sec = s;
+            tus.cs = c;
+        } else {
+            tus = null;
         }
-        return ret;
     }
 
 }

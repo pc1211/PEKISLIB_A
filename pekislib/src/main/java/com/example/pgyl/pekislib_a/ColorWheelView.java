@@ -69,7 +69,7 @@ public final class ColorWheelView extends View {
     private float rotationAngle;
     private float startAngle;
     private float angleSpread;
-    private ColorWheelViewRobot colorWheelViewRobot;
+    private ColorWheelViewUpdater colorWheelViewUpdater;
     //endregion
 
     public ColorWheelView(Context context, AttributeSet attrs) {
@@ -98,15 +98,15 @@ public final class ColorWheelView extends View {
                 return ColorWheelView.this.onTouch(v, event);
             }
         });
-        colorWheelViewRobot = new ColorWheelViewRobot(this);
+        colorWheelViewUpdater = new ColorWheelViewUpdater(this);
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
 
-        colorWheelViewRobot.close();
-        colorWheelViewRobot = null;
+        colorWheelViewUpdater.close();
+        colorWheelViewUpdater = null;
         fillPaint = null;
         outlinePaint = null;
         viewCanvas = null;
@@ -160,11 +160,7 @@ public final class ColorWheelView extends View {
     public void setColors(String[] colors) {
         this.colors = new int[colors.length];
         for (int i = 0; i <= (colors.length - 1); i = i + 1) {
-            if (colors[i] != null) {
-                this.colors[i] = Color.parseColor(COLOR_PREFIX + colors[i]);
-            } else {
-                this.colors[i] = Color.BLACK;
-            }
+            this.colors[i] = ((colors[i] != null) ? Color.parseColor(COLOR_PREFIX + colors[i]) : Color.BLACK);
             angleSpread = 2 * (float) Math.PI / colors.length;
         }
     }
@@ -224,7 +220,7 @@ public final class ColorWheelView extends View {
     private void onTouchActionUp() {
         if (rotationAngle != 0) {
             long nowm = System.currentTimeMillis();
-            colorWheelViewRobot.rotateAnimation(-rotationAngle, nowm);       //  Aller au centre
+            colorWheelViewUpdater.rotateAnimation(-rotationAngle, nowm);       //  Aller au centre
         }
     }
 

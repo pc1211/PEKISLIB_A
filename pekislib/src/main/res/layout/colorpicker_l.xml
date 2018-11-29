@@ -11,19 +11,24 @@
     	android:layout_width="match_parent"
     	android:layout_height="wrap_content">    
         <SeekBar
-            android:id="@+id/SEEKB_1"
+            android:id="@+id/SEEKB_RED_HUE"
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
             android:layout_width="0dp"
             android:layout_weight="3"                              
             android:layout_height="wrap_content"
-            android:max="255"
+            android:max="65535"
             android:progress="0"/>
         <Button
-            android:id="@+id/BTN_NEXT"
+            android:id="@+id/BTN_NEXT_COLOR_ITEM"
             android:layout_width="0dp"
-            android:layout_weight="2"                  
-            android:layout_height="wrap_content" />       
+            android:layout_weight="1"
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/BTN_CANCEL"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content" />
     </LinearLayout>         
     <LinearLayout
     	android:orientation="horizontal"
@@ -31,25 +36,25 @@
     	android:layout_width="match_parent"
     	android:layout_height="wrap_content">    
         <SeekBar
-            android:id="@+id/SEEKB_2"
+            android:id="@+id/SEEKB_GREEN_SAT"
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
             android:layout_width="0dp"
             android:layout_weight="3"                              
             android:layout_height="wrap_content"
-            android:max="255"
+            android:max="65535"
             android:progress="0"/>
         <Button
-            android:id="@+id/BTN_RGB"
-            android:textStyle="bold"
-            android:layout_width="0dp"
-            android:layout_weight="1"                  
-            android:layout_height="wrap_content" />       
-        <Button
-            android:id="@+id/BTN_CANCEL"
+            android:id="@+id/BTN_PRESETS"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content" />   
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/BTN_OK"
+            android:textStyle="bold"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content" />
     </LinearLayout>         
     <LinearLayout
     	android:orientation="horizontal"
@@ -57,25 +62,25 @@
     	android:layout_width="match_parent"
     	android:layout_height="wrap_content">   
         <SeekBar
-            android:id="@+id/SEEKB_3"
+            android:id="@+id/SEEKB_BLUE_VAL"
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
             android:layout_width="0dp"
             android:layout_weight="3"                              
             android:layout_height="wrap_content"
-            android:max="255"
+            android:max="65535"
             android:progress="0"/>
         <Button
-            android:id="@+id/BTN_PRESETS"
+            android:id="@+id/BTN_NEXT_COLOR_SPACE"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content" />   
+            android:layout_height="wrap_content" />
         <Button
-            android:id="@+id/BTN_OK"
+            android:id="@+id/BTN_RGB_COLOR_VALUE"
             android:textStyle="bold"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content" />        
+            android:layout_height="wrap_content" />
     </LinearLayout>    
     <LinearLayout
         android:orientation="horizontal"

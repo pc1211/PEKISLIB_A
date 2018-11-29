@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.example.pgyl.pekislib_a.Constants.ACTIVITY_EXTRA_KEYS;
+import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
 import static com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITIES;
 import static com.example.pgyl.pekislib_a.Constants.SHP_FILE_NAME_SUFFIX;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_EXTRA_KEYS;
@@ -45,7 +46,7 @@ import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatu
 public class ColorPickerActivity extends Activity {
     //region Constantes
     private enum COMMANDS {
-        NEXT("Next"), CANCEL("Cancel"), RGB("RGB"), PRESETS("Presets"), OK("OK");
+        NEXT_COLOR_ITEM(""), NEXT_COLOR_SPACE(""), CANCEL("Cancel"), RGB_COLOR_VALUE(""), PRESETS("Presets"), OK("OK");
 
         private String valueText;
 
@@ -56,39 +57,48 @@ public class ColorPickerActivity extends Activity {
         public String TEXT() {
             return valueText;
         }
-    }
 
-    private enum PRIMARY_COLORS {
-        RED(Color.RED, 0), GREEN(Color.GREEN, 1), BLUE(Color.BLUE, 2);
-
-        private int valueColor;
-        private int valueIndex;
-
-        PRIMARY_COLORS(int valueColor, int valueIndex) {
-            this.valueColor = valueColor;
-            this.valueIndex = valueIndex;
-        }
-
-        int VALUE() {
-            return valueColor;
-        }
-
-        int INDEX() {
-            return valueIndex;
+        public int INDEX() {
+            return ordinal();
         }
     }
 
-    private enum SHP_KEY_NAMES {COLOR_INDEX}
+    private enum SEEKBARS {
+        RED_HUE(Color.RED), GREEN_SAT(Color.GREEN), BLUE_VAL(Color.BLUE);
+
+        private int rgbColorValue;
+
+        SEEKBARS(int rgbColorValue) {
+            this.rgbColorValue = rgbColorValue;
+        }
+
+        public int RGB_COLOR_VALUE() {
+            return rgbColorValue;
+        }
+
+        public int INDEX() {
+            return ordinal();
+        }
+    }
+
+    private enum COLOR_SPACES {RGB, HSV}
+
+    private enum SHP_KEY_NAMES {COLOR_INDEX, COLOR_SPACE}
 
     private final int COLOR_INDEX_DEFAULT_VALUE = 1;
+    private final COLOR_SPACES COLOR_SPACE_DEFAULT_VALUE = COLOR_SPACES.RGB;
     //endregion
     //region Variables
-    private SeekBar[] seekbars;
+    private SeekBar[] seekBars;
+    private LayerDrawable[] progressDrawables;
+    private Drawable[] processDrawables;
     private String[] colors;
     private int colorIndex;
     private String[] labelNames;
+    private COLOR_SPACES colorSpace;
+    private float[] hsvStruc;
     private ColorWheelView colorWheelView;
-    private ColorWheelViewRobot colorWheelViewRobot;
+    private ColorWheelViewUpdater colorWheelViewUpdater;
     private String tableName;
     private Button[] buttons;
     private boolean validReturnFromCalledActivity;
@@ -106,7 +116,7 @@ public class ColorPickerActivity extends Activity {
         setupOrientationLayout();
         setupButtons();
         setupColorWheelView();
-        setupSeekbars();
+        setupSeekBars();
         validReturnFromCalledActivity = false;
     }
 
@@ -118,8 +128,8 @@ public class ColorPickerActivity extends Activity {
         setCurrentColorsInColorPickerActivity(stringShelfDatabase, tableName, colors);
         stringShelfDatabase.close();
         stringShelfDatabase = null;
-        colorWheelViewRobot.close();
-        colorWheelViewRobot = null;
+        colorWheelViewUpdater.close();
+        colorWheelViewUpdater = null;
     }
 
     @Override
@@ -135,8 +145,10 @@ public class ColorPickerActivity extends Activity {
         if (isColdStartStatusInColorPickerActivity(stringShelfDatabase)) {
             setStartStatusInColorPickerActivity(stringShelfDatabase, ACTIVITY_START_STATUS.HOT);
             colorIndex = COLOR_INDEX_DEFAULT_VALUE;
+            colorSpace = COLOR_SPACE_DEFAULT_VALUE;
         } else {
             colorIndex = getSHPcolorIndex();
+            colorSpace = getSHPcolorSpace();
             if (validReturnFromCalledActivity) {
                 validReturnFromCalledActivity = false;
                 if (returnsFromInputButtonsActivity()) {
@@ -149,22 +161,25 @@ public class ColorPickerActivity extends Activity {
         }
 
         setupColorWheelViewColors();
-        setupColorWheelViewRobot();
-        updateDisplayButtonTexts();
-        updateDisplaySeekBars();
+        setupColorWheelViewUpdater();
+        setupHSVColorSpace();
+        updateDisplayButtonTextColorItem();
+        updateDisplayButtonTextColorValue();
+        updateDisplayColorSpace();
+        updateDisplaySeekBarsProgress();
         colorWheelView.invalidate();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent returnIntent) {
         validReturnFromCalledActivity = false;
-        if (requestCode == PEKISLIB_ACTIVITIES.INPUT_BUTTONS.ordinal()) {
+        if (requestCode == PEKISLIB_ACTIVITIES.INPUT_BUTTONS.INDEX()) {
             calledActivity = PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString();
             if (resultCode == RESULT_OK) {
                 validReturnFromCalledActivity = true;
             }
         }
-        if (requestCode == PEKISLIB_ACTIVITIES.PRESETS.ordinal()) {
+        if (requestCode == PEKISLIB_ACTIVITIES.PRESETS.INDEX()) {
             calledActivity = PEKISLIB_ACTIVITIES.PRESETS.toString();
             if (resultCode == RESULT_OK) {
                 validReturnFromCalledActivity = true;
@@ -189,13 +204,16 @@ public class ColorPickerActivity extends Activity {
 
     private void onButtonClick(COMMANDS command) {
         long nowm = System.currentTimeMillis();
-        if (command.equals(COMMANDS.NEXT)) {
-            onButtonClickNext(nowm);
+        if (command.equals(COMMANDS.NEXT_COLOR_ITEM)) {
+            onButtonClickNextColorItem(nowm);
+        }
+        if (command.equals(COMMANDS.NEXT_COLOR_SPACE)) {
+            onButtonClickNextColorSpace();
         }
         if (command.equals(COMMANDS.CANCEL)) {
             onButtonClickCancel();
         }
-        if (command.equals(COMMANDS.RGB)) {
+        if (command.equals(COMMANDS.RGB_COLOR_VALUE)) {
             onButtonClickRGB();
         }
         if (command.equals(COMMANDS.PRESETS)) {
@@ -206,8 +224,15 @@ public class ColorPickerActivity extends Activity {
         }
     }
 
-    private void onButtonClickNext(long nowm) {
-        colorWheelViewRobot.rotateAnimation(colorWheelView.getAngleSpread(), nowm);  //  Sens inverse des aiguilles d'une montre
+    private void onButtonClickNextColorItem(long nowm) {
+        colorWheelViewUpdater.rotateAnimation(colorWheelView.getAngleSpread(), nowm);  //  Sens inverse des aiguilles d'une montre
+    }
+
+    private void onButtonClickNextColorSpace() {
+        colorSpace = ((colorSpace.equals(COLOR_SPACES.RGB)) ? COLOR_SPACES.HSV : COLOR_SPACES.RGB);
+        updateDisplayColorSpace();
+        updateDisplaySeekBarsProgress();
+        updateDisplayButtonTextColorValue();
     }
 
     private void onButtonClickCancel() {
@@ -232,36 +257,66 @@ public class ColorPickerActivity extends Activity {
 
     private void onWheelColorIndexChange(int newColorIndex) {      //  La rotation de la roue fait passer à une autre couleur
         colorIndex = newColorIndex + 1;                            //  colors stocke le 1er élément (ID)
-        updateDisplayButtonTexts();
-        updateDisplaySeekBars();
+        updateDisplayButtonTextColorItem();
+        updateDisplayButtonTextColorValue();
+        updateDisplaySeekBarsProgress();
     }
 
     private void onSeekBarProgressChanged(boolean fromUser) {
         if (fromUser) {
-            String rgb = String.format("%02X", seekbars[PRIMARY_COLORS.RED.INDEX()].getProgress());
-            rgb = rgb + String.format("%02X", seekbars[PRIMARY_COLORS.GREEN.INDEX()].getProgress());
-            rgb = rgb + String.format("%02X", seekbars[PRIMARY_COLORS.BLUE.INDEX()].getProgress());
-            colors[colorIndex] = rgb;
-            int index = COMMANDS.RGB.ordinal();
-            buttons[index].setText(rgb);
-            colorWheelView.setColor(colorIndex - 1, rgb);  //  colorWheelView ne stocke pas le 1er élément (ID)
+            int redHueSeekbarValue = seekBars[SEEKBARS.RED_HUE.INDEX()].getProgress();   //  0..65535
+            int greenSatSeekbarValue = seekBars[SEEKBARS.GREEN_SAT.INDEX()].getProgress();
+            int blueValSeekbarValue = seekBars[SEEKBARS.BLUE_VAL.INDEX()].getProgress();
+            if (colorSpace.equals(COLOR_SPACES.RGB)) {
+                colors[colorIndex] = String.format("%02X", (int) ((float) redHueSeekbarValue / 65535f * 255f)) +
+                        String.format("%02X", (int) ((float) greenSatSeekbarValue / 65535f * 255f)) +
+                        String.format("%02X", (int) ((float) blueValSeekbarValue / 65535f * 255f));
+            } else {
+                hsvStruc[0] = (float) redHueSeekbarValue / 65535f * 360f;
+                hsvStruc[1] = (float) greenSatSeekbarValue / 65535f;
+                hsvStruc[2] = (float) blueValSeekbarValue / 65535f;
+                colors[colorIndex] = String.format("%06X", Color.HSVToColor(0, hsvStruc));
+            }
+            updateDisplayButtonTextColorValue();
+            colorWheelView.setColor(colorIndex - 1, colors[colorIndex]);  //  colorWheelView ne stocke pas le 1er élément (ID)
             colorWheelView.invalidate();
         }
     }
 
-    private void updateDisplayButtonTexts() {
+    private void updateDisplayButtonTextColorItem() {
         final String SYMBOL_NEXT = " >";               //  Pour signifier qu'on peut passer au suivant en poussant sur le bouton
 
-        int index = COMMANDS.NEXT.ordinal();
-        buttons[index].setText(labelNames[colorIndex] + SYMBOL_NEXT);
-        index = COMMANDS.RGB.ordinal();
-        buttons[index].setText(colors[colorIndex]);
+        buttons[COMMANDS.NEXT_COLOR_ITEM.INDEX()].setText(labelNames[colorIndex] + SYMBOL_NEXT);
     }
 
-    private void updateDisplaySeekBars() {
-        for (PRIMARY_COLORS primaryColor : PRIMARY_COLORS.values()) {
-            int index = primaryColor.INDEX();
-            seekbars[index].setProgress(Integer.parseInt(colors[colorIndex].substring(2 * index, 2 * (index + 1)), 16));
+    private void updateDisplayButtonTextColorValue() {
+        buttons[COMMANDS.RGB_COLOR_VALUE.INDEX()].setText(colors[colorIndex]);
+    }
+
+    private void updateDisplayColorSpace() {
+        final String SYMBOL_NEXT = " >";               //  Pour signifier qu'on peut passer au suivant en poussant sur le bouton
+        final String HSV_SEEKBAR_COLOR = "C0C0C0";
+
+        buttons[COMMANDS.NEXT_COLOR_SPACE.INDEX()].setText(colorSpace.toString() + SYMBOL_NEXT);
+        for (SEEKBARS seekBar : SEEKBARS.values()) {
+            int seekBarColor = ((colorSpace.equals(COLOR_SPACES.RGB)) ? seekBar.RGB_COLOR_VALUE() : Color.parseColor(COLOR_PREFIX + HSV_SEEKBAR_COLOR));
+            processDrawables[seekBar.INDEX()].setColorFilter(seekBarColor, PorterDuff.Mode.SRC_IN);  // Colorier uniquement la 1e partie de la seekbar
+        }
+    }
+
+    private void updateDisplaySeekBarsProgress() {
+        int red = Integer.parseInt(colors[colorIndex].substring(0, 2), 16);  //  0..255
+        int green = Integer.parseInt(colors[colorIndex].substring(2, 4), 16);
+        int blue = Integer.parseInt(colors[colorIndex].substring(4, 6), 16);
+        if (colorSpace.equals(COLOR_SPACES.RGB)) {
+            seekBars[SEEKBARS.RED_HUE.INDEX()].setProgress(257 * red);    //  257 = 65535 / 255
+            seekBars[SEEKBARS.GREEN_SAT.INDEX()].setProgress(257 * green);
+            seekBars[SEEKBARS.BLUE_VAL.INDEX()].setProgress(257 * blue);
+        } else {
+            Color.RGBToHSV(red, green, blue, hsvStruc);
+            seekBars[SEEKBARS.RED_HUE.INDEX()].setProgress((int) (hsvStruc[0] / 360f * 65535f));
+            seekBars[SEEKBARS.GREEN_SAT.INDEX()].setProgress((int) (hsvStruc[1] * 65535f));
+            seekBars[SEEKBARS.BLUE_VAL.INDEX()].setProgress((int) (hsvStruc[2] * 65535f));
         }
     }
 
@@ -270,10 +325,16 @@ public class ColorPickerActivity extends Activity {
         return shp.getInt(SHP_KEY_NAMES.COLOR_INDEX.toString(), COLOR_INDEX_DEFAULT_VALUE);
     }
 
+    private COLOR_SPACES getSHPcolorSpace() {
+        SharedPreferences shp = getSharedPreferences(shpFileName, MODE_PRIVATE);
+        return COLOR_SPACES.valueOf(shp.getString(SHP_KEY_NAMES.COLOR_SPACE.toString(), COLOR_SPACE_DEFAULT_VALUE.toString()));
+    }
+
     private void savePreferences() {
         SharedPreferences shp = getSharedPreferences(shpFileName, MODE_PRIVATE);
         SharedPreferences.Editor shpEditor = shp.edit();
         shpEditor.putInt(SHP_KEY_NAMES.COLOR_INDEX.toString(), colorIndex);
+        shpEditor.putString(SHP_KEY_NAMES.COLOR_SPACE.toString(), colorSpace.toString());
         shpEditor.commit();
     }
 
@@ -292,11 +353,10 @@ public class ColorPickerActivity extends Activity {
         Class rid = R.id.class;
         for (COMMANDS command : COMMANDS.values()) {
             try {
-                int index = command.ordinal();
-                buttons[index] = findViewById(rid.getField(BUTTON_XML_PREFIX + command.toString()).getInt(rid));   //  1, 2, 3 ... dans le XML
-                buttons[index].setText(command.TEXT());
+                buttons[command.INDEX()] = findViewById(rid.getField(BUTTON_XML_PREFIX + command.toString()).getInt(rid));   //  1, 2, 3 ... dans le XML
+                buttons[command.INDEX()].setText(command.TEXT());
                 final COMMANDS fcommand = command;
-                buttons[index].setOnClickListener(new Button.OnClickListener() {
+                buttons[command.INDEX()].setOnClickListener(new Button.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         onButtonClick(fcommand);
@@ -314,6 +374,10 @@ public class ColorPickerActivity extends Activity {
         }
     }
 
+    private void setupHSVColorSpace() {
+        hsvStruc = new float[3];
+    }
+
     private void setupColorWheelView() {
         colorWheelView = findViewById(R.id.COLORS_VIEW);
         colorWheelView.setOnColorIndexChangeListener(new ColorWheelView.onColorIndexChangeListener() {
@@ -325,18 +389,17 @@ public class ColorPickerActivity extends Activity {
         colorWheelView.enableMarker();
     }
 
-    private void setupSeekbars() {
+    private void setupSeekBars() {
         final String SEEKBAR_XML_PREFIX = "SEEKB_";
 
-        seekbars = new SeekBar[PRIMARY_COLORS.values().length];
-        LayerDrawable[] progressDrawables = new LayerDrawable[PRIMARY_COLORS.values().length];
-        Drawable[] processDrawables = new Drawable[PRIMARY_COLORS.values().length];
+        seekBars = new SeekBar[SEEKBARS.values().length];
+        progressDrawables = new LayerDrawable[SEEKBARS.values().length];
+        processDrawables = new Drawable[SEEKBARS.values().length];
         Class rid = R.id.class;
-        for (PRIMARY_COLORS primaryColor : PRIMARY_COLORS.values()) {
+        for (SEEKBARS seekBar : SEEKBARS.values()) {
             try {
-                int index = primaryColor.INDEX();
-                seekbars[index] = findViewById(rid.getField(SEEKBAR_XML_PREFIX + (index + 1)).getInt(rid));
-                seekbars[index].setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                seekBars[seekBar.INDEX()] = findViewById(rid.getField(SEEKBAR_XML_PREFIX + seekBar.toString()).getInt(rid));
+                seekBars[seekBar.INDEX()].setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                         onSeekBarProgressChanged(fromUser);
@@ -352,9 +415,8 @@ public class ColorPickerActivity extends Activity {
 
                     }
                 });
-                progressDrawables[index] = (LayerDrawable) seekbars[index].getProgressDrawable();
-                processDrawables[index] = progressDrawables[index].findDrawableByLayerId(android.R.id.progress);
-                processDrawables[index].setColorFilter(primaryColor.VALUE(), PorterDuff.Mode.SRC_IN);  // Colorier uniquement la 1e partie de la seekbar
+                progressDrawables[seekBar.INDEX()] = (LayerDrawable) seekBars[seekBar.INDEX()].getProgressDrawable();
+                processDrawables[seekBar.INDEX()] = progressDrawables[seekBar.INDEX()].findDrawableByLayerId(android.R.id.progress);
             } catch (IllegalAccessException ex) {
                 Logger.getLogger(InputButtonsActivity.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IllegalArgumentException ex) {
@@ -377,8 +439,8 @@ public class ColorPickerActivity extends Activity {
         colorWheelView.setColorIndex(colorIndex - 1);
     }
 
-    private void setupColorWheelViewRobot() {
-        colorWheelViewRobot = new ColorWheelViewRobot(colorWheelView);
+    private void setupColorWheelViewUpdater() {
+        colorWheelViewUpdater = new ColorWheelViewUpdater(colorWheelView);
     }
 
     private void launchInputButtonsActivity() {
@@ -387,7 +449,7 @@ public class ColorPickerActivity extends Activity {
         callingIntent.putExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString(), labelNames[colorIndex]);
         callingIntent.putExtra(TABLE_EXTRA_KEYS.TABLE.toString(), tableName);
         callingIntent.putExtra(TABLE_EXTRA_KEYS.INDEX.toString(), colorIndex);
-        startActivityForResult(callingIntent, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.ordinal());
+        startActivityForResult(callingIntent, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.INDEX());
     }
 
     private void launchPresetsActivity() {
@@ -399,7 +461,7 @@ public class ColorPickerActivity extends Activity {
         callingIntent.putExtra(PRESETS_ACTIVITY_EXTRA_KEYS.SEPARATOR.toString(), SEPARATOR);
         callingIntent.putExtra(PRESETS_ACTIVITY_EXTRA_KEYS.IS_COLOR_TYPE.toString(), String.valueOf(PRESETS_ACTIVITY_IS_COLOR_TYPE ? 1 : 0));
         callingIntent.putExtra(TABLE_EXTRA_KEYS.TABLE.toString(), tableName);
-        startActivityForResult(callingIntent, PEKISLIB_ACTIVITIES.PRESETS.ordinal());
+        startActivityForResult(callingIntent, PEKISLIB_ACTIVITIES.PRESETS.INDEX());
     }
 
     private void launchHelpActivity() {

@@ -4,7 +4,7 @@ import android.os.Handler;
 
 import static com.example.pgyl.pekislib_a.TimeDateUtils.TIMEUNITS;
 
-public class ColorWheelViewRobot {
+public class ColorWheelViewUpdater {
     //region Constantes
     private final double WHEEL_ROTATION_ANGULAR_SPEED = 8;   //  Radians par seconde
     //endregion
@@ -26,7 +26,7 @@ public class ColorWheelViewRobot {
     };
     //endregion
 
-    public ColorWheelViewRobot(ColorWheelView colorWheelView) {
+    public ColorWheelViewUpdater(ColorWheelView colorWheelView) {
         this.colorWheelView = colorWheelView;
         init();
     }

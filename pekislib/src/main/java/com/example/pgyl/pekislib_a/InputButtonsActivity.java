@@ -90,6 +90,10 @@ public class InputButtonsActivity extends Activity {
         public String TEXT() {
             return valueText;
         }
+
+        public int INDEX() {
+            return ordinal();
+        }
     }
 
     private enum SPECIAL_BUTTONS {
@@ -605,11 +609,10 @@ public class InputButtonsActivity extends Activity {
         Class rid = R.id.class;
         for (COMMANDS command : COMMANDS.values()) {
             try {
-                int index = command.ordinal();
-                buttons[index] = findViewById(rid.getField(BUTTON_XML_PREFIX + command.toString()).getInt(rid));   //  1, 2, 3 ... dans le XML
-                buttons[index].setText(command.TEXT());
+                buttons[command.INDEX()] = findViewById(rid.getField(BUTTON_XML_PREFIX + command.toString()).getInt(rid));   //  1, 2, 3 ... dans le XML
+                buttons[command.INDEX()].setText(command.TEXT());
                 final COMMANDS fcommand = command;
-                buttons[index].setOnClickListener(new Button.OnClickListener() {
+                buttons[command.INDEX()].setOnClickListener(new Button.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         onButtonClick(fcommand);
