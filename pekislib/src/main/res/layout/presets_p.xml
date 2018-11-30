@@ -10,7 +10,7 @@
     	android:layout_width="match_parent"
     	android:layout_height="wrap_content">    
         <com.example.pgyl.pekislib_a.CustomButton
-            android:id="@+id/BTN_NEXT"
+            android:id="@+id/BTN_NEXT_FIELD"
             android:textColor="@android:color/black"
             android:background="@android:drawable/btn_default"
             android:layout_width="0dp"

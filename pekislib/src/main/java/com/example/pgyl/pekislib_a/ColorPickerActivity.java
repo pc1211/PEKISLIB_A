@@ -63,12 +63,12 @@ public class ColorPickerActivity extends Activity {
         }
     }
 
-    private enum SEEKBARS {
+    private enum COLOR_PARAMS {
         RED_HUE(Color.RED), GREEN_SAT(Color.GREEN), BLUE_VAL(Color.BLUE);
 
         private int rgbColorValue;
 
-        SEEKBARS(int rgbColorValue) {
+        COLOR_PARAMS(int rgbColorValue) {
             this.rgbColorValue = rgbColorValue;
         }
 
@@ -90,7 +90,6 @@ public class ColorPickerActivity extends Activity {
     //endregion
     //region Variables
     private SeekBar[] seekBars;
-    private LayerDrawable[] progressDrawables;
     private Drawable[] processDrawables;
     private String[] colors;
     private int colorIndex;
@@ -264,13 +263,13 @@ public class ColorPickerActivity extends Activity {
 
     private void onSeekBarProgressChanged(boolean fromUser) {
         if (fromUser) {
-            int redHueSeekbarValue = seekBars[SEEKBARS.RED_HUE.INDEX()].getProgress();   //  0..65535
-            int greenSatSeekbarValue = seekBars[SEEKBARS.GREEN_SAT.INDEX()].getProgress();
-            int blueValSeekbarValue = seekBars[SEEKBARS.BLUE_VAL.INDEX()].getProgress();
+            int redHueSeekbarValue = seekBars[COLOR_PARAMS.RED_HUE.INDEX()].getProgress();   //  0..65535
+            int greenSatSeekbarValue = seekBars[COLOR_PARAMS.GREEN_SAT.INDEX()].getProgress();
+            int blueValSeekbarValue = seekBars[COLOR_PARAMS.BLUE_VAL.INDEX()].getProgress();
             if (colorSpace.equals(COLOR_SPACES.RGB)) {
-                colors[colorIndex] = String.format("%02X", (int) ((float) redHueSeekbarValue / 65535f * 255f)) +
-                        String.format("%02X", (int) ((float) greenSatSeekbarValue / 65535f * 255f)) +
-                        String.format("%02X", (int) ((float) blueValSeekbarValue / 65535f * 255f));
+                colors[colorIndex] = String.format("%02X", (int) ((float) redHueSeekbarValue / 257f + 0.5f)) +    //  257 = 65535 / 255
+                        String.format("%02X", (int) ((float) greenSatSeekbarValue / 257f + 0.5f)) +
+                        String.format("%02X", (int) ((float) blueValSeekbarValue / 257f + 0.5f));
             } else {
                 hsvStruc[0] = (float) redHueSeekbarValue / 65535f * 360f;
                 hsvStruc[1] = (float) greenSatSeekbarValue / 65535f;
@@ -298,9 +297,9 @@ public class ColorPickerActivity extends Activity {
         final String HSV_SEEKBAR_COLOR = "C0C0C0";
 
         buttons[COMMANDS.NEXT_COLOR_SPACE.INDEX()].setText(colorSpace.toString() + SYMBOL_NEXT);
-        for (SEEKBARS seekBar : SEEKBARS.values()) {
-            int seekBarColor = ((colorSpace.equals(COLOR_SPACES.RGB)) ? seekBar.RGB_COLOR_VALUE() : Color.parseColor(COLOR_PREFIX + HSV_SEEKBAR_COLOR));
-            processDrawables[seekBar.INDEX()].setColorFilter(seekBarColor, PorterDuff.Mode.SRC_IN);  // Colorier uniquement la 1e partie de la seekbar
+        for (COLOR_PARAMS colorParam : COLOR_PARAMS.values()) {
+            int seekBarColor = ((colorSpace.equals(COLOR_SPACES.RGB)) ? colorParam.RGB_COLOR_VALUE() : Color.parseColor(COLOR_PREFIX + HSV_SEEKBAR_COLOR));
+            processDrawables[colorParam.INDEX()].setColorFilter(seekBarColor, PorterDuff.Mode.SRC_IN);  // Colorier uniquement la 1e partie de la seekbar
         }
     }
 
@@ -309,14 +308,14 @@ public class ColorPickerActivity extends Activity {
         int green = Integer.parseInt(colors[colorIndex].substring(2, 4), 16);
         int blue = Integer.parseInt(colors[colorIndex].substring(4, 6), 16);
         if (colorSpace.equals(COLOR_SPACES.RGB)) {
-            seekBars[SEEKBARS.RED_HUE.INDEX()].setProgress(257 * red);    //  257 = 65535 / 255
-            seekBars[SEEKBARS.GREEN_SAT.INDEX()].setProgress(257 * green);
-            seekBars[SEEKBARS.BLUE_VAL.INDEX()].setProgress(257 * blue);
+            seekBars[COLOR_PARAMS.RED_HUE.INDEX()].setProgress(257 * red);    //  257 = 65535 / 255
+            seekBars[COLOR_PARAMS.GREEN_SAT.INDEX()].setProgress(257 * green);
+            seekBars[COLOR_PARAMS.BLUE_VAL.INDEX()].setProgress(257 * blue);
         } else {
             Color.RGBToHSV(red, green, blue, hsvStruc);
-            seekBars[SEEKBARS.RED_HUE.INDEX()].setProgress((int) (hsvStruc[0] / 360f * 65535f));
-            seekBars[SEEKBARS.GREEN_SAT.INDEX()].setProgress((int) (hsvStruc[1] * 65535f));
-            seekBars[SEEKBARS.BLUE_VAL.INDEX()].setProgress((int) (hsvStruc[2] * 65535f));
+            seekBars[COLOR_PARAMS.RED_HUE.INDEX()].setProgress((int) (hsvStruc[0] / 360f * 65535f + 0.5f));
+            seekBars[COLOR_PARAMS.GREEN_SAT.INDEX()].setProgress((int) (hsvStruc[1] * 65535f + 0.5f));
+            seekBars[COLOR_PARAMS.BLUE_VAL.INDEX()].setProgress((int) (hsvStruc[2] * 65535f + 0.5f));
         }
     }
 
@@ -392,14 +391,14 @@ public class ColorPickerActivity extends Activity {
     private void setupSeekBars() {
         final String SEEKBAR_XML_PREFIX = "SEEKB_";
 
-        seekBars = new SeekBar[SEEKBARS.values().length];
-        progressDrawables = new LayerDrawable[SEEKBARS.values().length];
-        processDrawables = new Drawable[SEEKBARS.values().length];
+        seekBars = new SeekBar[COLOR_PARAMS.values().length];
+        LayerDrawable[] progressDrawables = new LayerDrawable[COLOR_PARAMS.values().length];
+        processDrawables = new Drawable[COLOR_PARAMS.values().length];
         Class rid = R.id.class;
-        for (SEEKBARS seekBar : SEEKBARS.values()) {
+        for (COLOR_PARAMS colorParam : COLOR_PARAMS.values()) {
             try {
-                seekBars[seekBar.INDEX()] = findViewById(rid.getField(SEEKBAR_XML_PREFIX + seekBar.toString()).getInt(rid));
-                seekBars[seekBar.INDEX()].setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                seekBars[colorParam.INDEX()] = findViewById(rid.getField(SEEKBAR_XML_PREFIX + colorParam.toString()).getInt(rid));
+                seekBars[colorParam.INDEX()].setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                         onSeekBarProgressChanged(fromUser);
@@ -415,8 +414,8 @@ public class ColorPickerActivity extends Activity {
 
                     }
                 });
-                progressDrawables[seekBar.INDEX()] = (LayerDrawable) seekBars[seekBar.INDEX()].getProgressDrawable();
-                processDrawables[seekBar.INDEX()] = progressDrawables[seekBar.INDEX()].findDrawableByLayerId(android.R.id.progress);
+                progressDrawables[colorParam.INDEX()] = (LayerDrawable) seekBars[colorParam.INDEX()].getProgressDrawable();
+                processDrawables[colorParam.INDEX()] = progressDrawables[colorParam.INDEX()].findDrawableByLayerId(android.R.id.progress);
             } catch (IllegalAccessException ex) {
                 Logger.getLogger(InputButtonsActivity.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IllegalArgumentException ex) {

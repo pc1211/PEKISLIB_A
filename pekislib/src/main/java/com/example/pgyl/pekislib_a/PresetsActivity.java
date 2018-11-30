@@ -46,7 +46,7 @@ import static com.example.pgyl.pekislib_a.TimeDateUtils.msToHms;
 public class PresetsActivity extends Activity {
     //region Constantes
     private enum COMMANDS {
-        NEXT("Next"), CANCEL("Cancel"), FIELD("Field"), OK("OK"), ADD("Add"), REMOVE("Remove"), DESELECT("Deselect"), DEFAULT("Default");
+        NEXT_FIELD(""), CANCEL("Cancel"), FIELD(""), OK("OK"), ADD("Add"), REMOVE("Remove"), DESELECT("Deselect"), DEFAULT("Default");
 
         private String valueText;
 
@@ -185,7 +185,7 @@ public class PresetsActivity extends Activity {
     }
 
     private void onButtonClick(COMMANDS command) {
-        if (command.equals(COMMANDS.NEXT)) {
+        if (command.equals(COMMANDS.NEXT_FIELD)) {
             onButtonClickNext();
         }
         if (command.equals(COMMANDS.CANCEL)) {
@@ -305,7 +305,7 @@ public class PresetsActivity extends Activity {
             fieldText = msToHms(Long.parseLong(fieldText), TIMEUNITS.valueOf(timeUnits[columnIndex]));
         }
         buttons[COMMANDS.FIELD.INDEX()].setText(fieldText);
-        buttons[COMMANDS.NEXT.INDEX()].setText(labelNames[columnIndex] + SYMBOL_NEXT);
+        buttons[COMMANDS.NEXT_FIELD.INDEX()].setText(labelNames[columnIndex] + SYMBOL_NEXT);
     }
 
     private void updateDisplayButtonColor(COMMANDS command) {
