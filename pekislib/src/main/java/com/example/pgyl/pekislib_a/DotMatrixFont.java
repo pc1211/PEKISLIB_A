@@ -7,8 +7,8 @@ import java.util.Map;
 
 public class DotMatrixFont {
     private Map<Character, DotMatrixSymbol> charMap;
-    private int width;
-    private int height;
+    private int MaxSymbolWidth;
+    private int MaxSymbolHeight;
     private int rightMargin;
 
     public DotMatrixFont() {
@@ -20,8 +20,8 @@ public class DotMatrixFont {
 
         charMap = new HashMap<Character, DotMatrixSymbol>();
         rightMargin = RIGHT_MARGIN_DEFAULT;
-        width = 0;
-        height = 0;
+        MaxSymbolWidth = 0;
+        MaxSymbolHeight = 0;
     }
 
     public void close() {
@@ -29,28 +29,28 @@ public class DotMatrixFont {
         charMap = null;
     }
 
-    public Map<Character, DotMatrixSymbol> getCharMap() {
-        return charMap;
+    public DotMatrixSymbol getSymbol(Character ch) {
+        return charMap.get(ch);
     }
 
-    public int getWidth() {
-        return width;
-    }    //  Pour le set, cf setSymbols
+    public int getMaxSymbolWidth() {
+        return MaxSymbolWidth;
+    }
 
-    public int getHeight() {
-        return height;
-    }    //  Pour le set, cf setSymbols
+    public int getMaxSymbolHeight() {
+        return MaxSymbolHeight;
+    }
 
     public void setSymbols(DotMatrixSymbol[] symbols) {
         for (int i = 0; i <= (symbols.length - 1); i = i + 1) {
             charMap.put(symbols[i].getCh(), symbols[i]);
             symbols[i].setPosInitialOffset(new Point(0, 0));
             symbols[i].setPosFinalOffset(new Point(symbols[i].getWidth() + rightMargin, 0));
-            if (symbols[i].getWidth() > width) {    //  Chercher la largeur max. de la fonte
-                width = symbols[i].getWidth();
+            if (symbols[i].getWidth() > MaxSymbolWidth) {    //  Chercher la largeur max. de la fonte
+                MaxSymbolWidth = symbols[i].getWidth();
             }
-            if (symbols[i].getHeight() > height) {    //  Chercher la hauteur max. de la fonte
-                height = symbols[i].getHeight();
+            if (symbols[i].getHeight() > MaxSymbolHeight) {    //  Chercher la hauteur max. de la fonte
+                MaxSymbolHeight = symbols[i].getHeight();
             }
         }
     }
@@ -76,10 +76,26 @@ public class DotMatrixFont {
         int textWidth = 0;
         for (int i = 0; i <= (text.length() - 1); i = i + 1) {
             symbol = charMap.get(text.charAt(i));
-            textWidth = textWidth + symbol.getPosInitialOffset().x + symbol.getPosFinalOffset().x;
+            int symbolWidth = symbol.getPosInitialOffset().x + symbol.getPosFinalOffset().x;
+            textWidth = textWidth + symbolWidth;
         }
         symbol = null;
         return textWidth;
+    }
+
+    public int getTextHeight(String text) {   // Hauteur nécessaire pour afficher un texte
+        DotMatrixSymbol symbol;
+
+        int textHeight = 0;
+        for (int i = 0; i <= (text.length() - 1); i = i + 1) {
+            symbol = charMap.get(text.charAt(i));
+            int symbolHeight = symbol.getHeight() + symbol.getPosInitialOffset().y;
+            if (symbolHeight > textHeight) {
+                textHeight = symbolHeight;
+            }
+        }
+        symbol = null;
+        return textHeight;
     }
 
 }

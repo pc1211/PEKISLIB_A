@@ -165,9 +165,9 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
 
         for (int i = 0; i <= (text.length() - 1); i = i + 1) {
             Character ch = text.charAt(i);
-            symbol = dotMatrixFont.getCharMap().get(ch);
+            symbol = dotMatrixFont.getSymbol(ch);
             if (symbol == null) {
-                symbol = defaultFont.getCharMap().get(ch);
+                symbol = defaultFont.getSymbol(ch);
             }
             drawSymbol(symbol);    //  Afficher symbole √† partir de SymbolPos
         }
