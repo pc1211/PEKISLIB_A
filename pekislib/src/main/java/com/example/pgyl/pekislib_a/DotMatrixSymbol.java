@@ -17,7 +17,7 @@ public class DotMatrixSymbol {
     }
 
     private void init() {
-        height = data.length;
+        height = data.length;   //  Hauteur du symbole
         width = 0;
         for (int i = 0; i <= (height - 1); i = i + 1) {
             if (data[i].length > width) {      //   Chercher la largeur max. du symbole

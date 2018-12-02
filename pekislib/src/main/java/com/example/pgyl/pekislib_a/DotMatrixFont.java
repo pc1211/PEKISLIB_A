@@ -46,10 +46,10 @@ public class DotMatrixFont {
             charMap.put(symbols[i].getCh(), symbols[i]);
             symbols[i].setPosInitialOffset(new Point(0, 0));
             symbols[i].setPosFinalOffset(new Point(symbols[i].getWidth() + rightMargin, 0));
-            if (symbols[i].getWidth() > MaxSymbolWidth) {    //  Chercher la largeur max. de la fonte
+            if (symbols[i].getWidth() > MaxSymbolWidth) {    //  Chercher la largeur max. d'un symbole
                 MaxSymbolWidth = symbols[i].getWidth();
             }
-            if (symbols[i].getHeight() > MaxSymbolHeight) {    //  Chercher la hauteur max. de la fonte
+            if (symbols[i].getHeight() > MaxSymbolHeight) {    //  Chercher la hauteur max. d'un symbole
                 MaxSymbolHeight = symbols[i].getHeight();
             }
         }
