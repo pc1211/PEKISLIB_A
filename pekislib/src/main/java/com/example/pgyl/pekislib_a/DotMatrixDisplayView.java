@@ -45,7 +45,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
     private float dotCellSize;
     private float dotSize;
     private float dotRightMarginCoeff;
-    private Paint dotPaint;
+    private Paint dotPaintON;
+    private Paint dotPaintOFF;
     private PointF dotPoint;
     private boolean drawing;
     private Bitmap viewBitmap;
@@ -76,13 +77,9 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         dotRightMarginCoeff = GRID_DOT_RIGHT_MARGIN_COEFF_DEFAULT;
         symbolPos = DEFAULT_FONT_SYMBOL_POS_DEFAULT;
         setupDefaultFont();
+        setupDotPaints();
+        setupViewCanvasBackPaint();
         dotPoint = new PointF();
-        dotPaint = new Paint();
-        dotPaint.setAntiAlias(true);
-        dotPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
-        viewCanvasBackPaint = new Paint();
-        viewCanvasBackPaint.setAntiAlias(true);
-        viewCanvasBackPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OVER));
         drawing = false;
         buttonState = BUTTON_STATES.UNPRESSED;
         setOnTouchListener(new OnTouchListener() {
@@ -101,7 +98,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         defaultFont = null;
         grid = null;
         viewCanvasBackPaint = null;
-        dotPaint = null;
+        dotPaintON = null;
+        dotPaintOFF = null;
         viewCanvas = null;
     }
 
@@ -318,17 +316,20 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
 
     @Override
     protected void onDraw(Canvas canvas) {
+        Paint dotPaint;
+
         super.onDraw(canvas);
 
         drawing = true;
         int frontStateColorIndex = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? backColorIndex : frontColorIndex);
         int backStateColorIndex = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? frontColorIndex : backColorIndex);
         int alternateStateColorIndex = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? frontColorIndex : alternateColorIndex);
+        dotPaintON.setColor(Color.parseColor(COLOR_PREFIX + colors[frontStateColorIndex]));
+        dotPaintOFF.setColor(Color.parseColor(COLOR_PREFIX + colors[backStateColorIndex]));
         viewCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
         for (int i = 0; i <= (displayRect.width() - 1); i = i + 1) {
             for (int j = 0; j <= (displayRect.height() - 1); j = j + 1) {
-                int dotColorIndex = ((grid[j][i] == ON_VALUE) ? frontStateColorIndex : backStateColorIndex);
-                dotPaint.setColor(Color.parseColor(COLOR_PREFIX + colors[dotColorIndex]));
+                dotPaint = ((grid[j][i] == ON_VALUE) ? dotPaintON : dotPaintOFF);
                 dotPoint.set(gridMargins.left + (float) gridStartX + (float) i * dotCellSize, gridMargins.top + (float) j * dotCellSize);
                 viewCanvas.drawRect(dotPoint.x, dotPoint.y, dotPoint.x + dotSize, dotPoint.y + dotSize, dotPaint);
             }
@@ -336,13 +337,13 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         viewCanvasBackPaint.setColor(Color.parseColor(COLOR_PREFIX + colors[alternateStateColorIndex]));
         viewCanvas.drawRoundRect(viewCanvasRect, backCornerRadius, backCornerRadius, viewCanvasBackPaint);
         canvas.drawBitmap(viewBitmap, 0, 0, null);
+        dotPaint = null;
         drawing = false;
     }
 
     private void drawSymbol(DotMatrixSymbol symbol) {
         int[][] symbolData = symbol.getData();
-        symbolPos.x = symbolPos.x + symbol.getPosInitialOffset().x;   //  Appliquer un d√©calage avant l'affichage du symbole
-        symbolPos.y = symbolPos.y + symbol.getPosInitialOffset().y;
+        symbolPos.offset(symbol.getPosInitialOffset().x, symbol.getPosInitialOffset().y);   //  Appliquer un d√©calage avant l'affichage du symbole
         for (int i = 0; i <= (symbol.getWidth() - 1); i = i + 1) {
             int symbolDotX = symbolPos.x + i;
             for (int j = 0; j <= (symbol.getHeight() - 1); j = j + 1) {
@@ -352,8 +353,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
                 }
             }
         }
-        symbolPos.x = symbolPos.x + symbol.getPosFinalOffset().x;   //  Pr√™t pour l'affichage du symbole suivant
-        symbolPos.y = symbolPos.y + symbol.getPosFinalOffset().y;
+        symbolPos.offset(symbol.getPosFinalOffset().x, symbol.getPosFinalOffset().y);   //  Pr√™t pour l'affichage du symbole suivant
     }
 
     private void fillRect(Rect rect, int value) {
@@ -369,6 +369,21 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         dotCellSize = (int) (((float) viewWidth - (gridMargins.left + gridMargins.right)) / (float) displayRect.width());
         dotSize = (int) (dotCellSize / (1 + dotRightMarginCoeff) + 0.5f);
         gridStartX = (int) (((float) viewWidth - (gridMargins.left + (float) displayRect.width() * dotCellSize + gridMargins.right)) / 2 + 0.5f);
+    }
+
+    private void setupDotPaints() {
+        dotPaintON = new Paint();
+        dotPaintON.setAntiAlias(true);
+        dotPaintON.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+        dotPaintOFF = new Paint();
+        dotPaintOFF.setAntiAlias(true);
+        dotPaintOFF.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+    }
+
+    private void setupViewCanvasBackPaint() {
+        viewCanvasBackPaint = new Paint();
+        viewCanvasBackPaint.setAntiAlias(true);
+        viewCanvasBackPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OVER));
     }
 
     private void setupDefaultFont() {

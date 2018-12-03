@@ -13,7 +13,6 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.larvalabs.svgandroid.SVG;
 import com.larvalabs.svgandroid.SVGParser;
 
 import java.util.EnumMap;
@@ -89,8 +88,7 @@ public final class ColorWheelView extends View {
         markerState = MARKER_STATES.PIN;
         markerDestPointsMap = new EnumMap<MARKER_STATES, PointF>(MARKER_STATES.class);
         markerDestPoint = new PointF();
-        SVG svg = SVGParser.getSVGFromResource(getResources(), R.raw.redpin);
-        markerPicture = svg.getPicture();
+        markerPicture = SVGParser.getSVGFromResource(getResources(), R.raw.redpin).getPicture();
         drawing = false;
         setOnTouchListener(new OnTouchListener() {
             @Override
@@ -114,6 +112,7 @@ public final class ColorWheelView extends View {
         viewBitmap = null;
         markerDestPointsMap = null;
         markerBitmap = null;
+        markerPicture = null;
     }
 
     @Override
@@ -134,7 +133,6 @@ public final class ColorWheelView extends View {
         markerDestPointsMap.put(MARKER_STATES.PIN, new PointF(markerTipPoint.x - markerCellCanvasRect.width(), markerTipPoint.y - markerCellCanvasRect.height()));
         markerDestPoint.set(markerDestPointsMap.get(markerState));
         markerBitmap = createMarkerBitmap(markerPicture);
-        markerPicture = null;
     }
 
     public boolean isDrawing() {
