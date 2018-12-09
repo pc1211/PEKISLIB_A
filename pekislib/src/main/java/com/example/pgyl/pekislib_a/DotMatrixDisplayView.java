@@ -355,19 +355,11 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     }
 
     private int gridXWrapAround(int gridX) {
-        if (gridX >= gridRect.right) {
-            return (gridX - gridRect.width());
-        } else {
-            return gridX;
-        }
+        return ((gridX >= gridRect.right) ? gridX - gridRect.width() : gridX);
     }
 
     private int gridYWrapAround(int gridY) {
-        if (gridY >= gridRect.bottom) {
-            return (gridY - gridRect.height());
-        } else {
-            return gridY;
-        }
+        return ((gridY >= gridRect.bottom) ? gridY - gridRect.height() : gridY);
     }
 
     private void calculateInternalDimensions(int viewWidth) {  // Ajustement à un entier pour éviter le dessin d'une grille irrrégulière dans la largeur ou hauteur de ses éléments
