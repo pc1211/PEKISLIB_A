@@ -30,6 +30,7 @@ public class Constants {
     public static final int UNDEFINED = -1;
     public static final int ERROR_VALUE = -1;
     public static final String CRLF = "\r\n";
+    public static final int HEX_RADIX = 16;
     public static final String COLOR_PREFIX = "#FF";
     public static final int COLOR_XOR_INVERTER = 0x00FFFFFF;
     public static String SHP_FILE_NAME_SUFFIX = "_preferences";

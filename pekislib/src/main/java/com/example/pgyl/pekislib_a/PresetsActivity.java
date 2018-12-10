@@ -64,10 +64,12 @@ public class PresetsActivity extends Activity {
     }
 
     public enum PRESETS_ACTIVITY_EXTRA_KEYS {
-        SEPARATOR, IS_COLOR_TYPE
+        SEPARATOR, DISPLAY_TYPE
     }
 
-    public static final boolean PRESETS_ACTIVITY_IS_COLOR_TYPE = true;
+    public enum PRESETS_ACTIVITY_DISPLAY_TYPE {
+        COLORS, NO_COLORS
+    }
 
     private enum SHP_KEY_NAMES {
         SELECT_INDEX, COLUMN_INDEX
@@ -84,7 +86,7 @@ public class PresetsActivity extends Activity {
     private String[] timeUnits;
     private String[] defaults;
     private String tableName;
-    private boolean isColorType;
+    private boolean isTypeColors;
     private int listIndex;
     private int columnIndex;
     private CustomButton[] buttons;
@@ -125,7 +127,7 @@ public class PresetsActivity extends Activity {
 
         shpFileName = getPackageName() + "." + getClass().getSimpleName() + SHP_FILE_NAME_SUFFIX;
         tableName = getIntent().getStringExtra(TABLE_EXTRA_KEYS.TABLE.toString());
-        isColorType = (Integer.parseInt(getIntent().getStringExtra(PRESETS_ACTIVITY_EXTRA_KEYS.IS_COLOR_TYPE.toString())) == 1);
+        isTypeColors = ((getIntent().getStringExtra(PRESETS_ACTIVITY_EXTRA_KEYS.DISPLAY_TYPE.toString()).equals(PRESETS_ACTIVITY_DISPLAY_TYPE.COLORS.toString())) ? true : false);
 
         setupStringShelfDatabase();
         setupPresetsHandler();
@@ -345,7 +347,7 @@ public class PresetsActivity extends Activity {
         } else {
             presetsHandler.sortPresets();
         }
-        if (isColorType == PRESETS_ACTIVITY_IS_COLOR_TYPE) {
+        if (isTypeColors) {   //  Afficher aussi la roue de couleurs
             ListItemColorAdapter lvAdapter = new ListItemColorAdapter(this);
             lvAdapter.setColorItems(presetsHandler.presetDataList());
             lvAdapter.setTextItems(presetsHandler.concatenatedDisplayPresetDataList());

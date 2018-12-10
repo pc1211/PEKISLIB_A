@@ -26,6 +26,7 @@ import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 import static com.example.pgyl.pekislib_a.Constants.ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.Constants.ERROR_VALUE;
+import static com.example.pgyl.pekislib_a.Constants.HEX_RADIX;
 import static com.example.pgyl.pekislib_a.Constants.NOT_FOUND;
 import static com.example.pgyl.pekislib_a.Constants.SHP_FILE_NAME_SUFFIX;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_EXTRA_KEYS;
@@ -53,13 +54,188 @@ import static com.example.pgyl.pekislib_a.TimeDateUtils.xhmsToMs;
 public class InputButtonsActivity extends Activity {
     //region Constantes
     public enum KEYBOARDS {
-        ALPHANUM(new String[]{"a", "b", "c", SPECIAL_BUTTONS.BACK.toString(), "d", "e", "f", SPECIAL_BUTTONS.CLEAR.toString(), "g", "h", "i", SPECIAL_BUTTONS.CASE.toString(), "j", "k", "l", SPECIAL_BUTTONS.NEXTP.toString(), "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", ".", " ", "1", "2", "3", SPECIAL_BUTTONS.BACK.toString(), "4", "5", "6", SPECIAL_BUTTONS.CLEAR.toString(), "7", "8", "9", SPECIAL_BUTTONS.CASE.toString(), "#", "0", ".", SPECIAL_BUTTONS.NEXTP.toString(), "+", "-", "*", "/", "(", ")", "[", "]", "{", "}", "<", ">", "=", "$", "£", "@", "&", "§", "~", SPECIAL_BUTTONS.BACK.toString(), "?", "!", "|", SPECIAL_BUTTONS.CLEAR.toString(), "\\", "_", "^", SPECIAL_BUTTONS.CASE.toString(), "\"", "'", ".", SPECIAL_BUTTONS.NEXTP.toString(), ",", ";", ":", NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, "à", "á", "â", SPECIAL_BUTTONS.BACK.toString(), "ã", "ä", "å", SPECIAL_BUTTONS.CLEAR.toString(), "ò", "ó", "ô", SPECIAL_BUTTONS.CASE.toString(), "õ", "ö", "ø", SPECIAL_BUTTONS.NEXTP.toString(), "è", "é", "ê", "ë", "ì", "í", "î", "ï", "ù", "ú", "û", "ü", "ÿ", "ñ", "ç", NA}, new String[]{"a", "b", "c", "d", "e", "f", "g", SPECIAL_BUTTONS.BACK.toString(), "h", "i", "j", "k", "l", "m", "n", SPECIAL_BUTTONS.CLEAR.toString(), "o", "p", "q", "r", "s", "t", "u", SPECIAL_BUTTONS.CASE.toString(), "v", "w", "x", "y", "z", ".", " ", SPECIAL_BUTTONS.NEXTP.toString(), "1", "2", "3", "+", "-", "*", "/", SPECIAL_BUTTONS.BACK.toString(), "4", "5", "6", "(", ")", "[", "]", SPECIAL_BUTTONS.CLEAR.toString(), "7", "8", "9", "{", "}", "<", ">", SPECIAL_BUTTONS.CASE.toString(), "#", "0", ".", "=", "$", "£", "@", SPECIAL_BUTTONS.NEXTP.toString(), "&", "§", "~", "?", "!", "|", "\\", SPECIAL_BUTTONS.BACK.toString(), "_", "^", "\"", "'", ".", ",", ";", SPECIAL_BUTTONS.CLEAR.toString(), ":", NA, NA, NA, NA, NA, NA, SPECIAL_BUTTONS.CASE.toString(), NA, NA, NA, NA, NA, NA, NA, SPECIAL_BUTTONS.NEXTP.toString(), "à", "á", "â", "ã", "ä", "å", "ò", SPECIAL_BUTTONS.BACK.toString(), "ó", "ô", "õ", "ö", "ø", "è", "é", SPECIAL_BUTTONS.CLEAR.toString(), "ê", "ë", "ì", "í", "î", "ï", "ù", SPECIAL_BUTTONS.CASE.toString(), "ú", "û", "ü", "ÿ", "ñ", "ç", NA, SPECIAL_BUTTONS.NEXTP.toString()}),
-        TIME_HMS(new String[]{"1", "2", "3", SPECIAL_BUTTONS.BACK.toString(), "4", "5", "6", SPECIAL_BUTTONS.CLEAR.toString(), "7", "8", "9", ":", NA, "0", NA, "."}, new String[]{"1", "2", "3", ":", ".", NA, NA, SPECIAL_BUTTONS.BACK.toString(), "4", "5", "6", NA, NA, NA, NA, SPECIAL_BUTTONS.CLEAR.toString(), "7", "8", "9", NA, NA, NA, NA, NA, NA, "0", NA, NA, NA, NA, NA, NA}),
-        TIME_XHMS(new String[]{"1", "2", "3", SPECIAL_BUTTONS.BACK.toString(), "4", "5", "6", SPECIAL_BUTTONS.CLEAR.toString(), "7", "8", "9", NA, NA, "0", NA, NA, "h", "m", "s", "c"}, new String[]{"1", "2", "3", "h", "m", "s", "c", SPECIAL_BUTTONS.BACK.toString(), "4", "5", "6", NA, NA, NA, NA, SPECIAL_BUTTONS.CLEAR.toString(), "7", "8", "9", NA, NA, NA, NA, NA, NA, "0", NA, NA, NA, NA, NA, NA}),
-        DATE_JJMMAAAA(new String[]{"1", "2", "3", SPECIAL_BUTTONS.BACK.toString(), "4", "5", "6", SPECIAL_BUTTONS.CLEAR.toString(), "7", "8", "9", NA, NA, "0", "/", NA}, new String[]{"1", "2", "3", NA, NA, NA, NA, SPECIAL_BUTTONS.BACK.toString(), "4", "5", "6", NA, NA, NA, NA, SPECIAL_BUTTONS.CLEAR.toString(), "7", "8", "9", NA, NA, NA, NA, NA, NA, "0", "/", NA, NA, NA, NA, NA}),
-        LONG(new String[]{"1", "2", "3", SPECIAL_BUTTONS.BACK.toString(), "4", "5", "6", SPECIAL_BUTTONS.CLEAR.toString(), "7", "8", "9", NA, "-", "0", NA, NA}, new String[]{"1", "2", "3", NA, NA, NA, NA, SPECIAL_BUTTONS.BACK.toString(), "4", "5", "6", NA, NA, NA, NA, SPECIAL_BUTTONS.CLEAR.toString(), "7", "8", "9", NA, NA, NA, NA, NA, "-", "0", NA, NA, NA, NA, NA, NA}),
-        FLOAT(new String[]{"1", "2", "3", SPECIAL_BUTTONS.BACK.toString(), "4", "5", "6", SPECIAL_BUTTONS.CLEAR.toString(), "7", "8", "9", NA, "-", "0", ".", NA}, new String[]{"1", "2", "3", NA, NA, NA, NA, SPECIAL_BUTTONS.BACK.toString(), "4", "5", "6", NA, NA, NA, NA, SPECIAL_BUTTONS.CLEAR.toString(), "7", "8", "9", NA, NA, NA, NA, NA, "-", "0", ".", NA, NA, NA, NA, NA}),
-        HEX(new String[]{"1", "2", "3", SPECIAL_BUTTONS.BACK.toString(), "4", "5", "6", SPECIAL_BUTTONS.CLEAR.toString(), "7", "8", "9", NA, NA, "0", NA, NA, "A", "B", "C", NA, "D", "E", "F", NA}, new String[]{"1", "2", "3", "A", "B", "C", NA, SPECIAL_BUTTONS.BACK.toString(), "4", "5", "6", "D", "E", "F", NA, SPECIAL_BUTTONS.CLEAR.toString(), "7", "8", "9", NA, NA, NA, NA, NA, NA, "0", NA, NA, NA, NA, NA, NA});
+        ALPHANUM(
+                new String[]{   //  Portrait
+                        "a", "b", "c", SPECIAL_BUTTONS.BACK.toString(),
+                        "d", "e", "f", SPECIAL_BUTTONS.CLEAR.toString(),
+                        "g", "h", "i", SPECIAL_BUTTONS.CASE.toString(),
+                        "j", "k", "l", SPECIAL_BUTTONS.NEXTP.toString(),
+                        "m", "n", "o", "p",
+                        "q", "r", "s", "t",
+                        "u", "v", "w", "x",
+                        "y", "z", ".", " ",
+
+                        "1", "2", "3", SPECIAL_BUTTONS.BACK.toString(),
+                        "4", "5", "6", SPECIAL_BUTTONS.CLEAR.toString(),
+                        "7", "8", "9", SPECIAL_BUTTONS.CASE.toString(),
+                        "#", "0", ".", SPECIAL_BUTTONS.NEXTP.toString(),
+                        "+", "-", "*", "/",
+                        "(", ")", "[", "]",
+                        "{", "}", "<", ">",
+                        "=", "$", "£", "@",
+
+                        "&", "§", "~", SPECIAL_BUTTONS.BACK.toString(),
+                        "?", "!", "|", SPECIAL_BUTTONS.CLEAR.toString(),
+                        "\\", "_", "^", SPECIAL_BUTTONS.CASE.toString(),
+                        "\"", "'", "`", SPECIAL_BUTTONS.NEXTP.toString(),
+                        ".", ",", ";", ":",
+                        "%", NA, NA, NA,
+                        NA, NA, NA, NA,
+                        NA, NA, NA, NA,
+
+                        "à", "á", "â", SPECIAL_BUTTONS.BACK.toString(),
+                        "ã", "ä", "å", SPECIAL_BUTTONS.CLEAR.toString(),
+                        "ò", "ó", "ô", SPECIAL_BUTTONS.CASE.toString(),
+                        "õ", "ö", "ø", SPECIAL_BUTTONS.NEXTP.toString(),
+                        "è", "é", "ê", "ë",
+                        "ì", "í", "î", "ï",
+                        "ù", "ú", "û", "ü",
+                        "ÿ", "ñ", "ç", NA},
+
+                new String[]{   //  Paysage
+                        "a", "b", "c", "d", "e", "f", "g", SPECIAL_BUTTONS.BACK.toString(),
+                        "h", "i", "j", "k", "l", "m", "n", SPECIAL_BUTTONS.CLEAR.toString(),
+                        "o", "p", "q", "r", "s", "t", "u", SPECIAL_BUTTONS.CASE.toString(),
+                        "v", "w", "x", "y", "z", ".", " ", SPECIAL_BUTTONS.NEXTP.toString(),
+
+                        "1", "2", "3", "+", "-", "*", "/", SPECIAL_BUTTONS.BACK.toString(),
+                        "4", "5", "6", "(", ")", "[", "]", SPECIAL_BUTTONS.CLEAR.toString(),
+                        "7", "8", "9", "{", "}", "<", ">", SPECIAL_BUTTONS.CASE.toString(),
+                        "#", "0", ".", "=", "$", "£", "@", SPECIAL_BUTTONS.NEXTP.toString(),
+
+                        "&", "§", "~", "?", "!", "|", "\\", SPECIAL_BUTTONS.BACK.toString(),
+                        "_", "^", "\"", "'", "`", ".", ",", SPECIAL_BUTTONS.CLEAR.toString(),
+                        ";", ":", NA, NA, NA, NA, NA, SPECIAL_BUTTONS.CASE.toString(),
+                        NA, NA, NA, NA, NA, NA, NA, SPECIAL_BUTTONS.NEXTP.toString(),
+
+                        "à", "á", "â", "ã", "ä", "å", "ò", SPECIAL_BUTTONS.BACK.toString(),
+                        "ó", "ô", "õ", "ö", "ø", "è", "é", SPECIAL_BUTTONS.CLEAR.toString(),
+                        "ê", "ë", "ì", "í", "î", "ï", "ù", SPECIAL_BUTTONS.CASE.toString(),
+                        "ú", "û", "ü", "ÿ", "ñ", "ç", NA, SPECIAL_BUTTONS.NEXTP.toString()}),
+
+        ASCII(
+                new String[]{   //  Portrait
+                        "a", "b", "c", SPECIAL_BUTTONS.BACK.toString(),
+                        "d", "e", "f", SPECIAL_BUTTONS.CLEAR.toString(),
+                        "g", "h", "i", SPECIAL_BUTTONS.CASE.toString(),
+                        "j", "k", "l", SPECIAL_BUTTONS.NEXTP.toString(),
+                        "m", "n", "o", "p",
+                        "q", "r", "s", "t",
+                        "u", "v", "w", "x",
+                        "y", "z", ".", " ",
+
+                        "1", "2", "3", SPECIAL_BUTTONS.BACK.toString(),
+                        "4", "5", "6", SPECIAL_BUTTONS.CLEAR.toString(),
+                        "7", "8", "9", SPECIAL_BUTTONS.CASE.toString(),
+                        "#", "0", ".", SPECIAL_BUTTONS.NEXTP.toString(),
+                        "+", "-", "*", "/",
+                        "(", ")", "[", "]",
+                        "{", "}", "<", ">",
+                        "=", "$", "@", NA,
+
+                        "&", "%", "~", SPECIAL_BUTTONS.BACK.toString(),
+                        "?", "!", "|", SPECIAL_BUTTONS.CLEAR.toString(),
+                        "\\", "_", "^", SPECIAL_BUTTONS.CASE.toString(),
+                        "\"", "'", "`", SPECIAL_BUTTONS.NEXTP.toString(),
+                        ".", ",", ";", ":",
+                        NA, NA, NA, NA,
+                        NA, NA, NA, NA,
+                        NA, NA, NA, NA},
+
+                new String[]{   //  Paysage
+                        "a", "b", "c", "d", "e", "f", "g", SPECIAL_BUTTONS.BACK.toString(),
+                        "h", "i", "j", "k", "l", "m", "n", SPECIAL_BUTTONS.CLEAR.toString(),
+                        "o", "p", "q", "r", "s", "t", "u", SPECIAL_BUTTONS.CASE.toString(),
+                        "v", "w", "x", "y", "z", ".", " ", SPECIAL_BUTTONS.NEXTP.toString(),
+
+                        "1", "2", "3", "+", "-", "*", "/", SPECIAL_BUTTONS.BACK.toString(),
+                        "4", "5", "6", "(", ")", "[", "]", SPECIAL_BUTTONS.CLEAR.toString(),
+                        "7", "8", "9", "{", "}", "<", ">", SPECIAL_BUTTONS.CASE.toString(),
+                        "#", "0", ".", "=", "$", "@", NA, SPECIAL_BUTTONS.NEXTP.toString(),
+
+                        "&", "%", "~", "?", "!", "|", "\\", SPECIAL_BUTTONS.BACK.toString(),
+                        "_", "^", "\"", "'", "`", ".", ",", SPECIAL_BUTTONS.CLEAR.toString(),
+                        ";", ":", NA, NA, NA, NA, NA, SPECIAL_BUTTONS.CASE.toString(),
+                        NA, NA, NA, NA, NA, NA, NA, SPECIAL_BUTTONS.NEXTP.toString()}),
+
+        TIME_HMS(
+                new String[]{   //  Portrait
+                        "1", "2", "3", SPECIAL_BUTTONS.BACK.toString(),
+                        "4", "5", "6", SPECIAL_BUTTONS.CLEAR.toString(),
+                        "7", "8", "9", ":", NA, "0", NA, "."},
+
+                new String[]{   //  Paysage
+                        "1", "2", "3", ":", ".", NA, NA, SPECIAL_BUTTONS.BACK.toString(),
+                        "4", "5", "6", NA, NA, NA, NA, SPECIAL_BUTTONS.CLEAR.toString(),
+                        "7", "8", "9", NA, NA, NA, NA, NA,
+                        NA, "0", NA, NA, NA, NA, NA, NA}),
+
+        TIME_XHMS(
+                new String[]{   //  Portrait
+                        "1", "2", "3", SPECIAL_BUTTONS.BACK.toString(),
+                        "4", "5", "6", SPECIAL_BUTTONS.CLEAR.toString(),
+                        "7", "8", "9", NA,
+                        NA, "0", NA, NA,
+                        "h", "m", "s", "c"},
+                new String[]{   //  Paysage
+                        "1", "2", "3", "h", "m", "s", "c", SPECIAL_BUTTONS.BACK.toString(),
+                        "4", "5", "6", NA, NA, NA, NA, SPECIAL_BUTTONS.CLEAR.toString(),
+                        "7", "8", "9", NA, NA, NA, NA, NA,
+                        NA, "0", NA, NA, NA, NA, NA, NA}),
+
+        DATE_JJMMAAAA(
+                new String[]{   //  Portrait
+                        "1", "2", "3", SPECIAL_BUTTONS.BACK.toString(),
+                        "4", "5", "6", SPECIAL_BUTTONS.CLEAR.toString(),
+                        "7", "8", "9", NA,
+                        NA, "0", "/", NA},
+
+                new String[]{   //  Paysage
+                        "1", "2", "3", NA, NA, NA, NA, SPECIAL_BUTTONS.BACK.toString(),
+                        "4", "5", "6", NA, NA, NA, NA, SPECIAL_BUTTONS.CLEAR.toString(),
+                        "7", "8", "9", NA, NA, NA, NA, NA,
+                        NA, "0", "/", NA, NA, NA, NA, NA}),
+
+        LONG(
+                new String[]{   //  Portrait
+                        "1", "2", "3", SPECIAL_BUTTONS.BACK.toString(),
+                        "4", "5", "6", SPECIAL_BUTTONS.CLEAR.toString(),
+                        "7", "8", "9", NA,
+                        "-", "0", NA, NA},
+
+                new String[]{   //  Paysage
+                        "1", "2", "3", NA, NA, NA, NA, SPECIAL_BUTTONS.BACK.toString(),
+                        "4", "5", "6", NA, NA, NA, NA, SPECIAL_BUTTONS.CLEAR.toString(),
+                        "7", "8", "9", NA, NA, NA, NA, NA,
+                        "-", "0", NA, NA, NA, NA, NA, NA}),
+
+        FLOAT(
+                new String[]{   //  Portrait
+                        "1", "2", "3", SPECIAL_BUTTONS.BACK.toString(),
+                        "4", "5", "6", SPECIAL_BUTTONS.CLEAR.toString(),
+                        "7", "8", "9", NA,
+                        "-", "0", ".", NA},
+
+                new String[]{   //  Paysage
+                        "1", "2", "3", NA, NA, NA, NA, SPECIAL_BUTTONS.BACK.toString(),
+                        "4", "5", "6", NA, NA, NA, NA, SPECIAL_BUTTONS.CLEAR.toString(),
+                        "7", "8", "9", NA, NA, NA, NA, NA,
+                        "-", "0", ".", NA, NA, NA, NA, NA}),
+
+        HEX(
+                new String[]{   //  Portrait
+                        "1", "2", "3", SPECIAL_BUTTONS.BACK.toString(),
+                        "4", "5", "6", SPECIAL_BUTTONS.CLEAR.toString(),
+                        "7", "8", "9", NA,
+                        NA, "0", NA, NA,
+                        "A", "B", "C", NA,
+                        "D", "E", "F", NA},
+
+                new String[]{   //  Paysage
+                        "1", "2", "3", "A", "B", "C", NA, SPECIAL_BUTTONS.BACK.toString(),
+                        "4", "5", "6", "D", "E", "F", NA, SPECIAL_BUTTONS.CLEAR.toString(),
+                        "7", "8", "9", NA, NA, NA, NA, NA,
+                        NA, "0", NA, NA, NA, NA, NA, NA});
 
         private String[] valuePortraitButtonTexts;
         private String[] valueLandscapeButtonTexts;
@@ -389,7 +565,7 @@ public class InputButtonsActivity extends Activity {
 
     private String parseCandidate(String candidate, String smin, String smax) {
         String ret = noErrorMessage();
-        if (keyboard.equals(KEYBOARDS.ALPHANUM)) {
+        if ((keyboard.equals(KEYBOARDS.ALPHANUM)) || (keyboard.equals(KEYBOARDS.ASCII))) {
             ret = parseAlphanum(candidate, smin, smax);
         }
         if (keyboard.equals(KEYBOARDS.TIME_HMS)) {
@@ -539,8 +715,6 @@ public class InputButtonsActivity extends Activity {
     }
 
     private String parseHex(String sed, String smin, String smax) {
-        final int HEX_RADIX = 16;
-
         String ret = noErrorMessage();
         try {
             long l = Long.parseLong(sed, HEX_RADIX);

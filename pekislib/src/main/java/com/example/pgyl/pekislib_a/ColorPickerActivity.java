@@ -22,12 +22,13 @@ import java.util.logging.Logger;
 
 import static com.example.pgyl.pekislib_a.Constants.ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
+import static com.example.pgyl.pekislib_a.Constants.HEX_RADIX;
 import static com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITIES;
 import static com.example.pgyl.pekislib_a.Constants.SHP_FILE_NAME_SUFFIX;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_TITLE;
+import static com.example.pgyl.pekislib_a.PresetsActivity.PRESETS_ACTIVITY_DISPLAY_TYPE;
 import static com.example.pgyl.pekislib_a.PresetsActivity.PRESETS_ACTIVITY_EXTRA_KEYS;
-import static com.example.pgyl.pekislib_a.PresetsActivity.PRESETS_ACTIVITY_IS_COLOR_TYPE;
 import static com.example.pgyl.pekislib_a.StringShelfDatabase.TABLE_DATA_INDEX;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.ACTIVITY_START_STATUS;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.TABLE_EXTRA_KEYS;
@@ -304,9 +305,9 @@ public class ColorPickerActivity extends Activity {
     }
 
     private void updateDisplaySeekBarsProgress() {
-        int red = Integer.parseInt(colors[colorIndex].substring(0, 2), 16);  //  0..255
-        int green = Integer.parseInt(colors[colorIndex].substring(2, 4), 16);
-        int blue = Integer.parseInt(colors[colorIndex].substring(4, 6), 16);
+        int red = Integer.parseInt(colors[colorIndex].substring(0, 2), HEX_RADIX);  //  0..255
+        int green = Integer.parseInt(colors[colorIndex].substring(2, 4), HEX_RADIX);
+        int blue = Integer.parseInt(colors[colorIndex].substring(4, 6), HEX_RADIX);
         if (colorSpace.equals(COLOR_SPACES.RGB)) {
             seekBars[COLOR_PARAMS.RED_HUE.INDEX()].setProgress(257 * red);    //  257 = 65535 / 255
             seekBars[COLOR_PARAMS.GREEN_SAT.INDEX()].setProgress(257 * green);
@@ -458,7 +459,7 @@ public class ColorPickerActivity extends Activity {
         Intent callingIntent = new Intent(this, PresetsActivity.class);
         callingIntent.putExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString(), "Color Presets");
         callingIntent.putExtra(PRESETS_ACTIVITY_EXTRA_KEYS.SEPARATOR.toString(), SEPARATOR);
-        callingIntent.putExtra(PRESETS_ACTIVITY_EXTRA_KEYS.IS_COLOR_TYPE.toString(), String.valueOf(PRESETS_ACTIVITY_IS_COLOR_TYPE ? 1 : 0));
+        callingIntent.putExtra(PRESETS_ACTIVITY_EXTRA_KEYS.DISPLAY_TYPE.toString(), PRESETS_ACTIVITY_DISPLAY_TYPE.COLORS.toString());
         callingIntent.putExtra(TABLE_EXTRA_KEYS.TABLE.toString(), tableName);
         startActivityForResult(callingIntent, PEKISLIB_ACTIVITIES.PRESETS.INDEX());
     }
