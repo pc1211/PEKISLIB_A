@@ -255,12 +255,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         scrollStart.set(scrollRect.left, scrollRect.top);
     }
 
-    public void writeText(int gridX, int gridY, String text, DotMatrixFont dotMatrixFont) {
-        symbolPos.set(gridX, gridY);
-        appendText(text, dotMatrixFont);
-    }
-
-    public void appendText(String text, DotMatrixFont dotMatrixFont) {   //  A partir de symbolPos
+    public void writeText(String text, DotMatrixFont dotMatrixFont) {   //  A partir de symbolPos
         DotMatrixSymbol symbol;
 
         for (int i = 0; i <= (text.length() - 1); i = i + 1) {
@@ -331,7 +326,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         drawing = false;
     }
 
-    private void drawSymbol(DotMatrixSymbol symbol) {
+    private void drawSymbol(DotMatrixSymbol symbol) {   //  A partir de symbolPos
         int[][] symbolData = symbol.getData();
         symbolPos.offset(symbol.getPosInitialOffset().x, symbol.getPosInitialOffset().y);   //  Appliquer un d√©calage avant l'affichage du symbole
         for (int i = 0; i <= (symbol.getWidth() - 1); i = i + 1) {
