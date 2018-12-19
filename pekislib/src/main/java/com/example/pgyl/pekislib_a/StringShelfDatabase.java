@@ -92,10 +92,7 @@ public class StringShelfDatabase extends SQLiteOpenHelper {
                 for (int i = 0; i <= (rowCount - 1); i = i + 1) {
                     for (int j = 0; j <= (columnCount - 1); j = j + 1) {
                         String fieldValue = cursor.getString(j);
-                        if (fieldValue.equals(NULL_STRING)) {
-                            fieldValue = null;
-                        }
-                        ret[i][j] = fieldValue;
+                        ret[i][j] = ((fieldValue.equals(NULL_STRING)) ? null : fieldValue);
                     }
                     cursor.moveToNext();
                 }
