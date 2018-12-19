@@ -193,20 +193,9 @@ public class StringShelfDatabase extends SQLiteOpenHelper {
         String fieldValues = "";
         int dataFieldCount = 0;
         for (int j = 0; j <= (userRow.length - 1); j = j + 1) {
-            String fieldName = "";
-            String fieldValue = userRow[j];
-            if (fieldValue == null) {
-                fieldValue = NULL_STRING;
-            }
-            fieldValue.replace("'", "''");  //  Escaper les single quotes
-            if (j == FIELDS.ID.USER_INDEX()) {
-                fieldName = FIELDS.ID.toString();
-            } else {
-                dataFieldCount = dataFieldCount + 1;
-                fieldName = FIELDS.DATA.toString() + dataFieldCount;
-            }
-            fieldNames = fieldNames + fieldName;
-            fieldValues = fieldValues + "'" + fieldValue + "'";
+            dataFieldCount = dataFieldCount + ((j == FIELDS.ID.USER_INDEX()) ? 0 : 1);
+            fieldNames = fieldNames + ((j == FIELDS.ID.USER_INDEX()) ? FIELDS.ID.toString() : FIELDS.DATA.toString() + String.valueOf(dataFieldCount));
+            fieldValues = fieldValues + "'" + ((userRow[j] != null) ? userRow[j].replace("'", "''") : NULL_STRING) + "'";   //  Escaper les single quotes
             if (j < (userRow.length - 1)) {
                 fieldNames = fieldNames + ", ";
                 fieldValues = fieldValues + ", ";
