@@ -315,13 +315,9 @@ public class PresetsActivity extends Activity {
         final String SPECIAL_FIELD_PRESSED_COLOR = "995400";
 
         if (command.equals(COMMANDS.FIELD)) {
-            if (listIndex != LIST_INDEX_DEFAULT_VALUE) {
-                buttons[command.INDEX()].setUnpressedColor(SPECIAL_FIELD_UNPRESSED_COLOR);
-                buttons[command.INDEX()].setPressedColor(SPECIAL_FIELD_PRESSED_COLOR);
-            } else {
-                buttons[command.INDEX()].setUnpressedColor(BUTTON_STATES.UNPRESSED.DEFAULT_COLOR());
-                buttons[command.INDEX()].setPressedColor(BUTTON_STATES.PRESSED.DEFAULT_COLOR());
-            }
+            boolean needSpecialColor = (listIndex != LIST_INDEX_DEFAULT_VALUE);
+            buttons[command.INDEX()].setUnpressedColor((needSpecialColor) ? SPECIAL_FIELD_UNPRESSED_COLOR : BUTTON_STATES.UNPRESSED.DEFAULT_COLOR());
+            buttons[command.INDEX()].setPressedColor((needSpecialColor) ? SPECIAL_FIELD_PRESSED_COLOR : BUTTON_STATES.PRESSED.DEFAULT_COLOR());
         }
         buttons[command.INDEX()].updateColor();
     }
@@ -440,14 +436,9 @@ public class PresetsActivity extends Activity {
         final String OK_PRESSED_COLOR_DEFAULT = "0040FF";
 
         for (COMMANDS command : COMMANDS.values()) {
-            String unpressedColor = BUTTON_STATES.UNPRESSED.DEFAULT_COLOR();
-            String pressedColor = BUTTON_STATES.PRESSED.DEFAULT_COLOR();
-            if (command.equals(COMMANDS.OK)) {
-                unpressedColor = OK_UNPRESSED_COLOR_DEFAULT;
-                pressedColor = OK_PRESSED_COLOR_DEFAULT;
-            }
-            buttons[command.INDEX()].setUnpressedColor(unpressedColor);
-            buttons[command.INDEX()].setPressedColor(pressedColor);
+            boolean needSpecialColor = (command.equals(COMMANDS.OK));
+            buttons[command.INDEX()].setUnpressedColor(((needSpecialColor) ? OK_UNPRESSED_COLOR_DEFAULT : BUTTON_STATES.UNPRESSED.DEFAULT_COLOR()));
+            buttons[command.INDEX()].setPressedColor(((needSpecialColor) ? OK_PRESSED_COLOR_DEFAULT : BUTTON_STATES.PRESSED.DEFAULT_COLOR()));
         }
     }
 
