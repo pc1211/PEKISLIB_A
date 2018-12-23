@@ -41,11 +41,11 @@ public class ClockAppAlarmUtils {
         return ret;
     }
 
-    public static boolean dismissClockAppAlarm(Context context, String message) {
+    public static boolean dismissClockAppAlarm(Context context, String message) {   //  On ne peut pas empêcher Clock App de s'afficher
         boolean ret = false;
         Intent intent = new Intent(AlarmClock.ACTION_DISMISS_ALARM);
         intent.putExtra(AlarmClock.EXTRA_ALARM_SEARCH_MODE, AlarmClock.ALARM_SEARCH_MODE_LABEL);
-        intent.putExtra(AlarmClock.EXTRA_MESSAGE, message);      //  On ne peut pas empêcher Clock App de s'afficher
+        intent.putExtra(AlarmClock.EXTRA_MESSAGE, message);
         String dismissingMessage = "Dismissing Clock App alarm " + message;
         if (intent.resolveActivity(context.getPackageManager()) != null) {
             ret = true;
