@@ -32,6 +32,7 @@ public class TimeDateUtils {
 
     public static final SimpleDateFormat ddMMyyyy = new SimpleDateFormat("dd/MM/yyyy");
     public static final SimpleDateFormat HHmm = new SimpleDateFormat("HH:mm");
+    public static final SimpleDateFormat HHmmss = new SimpleDateFormat("HH:mm:ss");
 
     public static long midnightTimeMillis() {
         Calendar calendar = Calendar.getInstance();
@@ -58,6 +59,16 @@ public class TimeDateUtils {
 
     public static String formattedCalendarTimeDate(Calendar calendar, SimpleDateFormat sdf) {
         return sdf.format(calendar.getTime());
+    }
+
+    public static String formattedTimeZoneLongTimeDate(long timeDateMillis, SimpleDateFormat sdf) {  //  OK TimeZone
+        String ret = null;
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timeDateMillis);
+        ret = sdf.format(calendar.getTime());
+        calendar.clear();
+        calendar = null;
+        return ret;
     }
 
     public static String msToHms(long ms, TIMEUNITS timeUnit) {    //   n (en ms) -> HH:MM:SS.CC (format "hmsc")

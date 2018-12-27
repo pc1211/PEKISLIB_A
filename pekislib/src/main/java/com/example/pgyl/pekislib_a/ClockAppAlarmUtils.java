@@ -12,7 +12,7 @@ import static com.example.pgyl.pekislib_a.TimeDateUtils.formattedCalendarTimeDat
 
 public class ClockAppAlarmUtils {
 
-    public static boolean setClockAppAlarm(Context context, long timeExp, String message) {
+    public static boolean setClockAppAlarm(Context context, long timeExp, String alarmLabel, String toastMessage) {
         boolean ret = false;
         Calendar calendar = Calendar.getInstance();    // Calendar => OK Time Zone
         String sTimeNow = formattedCalendarTimeDate(calendar, HHmm);
@@ -22,38 +22,36 @@ public class ClockAppAlarmUtils {
         int minExp = calendar.get(Calendar.MINUTE);
         calendar.clear();
         calendar = null;
-        String settingMessage = "Setting Clock App alarm on " + sTimeExp;
         if (!sTimeExp.equals(sTimeNow)) {
             Intent intent = new Intent(AlarmClock.ACTION_SET_ALARM);
             intent.putExtra(AlarmClock.EXTRA_HOUR, hourExp);
             intent.putExtra(AlarmClock.EXTRA_MINUTES, minExp);
-            intent.putExtra(AlarmClock.EXTRA_MESSAGE, message);
+            intent.putExtra(AlarmClock.EXTRA_MESSAGE, alarmLabel);
             intent.putExtra(AlarmClock.EXTRA_SKIP_UI, true);    //  Ne pas afficher Clock App
             if (intent.resolveActivity(context.getPackageManager()) != null) {
                 ret = true;
-                toastLong(settingMessage, context);
+                toastLong(toastMessage, context);
                 context.startActivity(intent);
             }
         }
         if (!ret) {
-            toastLong("Error " + settingMessage, context);
+            toastLong("Error " + toastMessage, context);
         }
         return ret;
     }
 
-    public static boolean dismissClockAppAlarm(Context context, String message) {   //  On ne peut pas empêcher Clock App de s'afficher
+    public static boolean dismissClockAppAlarm(Context context, String alarmLabel, String toastMessage) {   //  On ne peut pas empêcher Clock App de s'afficher
         boolean ret = false;
         Intent intent = new Intent(AlarmClock.ACTION_DISMISS_ALARM);
         intent.putExtra(AlarmClock.EXTRA_ALARM_SEARCH_MODE, AlarmClock.ALARM_SEARCH_MODE_LABEL);
-        intent.putExtra(AlarmClock.EXTRA_MESSAGE, message);
-        String dismissingMessage = "Dismissing Clock App alarm " + message;
+        intent.putExtra(AlarmClock.EXTRA_MESSAGE, alarmLabel);
         if (intent.resolveActivity(context.getPackageManager()) != null) {
             ret = true;
-            toastLong(dismissingMessage, context);
+            toastLong(toastMessage, context);
             context.startActivity(intent);
         }
         if (!ret) {
-            toastLong("Error " + dismissingMessage, context);
+            toastLong("Error " + toastMessage, context);
         }
         return ret;
     }
