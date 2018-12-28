@@ -30,12 +30,14 @@ public class ClockAppAlarmUtils {
             intent.putExtra(AlarmClock.EXTRA_SKIP_UI, true);    //  Ne pas afficher Clock App
             if (intent.resolveActivity(context.getPackageManager()) != null) {
                 ret = true;
-                toastLong(toastMessage, context);
+                if (toastMessage != null) {
+                    toastLong(toastMessage, context);
+                }
                 context.startActivity(intent);
             }
         }
         if (!ret) {
-            toastLong("Error " + toastMessage, context);
+            toastLong("Error" + ((toastMessage != null) ? " " + toastMessage : ""), context);
         }
         return ret;
     }
@@ -47,11 +49,13 @@ public class ClockAppAlarmUtils {
         intent.putExtra(AlarmClock.EXTRA_MESSAGE, alarmLabel);
         if (intent.resolveActivity(context.getPackageManager()) != null) {
             ret = true;
-            toastLong(toastMessage, context);
+            if (toastMessage != null) {
+                toastLong(toastMessage, context);
+            }
             context.startActivity(intent);
         }
         if (!ret) {
-            toastLong("Error " + toastMessage, context);
+            toastLong("Error" + ((toastMessage != null) ? " " + toastMessage : ""), context);
         }
         return ret;
     }
