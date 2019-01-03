@@ -37,6 +37,8 @@ public final class SymbolButtonView extends View {
     private final float SIZE_COEFF_DEFAULT = 0.9f;   //  (0..1)
     //endregion
     //region Variables
+    private long minClickTimeInterval;
+    private long lastClickUpTime;
     private BUTTON_STATES buttonState;
     private int frontColor;
     private int backColor;
@@ -62,12 +64,16 @@ public final class SymbolButtonView extends View {
     }
 
     public void init() {
+        final long MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE = 0;   //   Interval de temps (ms) minimum imposé entre 2 click
+
         backPaint = new Paint();
         backPaint.setAntiAlias(true);
         backPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OVER));
         symbolPicture = null;  //  En attente d'appel de setSVGImageResource
         buttonZone = new RectF();
         buttonState = BUTTON_STATES.UNPRESSED;
+        minClickTimeInterval = MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE;
+        lastClickUpTime = 0;
         symbolSizeCoeff = SIZE_COEFF_DEFAULT;
         symbolRelativePositionCoeffs = CENTER_X_Y;
         setOnTouchListener(new OnTouchListener() {
@@ -129,21 +135,33 @@ public final class SymbolButtonView extends View {
         this.extraColor = Color.parseColor(COLOR_PREFIX + extraColor);
     }
 
+    public void setMinClickTimeInterval(long minClickTimeInterval) {
+        this.minClickTimeInterval = minClickTimeInterval;
+    }
+
     public boolean onButtonTouch(View v, MotionEvent event) {
         int action = event.getAction();
         if (action == MotionEvent.ACTION_DOWN) {
             clickDownInButtonZone = true;
             buttonState = BUTTON_STATES.PRESSED;
+            v.getParent().requestDisallowInterceptTouchEvent(true);   //  Une listView éventuelle (qui contient des items avec ce contrôle et voudrait scroller) ne pourra voler l'événement ACTION_MOVE de ce contrôle
             invalidate();
+            return true;
         }
         if ((action == MotionEvent.ACTION_MOVE) || (action == MotionEvent.ACTION_UP)) {
             if (clickDownInButtonZone) {
                 if (buttonZone.contains(v.getLeft() + (int) event.getX(), v.getTop() + (int) event.getY())) {
                     if (action == MotionEvent.ACTION_UP) {
+                        long nowm = System.currentTimeMillis();
                         buttonState = BUTTON_STATES.UNPRESSED;
                         invalidate();
-                        if (mOnCustomClickListener != null) {
-                            mOnCustomClickListener.onCustomClick();
+                        if ((nowm - lastClickUpTime) >= minClickTimeInterval) {   //  OK pour traiter le click
+                            lastClickUpTime = nowm;
+                            if (mOnCustomClickListener != null) {
+                                mOnCustomClickListener.onCustomClick();
+                            }
+                        } else {   //  Attendre pour pouvoir traiter un autre click
+                            clickDownInButtonZone = false;
                         }
                     }
                 } else {
@@ -152,8 +170,9 @@ public final class SymbolButtonView extends View {
                     invalidate();
                 }
             }
+            return (action == MotionEvent.ACTION_MOVE);
         }
-        return true;
+        return false;
     }
 
     @Override

@@ -52,6 +52,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     private RectF viewCanvasRect;
     private Paint viewCanvasBackPaint;
     private float backCornerRadius;
+    private long minClickTimeInterval;
+    private long lastClickUpTime;
     private BUTTON_STATES buttonState;
     private boolean clickDownInButtonZone;
     private Rect buttonZone;
@@ -69,6 +71,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         final RectF DISPLAY_MARGIN_SIZE_COEFFS_DEFAULT = new RectF(0.02f, 0.02f, 0.02f, 0.02f);   //  Marge autour de la grille (% de largeur totale)
         final float DISPLAY_DOT_RIGHT_MARGIN_COEFF_DEFAULT = 0.2f;   //  Distance entre carrés (% de largeur d'un carré)
         final Point DEFAULT_FONT_SYMBOL_POS_DEFAULT = new Point(0, 0);   //  Position du prochain symbole à afficher (en coordonnées de la grille (x,y), (0,0) étant le carré en haut à gauche)
+        final long MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE = 0;   //   Interval de temps (ms) minimum imposé entre 2 click
 
         displayMarginCoeffs = DISPLAY_MARGIN_SIZE_COEFFS_DEFAULT;
         dotRightMarginCoeff = DISPLAY_DOT_RIGHT_MARGIN_COEFF_DEFAULT;
@@ -80,6 +83,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         dotPoint = new PointF();
         drawing = false;
         buttonState = BUTTON_STATES.UNPRESSED;
+        minClickTimeInterval = MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE;
+        lastClickUpTime = 0;
         setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -269,12 +274,18 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         symbol = null;
     }
 
+    public void setMinClickTimeInterval(long minClickTimeInterval) {
+        this.minClickTimeInterval = minClickTimeInterval;
+    }
+
     private boolean onButtonTouch(View v, MotionEvent event) {
         int action = event.getAction();
         if (action == MotionEvent.ACTION_DOWN) {
             clickDownInButtonZone = true;
             buttonState = BUTTON_STATES.PRESSED;
+            v.getParent().requestDisallowInterceptTouchEvent(true);   //  Une listView éventuelle (qui contient des items avec ce contrôle et voudrait scroller) ne pourra voler l'événement ACTION_MOVE de ce contrôle
             invalidate();
+            return true;
         }
         if ((action == MotionEvent.ACTION_MOVE) || (action == MotionEvent.ACTION_UP)) {
             if (clickDownInButtonZone) {
@@ -283,10 +294,16 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                 }
                 if (buttonZone.contains(v.getLeft() + (int) event.getX(), v.getTop() + (int) event.getY())) {
                     if (action == MotionEvent.ACTION_UP) {
+                        long nowm = System.currentTimeMillis();
                         buttonState = BUTTON_STATES.UNPRESSED;
                         invalidate();
-                        if (mOnCustomClickListener != null) {
-                            mOnCustomClickListener.onCustomClick();
+                        if ((nowm - lastClickUpTime) >= minClickTimeInterval) {   //  OK pour traiter le click
+                            lastClickUpTime = nowm;
+                            if (mOnCustomClickListener != null) {
+                                mOnCustomClickListener.onCustomClick();
+                            }
+                        } else {   //  Attendre pour pouvoir traiter un autre click
+                            clickDownInButtonZone = false;
                         }
                     }
                 } else {
@@ -295,8 +312,9 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                     invalidate();
                 }
             }
+            return (action == MotionEvent.ACTION_MOVE);
         }
-        return true;
+        return false;
     }
 
     @Override

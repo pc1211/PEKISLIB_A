@@ -16,6 +16,8 @@ import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
 
 public final class CustomImageButton extends ImageButton {
     //region Variables
+    private long minClickTimeInterval;
+    private long lastClickUpTime;
     private BUTTON_STATES buttonState;
     private int unpressedColor;
     private int pressedColor;
@@ -30,10 +32,14 @@ public final class CustomImageButton extends ImageButton {
     }
 
     public void init() {
+        final long MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE = 0;   //   Interval de temps (ms) minimum imposé entre 2 click
+
         drawable = getBackground().getConstantState().newDrawable().mutate();
         unpressedColor = UNDEFINED;
         pressedColor = UNDEFINED;
         buttonState = BUTTON_STATES.UNPRESSED;
+        minClickTimeInterval = MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE;
+        lastClickUpTime = 0;
         setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -63,12 +69,18 @@ public final class CustomImageButton extends ImageButton {
         invalidate();
     }
 
+    public void setMinClickTimeInterval(long minClickTimeInterval) {
+        this.minClickTimeInterval = minClickTimeInterval;
+    }
+
     private boolean onButtonTouch(View v, MotionEvent event) {
         int action = event.getAction();
         if (action == MotionEvent.ACTION_DOWN) {
             clickDownInButtonZone = true;
             buttonState = BUTTON_STATES.PRESSED;
+            v.getParent().requestDisallowInterceptTouchEvent(true);   //  Une listView éventuelle (qui contient des items avec ce contrôle et voudrait scroller) ne pourra voler l'événement ACTION_MOVE de ce contrôle
             updateColor();
+            return true;
         }
         if ((action == MotionEvent.ACTION_MOVE) || (action == MotionEvent.ACTION_UP)) {
             if (clickDownInButtonZone) {
@@ -77,9 +89,15 @@ public final class CustomImageButton extends ImageButton {
                 }
                 if (buttonZone.contains(v.getLeft() + (int) event.getX(), v.getTop() + (int) event.getY())) {
                     if (action == MotionEvent.ACTION_UP) {
+                        long nowm = System.currentTimeMillis();
                         buttonState = BUTTON_STATES.UNPRESSED;
                         updateColor();
-                        performClick();
+                        if ((nowm - lastClickUpTime) >= minClickTimeInterval) {   //  OK pour traiter le click
+                            lastClickUpTime = nowm;
+                            performClick();
+                        } else {   //  Attendre pour pouvoir traiter un autre click
+                            clickDownInButtonZone = false;
+                        }
                     }
                 } else {
                     clickDownInButtonZone = false;
@@ -87,8 +105,9 @@ public final class CustomImageButton extends ImageButton {
                     updateColor();
                 }
             }
+            return (action == MotionEvent.ACTION_MOVE);
         }
-        return true;
+        return false;
     }
 
 }
