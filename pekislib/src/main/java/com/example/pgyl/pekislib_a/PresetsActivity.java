@@ -384,6 +384,7 @@ public class PresetsActivity extends Activity {
 
     private void setupButtons() {
         final String BUTTON_XML_PREFIX = "BTN_";
+        final long BUTTON_MIN_CLICK_TIME_INTERVAL_MS = 500;
 
         buttons = new CustomButton[COMMANDS.values().length];
         Class rid = R.id.class;
@@ -391,6 +392,7 @@ public class PresetsActivity extends Activity {
             try {
                 buttons[command.INDEX()] = findViewById(rid.getField(BUTTON_XML_PREFIX + command.toString()).getInt(rid));   //  1, 2, 3 ... dans le XML
                 buttons[command.INDEX()].setText(command.TEXT());
+                buttons[command.INDEX()].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
                 final COMMANDS fcommand = command;
                 buttons[command.INDEX()].setOnClickListener(new View.OnClickListener() {
                     @Override
