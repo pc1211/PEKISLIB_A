@@ -17,13 +17,8 @@ public class ColorWheelViewUpdater {
     private long initm;
     private boolean inAutomatic;
     private ColorWheelView colorWheelView;
-    private final Handler handlerTime = new Handler();
-    private Runnable runnableTime = new Runnable() {
-        @Override
-        public void run() {
-            automatic();
-        }
-    };
+    private Handler handlerTime;
+    private Runnable runnableTime;
     //endregion
 
     public ColorWheelViewUpdater(ColorWheelView colorWheelView) {
@@ -32,10 +27,12 @@ public class ColorWheelViewUpdater {
     }
 
     private void init() {
-        //  NOP
+        setupRunnableTime();
     }
 
     public void close() {
+        runnableTime = null;
+        handlerTime = null;
         colorWheelView = null;
     }
 
@@ -69,5 +66,15 @@ public class ColorWheelViewUpdater {
             colorWheelView.pinMarker();
             colorWheelView.invalidate();
         }
+    }
+
+    private void setupRunnableTime() {
+        handlerTime = new Handler();
+        runnableTime = new Runnable() {
+            @Override
+            public void run() {
+                automatic();
+            }
+        };
     }
 }
