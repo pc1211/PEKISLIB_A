@@ -1,6 +1,5 @@
 package com.example.pgyl.pekislib_a;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -334,8 +333,7 @@ public class InputButtonsActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
-        ActionBar actionBar = getActionBar();
-        actionBar.setTitle(getIntent().getStringExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString()));
+        getActionBar().setTitle(getIntent().getStringExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString()));
         setupOrientationLayout();
         setupButtons();
         setupKeyboardButtons();
