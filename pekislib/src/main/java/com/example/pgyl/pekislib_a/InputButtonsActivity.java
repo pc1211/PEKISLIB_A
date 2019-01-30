@@ -195,6 +195,19 @@ public class InputButtonsActivity extends Activity {
                         "7", "8", "9", NA, NA, NA, NA, NA,
                         NA, "0", "/", NA, NA, NA, NA, NA}),
 
+        POSINT(
+                new String[]{   //  Portrait
+                        "1", "2", "3", SPECIAL_BUTTONS.BACK.toString(),
+                        "4", "5", "6", SPECIAL_BUTTONS.CLEAR.toString(),
+                        "7", "8", "9", NA,
+                        NA, "0", NA, NA},
+
+                new String[]{   //  Paysage
+                        "1", "2", "3", NA, NA, NA, NA, SPECIAL_BUTTONS.BACK.toString(),
+                        "4", "5", "6", NA, NA, NA, NA, SPECIAL_BUTTONS.CLEAR.toString(),
+                        "7", "8", "9", NA, NA, NA, NA, NA,
+                        NA, "0", NA, NA, NA, NA, NA, NA}),
+
         LONG(
                 new String[]{   //  Portrait
                         "1", "2", "3", SPECIAL_BUTTONS.BACK.toString(),
@@ -563,40 +576,47 @@ public class InputButtonsActivity extends Activity {
 
     private String parseCandidate(String candidate, String smin, String smax) {
         String ret = noErrorMessage();
-        if ((keyboard.equals(KEYBOARDS.ALPHANUM)) || (keyboard.equals(KEYBOARDS.ASCII))) {
-            ret = parseAlphanum(candidate, smin, smax);
-        }
-        if (keyboard.equals(KEYBOARDS.TIME_HMS)) {
-            ret = parseTimeHMS(candidate, smin, smax);
-        }
-        if (keyboard.equals(KEYBOARDS.TIME_XHMS)) {
-            ret = parseTimeXHMS(candidate, smin, smax);
-        }
-        if (keyboard.equals(KEYBOARDS.DATE_JJMMAAAA)) {
-            ret = parseDATEJJMMAAAA(candidate, smin, smax);
-        }
-        if (keyboard.equals(KEYBOARDS.LONG)) {
-            ret = parseLong(candidate, smin, smax);
-        }
-        if (keyboard.equals(KEYBOARDS.FLOAT)) {
-            ret = parseFloat(candidate, smin, smax);
-        }
-        if (keyboard.equals(KEYBOARDS.HEX)) {
-            ret = parseHex(candidate, smin, smax);
+        if (candidate.length() >= 1) {
+            if ((keyboard.equals(KEYBOARDS.ALPHANUM)) || (keyboard.equals(KEYBOARDS.ASCII))) {
+                ret = parseAlphanum(candidate, smin, smax);
+            }
+            if (keyboard.equals(KEYBOARDS.TIME_HMS)) {
+                ret = parseTimeHMS(candidate, smin, smax);
+            }
+            if (keyboard.equals(KEYBOARDS.TIME_XHMS)) {
+                ret = parseTimeXHMS(candidate, smin, smax);
+            }
+            if (keyboard.equals(KEYBOARDS.DATE_JJMMAAAA)) {
+                ret = parseDATEJJMMAAAA(candidate, smin, smax);
+            }
+            if (keyboard.equals(KEYBOARDS.POSINT)) {
+                ret = parseInteger(candidate, smin, smax);
+            }
+            if (keyboard.equals(KEYBOARDS.LONG)) {
+                ret = parseLong(candidate, smin, smax);
+            }
+            if (keyboard.equals(KEYBOARDS.FLOAT)) {
+                ret = parseFloat(candidate, smin, smax);
+            }
+            if (keyboard.equals(KEYBOARDS.HEX)) {
+                ret = parseHex(candidate, smin, smax);
+            }
         }
         return ret;
     }
 
     private String normalizedCandidate(String candidate) {
         String ret = candidate;
-        if (keyboard.equals(KEYBOARDS.TIME_HMS)) {
-            ret = String.valueOf(hmsToMs(candidate));
-        }
-        if (keyboard.equals(KEYBOARDS.TIME_XHMS)) {
-            ret = String.valueOf(xhmsToMs(candidate));
-        }
-        if (keyboard.equals(KEYBOARDS.DATE_JJMMAAAA)) {
-            ret = formattedStringTimeDate(candidate, ddMMyyyy);
+        if (candidate.length() >= 1) {
+            if (keyboard.equals(KEYBOARDS.TIME_HMS)) {
+                ret = String.valueOf(hmsToMs(candidate));
+            }
+            if (keyboard.equals(KEYBOARDS.TIME_XHMS)) {
+                ret = String.valueOf(xhmsToMs(candidate));
+            }
+            if (keyboard.equals(KEYBOARDS.DATE_JJMMAAAA)) {
+                ret = formattedStringTimeDate(candidate, ddMMyyyy);
+            }
         }
         return ret;
     }
@@ -676,6 +696,22 @@ public class InputButtonsActivity extends Activity {
             }
         } catch (ParseException ex) {
             ret = errorMessageParse(KEYBOARDS.DATE_JJMMAAAA);
+        }
+        return ret;
+    }
+
+    private String parseInteger(String sed, String smin, String smax) {
+        String ret = noErrorMessage();
+        try {
+            int l = Integer.parseInt(sed);
+            if (l < Integer.parseInt(smin)) {
+                ret = errorMessageMin(smin);
+            }
+            if (l > Integer.parseInt(smax)) {
+                ret = errorMessageMax(smax);
+            }
+        } catch (NumberFormatException ex) {
+            ret = errorMessageParse(KEYBOARDS.POSINT);
         }
         return ret;
     }
