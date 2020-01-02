@@ -20,8 +20,11 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.example.pgyl.pekislib_a.ColorUtils.RGBToHSV;
+import static com.example.pgyl.pekislib_a.ColorUtils.HSVToRGB;
 import static com.example.pgyl.pekislib_a.Constants.ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
+import static com.example.pgyl.pekislib_a.Constants.COLOR_RGB_MASK;
 import static com.example.pgyl.pekislib_a.Constants.HEX_RADIX;
 import static com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITIES;
 import static com.example.pgyl.pekislib_a.Constants.SHP_FILE_NAME_SUFFIX;
@@ -47,7 +50,7 @@ import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatu
 public class ColorPickerActivity extends Activity {
     //region Constantes
     private enum COMMANDS {
-        NEXT_COLOR_ITEM(""), NEXT_COLOR_SPACE(""), CANCEL("Cancel"), RGB_COLOR_VALUE(""), PRESETS("Presets"), OK("OK");
+        NEXT_COLOR_ITEM(""), NEXT_COLOR_SPACE(""), CANCEL("Cancel"), COLOR_VALUE(""), PRESETS("Presets"), OK("OK");
 
         private String valueText;
 
@@ -152,7 +155,8 @@ public class ColorPickerActivity extends Activity {
             if (validReturnFromCalledActivity) {
                 validReturnFromCalledActivity = false;
                 if (returnsFromInputButtonsActivity()) {
-                    colors[colorIndex] = getCurrentStringInInputButtonsActivity(stringShelfDatabase, tableName, colorIndex);
+                    String colorText = getCurrentStringInInputButtonsActivity(stringShelfDatabase, tableName, colorIndex);
+                    colors[colorIndex] = ((colorSpace.equals(COLOR_SPACES.RGB)) ? colorText : HSVToRGB(colorText));
                 }
                 if (returnsFromPresetsActivity()) {
                     colors = getCurrentPresetInPresetsActivity(stringShelfDatabase, tableName);
@@ -213,7 +217,7 @@ public class ColorPickerActivity extends Activity {
         if (command.equals(COMMANDS.CANCEL)) {
             onButtonClickCancel();
         }
-        if (command.equals(COMMANDS.RGB_COLOR_VALUE)) {
+        if (command.equals(COMMANDS.COLOR_VALUE)) {
             onButtonClickRGB();
         }
         if (command.equals(COMMANDS.PRESETS)) {
@@ -240,7 +244,8 @@ public class ColorPickerActivity extends Activity {
     }
 
     private void onButtonClickRGB() {
-        setCurrentStringInInputButtonsActivity(stringShelfDatabase, tableName, colorIndex, colors[colorIndex]);
+        String colorText = ((colorSpace.equals(COLOR_SPACES.RGB)) ? colors[colorIndex] : RGBToHSV(colors[colorIndex]));
+        setCurrentStringInInputButtonsActivity(stringShelfDatabase, tableName, colorIndex, colorText);
         launchInputButtonsActivity();
     }
 
@@ -275,7 +280,7 @@ public class ColorPickerActivity extends Activity {
                 hsvStruc[0] = (float) redHueSeekbarValue / 65535f * 360f;
                 hsvStruc[1] = (float) greenSatSeekbarValue / 65535f;
                 hsvStruc[2] = (float) blueValSeekbarValue / 65535f;
-                colors[colorIndex] = String.format("%06X", Color.HSVToColor(0, hsvStruc));
+                colors[colorIndex] = String.format("%06X", Color.HSVToColor(0, hsvStruc) & COLOR_RGB_MASK);
             }
             updateDisplayButtonTextColorValue();
             colorWheelView.setColor(colorIndex - 1, colors[colorIndex]);  //  colorWheelView ne stocke pas le 1er élément (ID)
@@ -290,7 +295,8 @@ public class ColorPickerActivity extends Activity {
     }
 
     private void updateDisplayButtonTextColorValue() {
-        buttons[COMMANDS.RGB_COLOR_VALUE.INDEX()].setText(colors[colorIndex]);
+        String textColorValue = ((colorSpace.equals(COLOR_SPACES.RGB)) ? colors[colorIndex] : RGBToHSV(colors[colorIndex]));
+        buttons[COMMANDS.COLOR_VALUE.INDEX()].setText(textColorValue);
     }
 
     private void updateDisplayColorSpace() {
@@ -314,7 +320,7 @@ public class ColorPickerActivity extends Activity {
             seekBars[COLOR_PARAMS.BLUE_VAL.INDEX()].setProgress(257 * blue);
         } else {
             Color.RGBToHSV(red, green, blue, hsvStruc);
-            seekBars[COLOR_PARAMS.RED_HUE.INDEX()].setProgress((int) (hsvStruc[0] / 360f * 65535f + 0.5f));
+            seekBars[COLOR_PARAMS.RED_HUE.INDEX()].setProgress((int) (hsvStruc[0] * 65535f / 360f + 0.5f));
             seekBars[COLOR_PARAMS.GREEN_SAT.INDEX()].setProgress((int) (hsvStruc[1] * 65535f + 0.5f));
             seekBars[COLOR_PARAMS.BLUE_VAL.INDEX()].setProgress((int) (hsvStruc[2] * 65535f + 0.5f));
         }

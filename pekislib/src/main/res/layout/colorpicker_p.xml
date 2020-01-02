@@ -30,7 +30,7 @@
             android:layout_weight="1"
             android:layout_height="wrap_content" />
         <Button
-            android:id="@+id/BTN_RGB_COLOR_VALUE"
+            android:id="@+id/BTN_COLOR_VALUE"
             android:textStyle="bold"
             android:layout_width="0dp"
             android:layout_weight="1"                  
