@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.example.pgyl.pekislib_a.ColorUtils.RGBToHSV;
 import static com.example.pgyl.pekislib_a.ColorUtils.HSVToRGB;
 import static com.example.pgyl.pekislib_a.Constants.ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
@@ -156,7 +155,7 @@ public class ColorPickerActivity extends Activity {
                 validReturnFromCalledActivity = false;
                 if (returnsFromInputButtonsActivity()) {
                     String colorText = getCurrentStringInInputButtonsActivity(stringShelfDatabase, tableName, colorIndex);
-                    colors[colorIndex] = ((colorSpace.equals(COLOR_SPACES.RGB)) ? colorText : HSVToRGB(colorText));
+                    colors[colorIndex] = ((colorSpace.equals(COLOR_SPACES.RGB)) ? colorText : HSVToRGB(colorText));  //  HSV dégradé
                 }
                 if (returnsFromPresetsActivity()) {
                     colors = getCurrentPresetInPresetsActivity(stringShelfDatabase, tableName);
@@ -167,10 +166,10 @@ public class ColorPickerActivity extends Activity {
         setupColorWheelViewColors();
         setupColorWheelViewUpdater();
         setupHSVColorSpace();
-        updateDisplayButtonTextColorItem();
-        updateDisplayButtonTextColorValue();
+        updateDisplayButtonTextNextColorItem();
         updateDisplayColorSpace();
         updateDisplaySeekBarsProgress();
+        updateDisplayButtonTextColorValue();
         colorWheelView.invalidate();
     }
 
@@ -218,7 +217,7 @@ public class ColorPickerActivity extends Activity {
             onButtonClickCancel();
         }
         if (command.equals(COMMANDS.COLOR_VALUE)) {
-            onButtonClickRGB();
+            onButtonClickColorValue();
         }
         if (command.equals(COMMANDS.PRESETS)) {
             onButtonClickPresets();
@@ -243,9 +242,8 @@ public class ColorPickerActivity extends Activity {
         finish();
     }
 
-    private void onButtonClickRGB() {
-        String colorText = ((colorSpace.equals(COLOR_SPACES.RGB)) ? colors[colorIndex] : RGBToHSV(colors[colorIndex]));
-        setCurrentStringInInputButtonsActivity(stringShelfDatabase, tableName, colorIndex, colorText);
+    private void onButtonClickColorValue() {
+        setCurrentStringInInputButtonsActivity(stringShelfDatabase, tableName, colorIndex, getSeekBarsProgressHexString());
         launchInputButtonsActivity();
     }
 
@@ -262,25 +260,20 @@ public class ColorPickerActivity extends Activity {
 
     private void onWheelColorIndexChange(int newColorIndex) {      //  La rotation de la roue fait passer à une autre couleur
         colorIndex = newColorIndex + 1;                            //  colors stocke le 1er élément (ID)
-        updateDisplayButtonTextColorItem();
-        updateDisplayButtonTextColorValue();
+        updateDisplayButtonTextNextColorItem();
         updateDisplaySeekBarsProgress();
+        updateDisplayButtonTextColorValue();
     }
 
     private void onSeekBarProgressChanged(boolean fromUser) {
         if (fromUser) {
-            int redHueSeekbarValue = seekBars[COLOR_PARAMS.RED_HUE.INDEX()].getProgress();   //  0..65535
-            int greenSatSeekbarValue = seekBars[COLOR_PARAMS.GREEN_SAT.INDEX()].getProgress();
-            int blueValSeekbarValue = seekBars[COLOR_PARAMS.BLUE_VAL.INDEX()].getProgress();
             if (colorSpace.equals(COLOR_SPACES.RGB)) {
-                colors[colorIndex] = String.format("%02X", (int) ((float) redHueSeekbarValue / 257f + 0.5f)) +    //  257 = 65535 / 255
-                        String.format("%02X", (int) ((float) greenSatSeekbarValue / 257f + 0.5f)) +
-                        String.format("%02X", (int) ((float) blueValSeekbarValue / 257f + 0.5f));
+                colors[colorIndex] = getSeekBarsProgressHexString();
             } else {
-                hsvStruc[0] = (float) redHueSeekbarValue / 65535f * 360f;
-                hsvStruc[1] = (float) greenSatSeekbarValue / 65535f;
-                hsvStruc[2] = (float) blueValSeekbarValue / 65535f;
-                colors[colorIndex] = String.format("%06X", Color.HSVToColor(0, hsvStruc) & COLOR_RGB_MASK);
+                hsvStruc[0] = (float) seekBars[COLOR_PARAMS.RED_HUE.INDEX()].getProgress() / 65535f * 360f;
+                hsvStruc[1] = (float) seekBars[COLOR_PARAMS.GREEN_SAT.INDEX()].getProgress() / 65535f;
+                hsvStruc[2] = (float) seekBars[COLOR_PARAMS.BLUE_VAL.INDEX()].getProgress() / 65535f;
+                colors[colorIndex] = String.format("%06X", Color.HSVToColor(hsvStruc) & COLOR_RGB_MASK);
             }
             updateDisplayButtonTextColorValue();
             colorWheelView.setColor(colorIndex - 1, colors[colorIndex]);  //  colorWheelView ne stocke pas le 1er élément (ID)
@@ -288,15 +281,14 @@ public class ColorPickerActivity extends Activity {
         }
     }
 
-    private void updateDisplayButtonTextColorItem() {
+    private void updateDisplayButtonTextNextColorItem() {
         final String SYMBOL_NEXT = " >";               //  Pour signifier qu'on peut passer au suivant en poussant sur le bouton
 
         buttons[COMMANDS.NEXT_COLOR_ITEM.INDEX()].setText(labelNames[colorIndex] + SYMBOL_NEXT);
     }
 
     private void updateDisplayButtonTextColorValue() {
-        String textColorValue = ((colorSpace.equals(COLOR_SPACES.RGB)) ? colors[colorIndex] : RGBToHSV(colors[colorIndex]));
-        buttons[COMMANDS.COLOR_VALUE.INDEX()].setText(textColorValue);
+        buttons[COMMANDS.COLOR_VALUE.INDEX()].setText(getSeekBarsProgressHexString());
     }
 
     private void updateDisplayColorSpace() {
@@ -324,6 +316,16 @@ public class ColorPickerActivity extends Activity {
             seekBars[COLOR_PARAMS.GREEN_SAT.INDEX()].setProgress((int) (hsvStruc[1] * 65535f + 0.5f));
             seekBars[COLOR_PARAMS.BLUE_VAL.INDEX()].setProgress((int) (hsvStruc[2] * 65535f + 0.5f));
         }
+    }
+
+    private String getSeekBarsProgressHexString() {  //  Hex RRGGBB ou HHSSVV
+        int redHueSeekBarValue = seekBars[COLOR_PARAMS.RED_HUE.INDEX()].getProgress();   //  0..65535
+        int greenSatSeekBarValue = seekBars[COLOR_PARAMS.GREEN_SAT.INDEX()].getProgress();
+        int blueValSeekBarValue = seekBars[COLOR_PARAMS.BLUE_VAL.INDEX()].getProgress();
+        String hexString = String.format("%02X", (int) ((float) redHueSeekBarValue / 257f + 0.5f)) +    //  257 = 65535 / 255
+                String.format("%02X", (int) ((float) greenSatSeekBarValue / 257f + 0.5f)) +
+                String.format("%02X", (int) ((float) blueValSeekBarValue / 257f + 0.5f));
+        return hexString;
     }
 
     private int getSHPcolorIndex() {
