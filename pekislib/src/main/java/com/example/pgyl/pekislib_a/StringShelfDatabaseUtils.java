@@ -14,7 +14,7 @@ public class StringShelfDatabaseUtils {
         }   //  INDEX 0 pour identifiant utilisateur
     }
 
-    public enum TABLE_IDS {CURRENT, DEFAULT, LABEL, KEYBOARD, REGEXP, MIN, MAX, TIMEUNIT}   //  Identifiants utilisateur génériques
+    public enum TABLE_IDS {CURRENT, DEFAULT, PRESET, LABEL, KEYBOARD, REGEXP, MIN, MAX, TIMEUNIT}   //  Identifiants utilisateur génériques
 
     public enum ACTIVITY_START_STATUS {COLD, HOT}
 

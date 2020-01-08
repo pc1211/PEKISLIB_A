@@ -103,16 +103,40 @@ public class StringShelfDatabase extends SQLiteOpenHelper {
         return ret;
     }
 
-    public String[] selectRowByIdOrCreate(String tableName, String idValue) {
+    public String[] selectRowById(String tableName, String idValue) {
         String[] ret;
 
         String[][] stsa = selectRows(tableName, FIELDS.ID.toString() + " = '" + idValue + "'");
         if (stsa != null) {
             ret = stsa[0];       //  Prendre le 1er (et unique) record (cf contrainte UNIQUE sur le champ ID)
+        } else {      //  IdValue inconnu dans la table
+            ret = null;
+        }
+        return ret;
+    }
+
+    public String[] selectRowByIdOrCreate(String tableName, String idValue) {
+        String[] ret;
+
+        String[] sts = selectRowById(tableName, idValue);
+        if (sts != null) {
+            ret = sts;
         } else {      //  IdValue inconnu dans la table => Enregistrer un record vide dans la table, avec ce IdValue
             ret = new String[getTableFieldsCount(tableName) - 1];   //  Champ _id non compté
             ret[FIELDS.ID.USER_INDEX()] = idValue;
             insertOrReplaceRow(tableName, ret);
+        }
+        return ret;
+    }
+
+    public String selectFieldById(String tableName, String idValue, int fieldIndex) {
+        String ret;
+
+        String[] sts = selectRowById(tableName, idValue);
+        if (sts != null) {
+            ret = sts[fieldIndex];
+        } else {   //  IdValue inconnu dans la table
+            ret = null;
         }
         return ret;
     }

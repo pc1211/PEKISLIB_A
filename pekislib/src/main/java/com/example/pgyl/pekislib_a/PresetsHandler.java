@@ -8,15 +8,13 @@ import java.util.Comparator;
 import static com.example.pgyl.pekislib_a.Constants.NOT_FOUND;
 import static com.example.pgyl.pekislib_a.StringShelfDatabase.TABLE_DATA_INDEX;
 import static com.example.pgyl.pekislib_a.StringShelfDatabase.TABLE_ID_INDEX;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.TABLE_IDS;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getKeyboards;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getTimeUnits;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.TIMEUNITS;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.msToHms;
 
 public class PresetsHandler {
-    //region Constantes
-    private final String PRESET_ID = "PRESET";
-    //endregion
     //region Variables
     private StringShelfDatabase stringShelfDatabase;
     private String tableName;
@@ -44,7 +42,7 @@ public class PresetsHandler {
 
     public void createNewPreset(String[] preset) {
         String[] sa = Arrays.copyOf(preset, preset.length);
-        sa[TABLE_ID_INDEX] = PRESET_ID + (getMaxId() + 1);   // => PRESET1, PRESET2, PRESET3, ...
+        sa[TABLE_ID_INDEX] = TABLE_IDS.PRESET.toString() + (getMaxId() + 1);   // => PRESET1, PRESET2, PRESET3, ...
         presets.add(sa);
     }
 
@@ -146,7 +144,7 @@ public class PresetsHandler {
         int ret = 0;
         if (!presets.isEmpty()) {
             for (int i = 0; i <= (presets.size() - 1); i = i + 1) {
-                int k = Integer.valueOf(presets.get(i)[TABLE_ID_INDEX].substring(PRESET_ID.length()));  // N° de PRESET
+                int k = Integer.valueOf(presets.get(i)[TABLE_ID_INDEX].substring(TABLE_IDS.PRESET.toString().length()));  // N° de PRESET
                 if (k > ret) {
                     ret = k;
                 }
@@ -174,7 +172,8 @@ public class PresetsHandler {
     }
 
     private String whereConditionForPresets() {
-        return stringShelfDatabase.getFieldName(TABLE_ID_INDEX) + " LIKE '" + PRESET_ID + "%'";
+        String tt = stringShelfDatabase.getFieldName(TABLE_ID_INDEX) + " LIKE '" + TABLE_IDS.PRESET.toString() + "%'";
+        return stringShelfDatabase.getFieldName(TABLE_ID_INDEX) + " LIKE '" + TABLE_IDS.PRESET.toString() + "%'";
     }
 
     private void savePresets() {
