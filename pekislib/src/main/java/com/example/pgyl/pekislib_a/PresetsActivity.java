@@ -30,14 +30,14 @@ import static com.example.pgyl.pekislib_a.MiscUtils.toastLong;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.ACTIVITY_START_STATUS;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.TABLE_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentPresetInPresetsActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentStringInInputButtonsActivity;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentValueInInputButtonsActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getDefaults;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getKeyboards;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getLabels;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getTimeUnits;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.isColdStartStatusInPresetsActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentPresetInPresetsActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentStringInInputButtonsActivity;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentValueInInputButtonsActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatusInInputButtonsActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatusInPresetsActivity;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.TIMEUNITS;
@@ -148,7 +148,7 @@ public class PresetsActivity extends Activity {
             if (validReturnFromCalledActivity) {
                 validReturnFromCalledActivity = false;
                 if (returnsFromInputButtonsActivity()) {
-                    preset[columnIndex] = getCurrentStringInInputButtonsActivity(stringShelfDatabase, tableName, columnIndex);
+                    preset[columnIndex] = getCurrentValueInInputButtonsActivity(stringShelfDatabase, tableName, columnIndex);
                     if (listIndex != LIST_INDEX_DEFAULT_VALUE) {
                         presetsHandler.setPresetColumn(listIndex, columnIndex, preset[columnIndex]);
                     }
@@ -228,7 +228,7 @@ public class PresetsActivity extends Activity {
     }
 
     private void onButtonClickField() {
-        setCurrentStringInInputButtonsActivity(stringShelfDatabase, tableName, columnIndex, preset[columnIndex]);
+        setCurrentValueInInputButtonsActivity(stringShelfDatabase, tableName, columnIndex, preset[columnIndex]);
         launchInputButtonsActivity();
     }
 

@@ -36,12 +36,12 @@ import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.ACTIVITY_STAR
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.TABLE_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentColorsInColorPickerActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentPresetInPresetsActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentStringInInputButtonsActivity;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentValueInInputButtonsActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getLabels;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.isColdStartStatusInColorPickerActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentColorsInColorPickerActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentPresetInPresetsActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentStringInInputButtonsActivity;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentValueInInputButtonsActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatusInColorPickerActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatusInInputButtonsActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatusInPresetsActivity;
@@ -154,7 +154,7 @@ public class ColorPickerActivity extends Activity {
             if (validReturnFromCalledActivity) {
                 validReturnFromCalledActivity = false;
                 if (returnsFromInputButtonsActivity()) {
-                    String colorText = getCurrentStringInInputButtonsActivity(stringShelfDatabase, tableName, colorIndex);
+                    String colorText = getCurrentValueInInputButtonsActivity(stringShelfDatabase, tableName, colorIndex);
                     colors[colorIndex] = ((colorSpace.equals(COLOR_SPACES.RGB)) ? colorText : HSVToRGB(colorText));  //  HSV dégradé
                 }
                 if (returnsFromPresetsActivity()) {
@@ -243,7 +243,7 @@ public class ColorPickerActivity extends Activity {
     }
 
     private void onButtonClickColorValue() {
-        setCurrentStringInInputButtonsActivity(stringShelfDatabase, tableName, colorIndex, getSeekBarsProgressHexString());
+        setCurrentValueInInputButtonsActivity(stringShelfDatabase, tableName, colorIndex, getSeekBarsProgressHexString());
         launchInputButtonsActivity();
     }
 
