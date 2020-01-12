@@ -5,14 +5,10 @@ import com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITIES;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.getActivityInfosStartStatusIndex;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.getActivityInfosTableName;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.getPekislibTableDataFieldsCount;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.TABLE_IDS;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.ACTIVITY_START_STATUS;
 
 public class StringShelfDatabaseUtils {
-
-    public enum TABLE_IDS {CURRENT, DEFAULT, PRESET, LABEL, KEYBOARD, REGEXP, MIN, MAX, TIMEUNIT}   //  Identifiants utilisateur génériques
-
-    public enum ACTIVITY_START_STATUS {COLD, HOT}
-
-    public enum TABLE_EXTRA_KEYS {TABLE, INDEX}
 
     public static void createPekislibTableIfNotExists(StringShelfDatabase stringShelfDatabase, String tableName) {
         stringShelfDatabase.createTableIfNotExists(tableName, 1 + getPekislibTableDataFieldsCount(tableName));   //  Champ ID + Données

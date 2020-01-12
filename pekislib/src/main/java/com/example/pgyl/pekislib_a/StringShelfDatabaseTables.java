@@ -2,7 +2,7 @@ package com.example.pgyl.pekislib_a;
 
 public class StringShelfDatabaseTables {
 
-    public enum PEKISLIB_TABLES {   //  "Enum of enums"
+    private enum PEKISLIB_TABLES {   //  "Enum of enums"
         ACTIVITY_INFOS(PekislibTableAndFields.activityInfos.class);
 
         private PekislibTableAndFields[] tableFields;
@@ -16,7 +16,7 @@ public class StringShelfDatabaseTables {
         }
     }
 
-    public interface PekislibTableAndFields {
+    private interface PekislibTableAndFields {
         enum activityInfos implements PekislibTableAndFields {
             START_STATUS;
 
@@ -25,6 +25,12 @@ public class StringShelfDatabaseTables {
             }   //  INDEX 0 pour identifiant utilisateur
         }
     }
+
+    public enum TABLE_IDS {CURRENT, DEFAULT, PRESET, LABEL, KEYBOARD, REGEXP, MIN, MAX, TIMEUNIT}   //  Identifiants utilisateur génériques
+
+    public enum ACTIVITY_START_STATUS {COLD, HOT}
+
+    public enum TABLE_EXTRA_KEYS {TABLE, INDEX}
 
     public static int getPekislibTableDataFieldsCount(String tableName) {
         return PEKISLIB_TABLES.valueOf(tableName).TABLE_FIELDS().length;

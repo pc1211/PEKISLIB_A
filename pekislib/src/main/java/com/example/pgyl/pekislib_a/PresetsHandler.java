@@ -8,7 +8,7 @@ import java.util.Comparator;
 import static com.example.pgyl.pekislib_a.Constants.NOT_FOUND;
 import static com.example.pgyl.pekislib_a.StringShelfDatabase.TABLE_DATA_INDEX;
 import static com.example.pgyl.pekislib_a.StringShelfDatabase.TABLE_ID_INDEX;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.TABLE_IDS;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.TABLE_IDS;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getKeyboards;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getTimeUnits;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.TIMEUNITS;
