@@ -32,6 +32,7 @@ public class StringShelfDatabase extends SQLiteOpenHelper {
 
     private final String NULL_STRING = "NULL@SSDB";   //  Chaîne stockée en cas de champ null
     //endregion
+
     //region Variables
     SQLiteDatabase ssdb;
     //endregion

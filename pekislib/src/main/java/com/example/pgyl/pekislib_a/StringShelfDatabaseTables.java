@@ -1,6 +1,6 @@
 package com.example.pgyl.pekislib_a;
 
-public class PekislibTableUtils {
+public class StringShelfDatabaseTables {
 
     public enum PEKISLIB_TABLES {   //  "Enum of enums"
         ACTIVITY_INFOS(PekislibTableAndFields.activityInfos.class);
