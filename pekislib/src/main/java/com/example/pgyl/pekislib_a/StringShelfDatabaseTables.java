@@ -3,21 +3,21 @@ package com.example.pgyl.pekislib_a;
 public class StringShelfDatabaseTables {
 
     private enum PEKISLIB_TABLES {   //  "Enum of enums"
-        ACTIVITY_INFOS(PekislibTableAndFields.activityInfos.class);
+        ACTIVITY_INFOS(PekislibTableFields.activityInfos.class);
 
-        private PekislibTableAndFields[] tableFields;
+        private PekislibTableFields[] tableFields;
 
-        PEKISLIB_TABLES(Class<? extends PekislibTableAndFields> pekislibTableFields) {
+        PEKISLIB_TABLES(Class<? extends PekislibTableFields> pekislibTableFields) {
             tableFields = pekislibTableFields.getEnumConstants();
         }
 
-        public PekislibTableAndFields[] TABLE_FIELDS() {
+        public PekislibTableFields[] TABLE_FIELDS() {
             return tableFields;
         }
     }
 
-    private interface PekislibTableAndFields {
-        enum activityInfos implements PekislibTableAndFields {
+    private interface PekislibTableFields {
+        enum activityInfos implements PekislibTableFields {
             START_STATUS;
 
             public int INDEX() {
@@ -42,7 +42,7 @@ public class StringShelfDatabaseTables {
     }
 
     public static int getActivityInfosStartStatusIndex() {
-        return PekislibTableAndFields.activityInfos.START_STATUS.INDEX();
+        return PekislibTableFields.activityInfos.START_STATUS.INDEX();
     }
     //endregion
 
