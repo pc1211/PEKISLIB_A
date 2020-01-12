@@ -30,6 +30,7 @@ public class PekislibTableUtils {
         return PEKISLIB_TABLES.valueOf(tableName).TABLE_FIELDS().length;
     }
 
+    //region ACTIVITY_INFOS
     public static String getActivityInfosTableName() {
         return PEKISLIB_TABLES.ACTIVITY_INFOS.toString();
     }
@@ -37,6 +38,7 @@ public class PekislibTableUtils {
     public static int getActivityInfosStartStatusIndex() {
         return PekislibTableAndFields.activityInfos.START_STATUS.INDEX();
     }
+    //endregion
 
 
 }
