@@ -1,23 +1,24 @@
 package com.example.pgyl.pekislib_a;
 
 public class StringShelfDatabaseTables {
+    //  TABLES
+    private enum PekisLibTables {
+        ACTIVITY_INFOS(PekislibTableDataFields.activityInfos.class);
 
-    private enum PEKISLIB_TABLES {   //  "Enum of enums"
-        ACTIVITY_INFOS(PekislibTableFields.activityInfos.class);
+        private int dataFieldsCount;
 
-        private PekislibTableFields[] tableFields;
-
-        PEKISLIB_TABLES(Class<? extends PekislibTableFields> pekislibTableFields) {
-            tableFields = pekislibTableFields.getEnumConstants();
+        PekisLibTables(Class<? extends PekislibTableDataFields> pekislibTableFields) {
+            dataFieldsCount = pekislibTableFields.getEnumConstants().length;
         }
 
-        public PekislibTableFields[] TABLE_FIELDS() {
-            return tableFields;
+        public int getDataFieldsCount() {
+            return dataFieldsCount;
         }
     }
 
-    private interface PekislibTableFields {
-        enum activityInfos implements PekislibTableFields {
+    //  CHAMPS de DATA
+    private interface PekislibTableDataFields {
+        enum activityInfos implements PekislibTableDataFields {
             START_STATUS;
 
             public int INDEX() {
@@ -33,16 +34,16 @@ public class StringShelfDatabaseTables {
     public enum TABLE_EXTRA_KEYS {TABLE, INDEX}
 
     public static int getPekislibTableDataFieldsCount(String tableName) {
-        return PEKISLIB_TABLES.valueOf(tableName).TABLE_FIELDS().length;
+        return PekisLibTables.valueOf(tableName).getDataFieldsCount();
     }
 
     //region ACTIVITY_INFOS
     public static String getActivityInfosTableName() {
-        return PEKISLIB_TABLES.ACTIVITY_INFOS.toString();
+        return PekisLibTables.ACTIVITY_INFOS.toString();
     }
 
     public static int getActivityInfosStartStatusIndex() {
-        return PekislibTableFields.activityInfos.START_STATUS.INDEX();
+        return PekislibTableDataFields.activityInfos.START_STATUS.INDEX();
     }
     //endregion
 
