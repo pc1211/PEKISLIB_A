@@ -76,6 +76,10 @@ public final class StateView extends View {
         stateColorsMap.put(state, Color.parseColor(COLOR_PREFIX + color));
     }
 
+    public void updateColor() {
+        invalidate();;
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);

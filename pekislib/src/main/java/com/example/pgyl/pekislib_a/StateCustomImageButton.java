@@ -49,44 +49,18 @@ public class StateCustomImageButton extends LinearLayout {
         });
     }
 
-    // Pour le CustomImageButton
-    public void setImageResource(int resId) {    //  Faites passer
-        customImageButton.setImageResource(resId);
+    public CustomImageButton getButton() {
+        return customImageButton;
     }
 
-    public void setUnpressedColor(String color) {    //  Faites passer
-        customImageButton.setUnpressedColor(color);
-    }
-
-    public void setPressedColor(String color) {    //  Faites passer
-        customImageButton.setPressedColor(color);
-    }
-
-    public void setMinClickTimeInterval(long minClickTimeInterval) {    //  Faites passer
-        customImageButton.setMinClickTimeInterval(minClickTimeInterval);
-    }
-
-    public void updateColor() {    //  Faites passer
-        customImageButton.updateColor();
+    public StateView getState() {
+        return stateView;
     }
 
     private void onButtonClick() {
         if (mOnCustomClickListener != null) {
             mOnCustomClickListener.onCustomClick();   //  Signaler le click du bouton
         }
-    }
-
-    // Pour la StateView
-    public void setState(StateView.STATES state) {    //  Faites passer
-        stateView.setState(state);
-    }
-
-    public void setStateColor(StateView.STATES state, String color) {    //  Faites passer
-        stateView.setStateColor(state, color);
-    }
-
-    public void updateStateColor() {
-        stateView.invalidate();
     }
 
 }
