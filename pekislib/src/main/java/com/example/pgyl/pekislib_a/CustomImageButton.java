@@ -14,7 +14,7 @@ import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
 import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
 
-public final class CustomImageButton extends ImageButton {
+public class CustomImageButton extends ImageButton {
     //region Variables
     private long minClickTimeInterval;
     private long lastClickUpTime;
@@ -31,7 +31,7 @@ public final class CustomImageButton extends ImageButton {
         init();
     }
 
-    public void init() {
+    private void init() {
         final long MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE = 0;   //   Interval de temps (ms) minimum imposé entre 2 click
 
         drawable = getBackground().getConstantState().newDrawable().mutate();

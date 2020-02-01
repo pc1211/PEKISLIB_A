@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.example.pgyl.pekislib_a.StateView
+        android:id="@+id/STATE"
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginRight="4dp" />
+
+    <com.example.pgyl.pekislib_a.CustomImageButton
+        android:id="@+id/BUTTON"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter" />
+</merge>
