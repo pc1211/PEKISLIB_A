@@ -131,7 +131,7 @@ public class PresetsActivity extends Activity {
 
         setupStringShelfDatabase();
         setupPresetsHandler();
-        setupButtonColors();
+        setupButtonSpecialColors();
         preset = getCurrentPresetInPresetsActivity(stringShelfDatabase, tableName);
         labelNames = getLabels(stringShelfDatabase, tableName);
         keyboards = getKeyboards(stringShelfDatabase, tableName);
@@ -427,14 +427,15 @@ public class PresetsActivity extends Activity {
         presetsHandler.setTableName(tableName);
     }
 
-    private void setupButtonColors() {
+    private void setupButtonSpecialColors() {
         final String OK_UNPRESSED_COLOR_DEFAULT = "668CFF";
         final String OK_PRESSED_COLOR_DEFAULT = "0040FF";
 
         for (COMMANDS command : COMMANDS.values()) {
-            boolean needSpecialColor = (command.equals(COMMANDS.OK));
-            buttons[command.INDEX()].setUnpressedColor(((needSpecialColor) ? OK_UNPRESSED_COLOR_DEFAULT : BUTTON_STATES.UNPRESSED.DEFAULT_COLOR()));
-            buttons[command.INDEX()].setPressedColor(((needSpecialColor) ? OK_PRESSED_COLOR_DEFAULT : BUTTON_STATES.PRESSED.DEFAULT_COLOR()));
+            if (command.equals(COMMANDS.OK)) {
+                buttons[command.INDEX()].setUnpressedColor(OK_UNPRESSED_COLOR_DEFAULT);
+                buttons[command.INDEX()].setPressedColor((OK_PRESSED_COLOR_DEFAULT));
+            }
         }
     }
 

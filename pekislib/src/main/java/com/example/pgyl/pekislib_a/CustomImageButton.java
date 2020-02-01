@@ -14,7 +14,7 @@ import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
 import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
 
-public class CustomImageButton extends ImageButton {
+public final class CustomImageButton extends ImageButton {
     //region Variables
     private long minClickTimeInterval;
     private long lastClickUpTime;
@@ -35,8 +35,8 @@ public class CustomImageButton extends ImageButton {
         final long MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE = 0;   //   Interval de temps (ms) minimum imposé entre 2 click
 
         drawable = getBackground().getConstantState().newDrawable().mutate();
-        unpressedColor = UNDEFINED;
-        pressedColor = UNDEFINED;
+        setUnpressedColor(BUTTON_STATES.UNPRESSED.DEFAULT_COLOR());
+        setPressedColor(BUTTON_STATES.PRESSED.DEFAULT_COLOR());
         buttonState = BUTTON_STATES.UNPRESSED;
         minClickTimeInterval = MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE;
         lastClickUpTime = 0;

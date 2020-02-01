@@ -31,12 +31,12 @@ public final class CustomButton extends Button {
         init();
     }
 
-    public void init() {
+    private void init() {
         final long MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE = 0;   //   Interval de temps (ms) minimum imposé entre 2 click
 
         drawable = getBackground().getConstantState().newDrawable().mutate();
-        unpressedColor = UNDEFINED;
-        pressedColor = UNDEFINED;
+        setUnpressedColor(BUTTON_STATES.UNPRESSED.DEFAULT_COLOR());
+        setPressedColor(BUTTON_STATES.PRESSED.DEFAULT_COLOR());
         buttonState = BUTTON_STATES.UNPRESSED;
         minClickTimeInterval = MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE;
         lastClickUpTime = 0;
