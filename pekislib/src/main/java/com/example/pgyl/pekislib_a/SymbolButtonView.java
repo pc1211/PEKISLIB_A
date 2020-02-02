@@ -139,6 +139,10 @@ public final class SymbolButtonView extends View {
         this.minClickTimeInterval = minClickTimeInterval;
     }
 
+    public void updateDisplay() {
+        invalidate();
+    }
+
     public boolean onButtonTouch(View v, MotionEvent event) {
         int action = event.getAction();
         if (action == MotionEvent.ACTION_DOWN) {

@@ -276,6 +276,10 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         this.minClickTimeInterval = minClickTimeInterval;
     }
 
+    public void updateDisplay() {
+        invalidate();
+    }
+
     private boolean onButtonTouch(View v, MotionEvent event) {
         int action = event.getAction();
         if (action == MotionEvent.ACTION_DOWN) {
