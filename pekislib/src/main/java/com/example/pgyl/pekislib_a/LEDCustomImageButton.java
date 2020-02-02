@@ -9,7 +9,7 @@ import android.widget.LinearLayout;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class StateCustomImageButton extends LinearLayout {
+public class LEDCustomImageButton extends LinearLayout {
     public interface onCustomClickListener {
         void onCustomClick();
     }
@@ -21,9 +21,9 @@ public class StateCustomImageButton extends LinearLayout {
     private onCustomClickListener mOnCustomClickListener;
 
     private CustomImageButton customImageButton;
-    private StateView stateView;
+    private LEDView ledView;
 
-    public StateCustomImageButton(Context context, AttributeSet attrs) {
+    public LEDCustomImageButton(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
@@ -37,7 +37,7 @@ public class StateCustomImageButton extends LinearLayout {
         Class rid = R.id.class;
         try {
             customImageButton = findViewById(rid.getField(BUTTON_XML_NAME).getInt(rid));
-            stateView = findViewById(rid.getField(STATE_XML_NAME).getInt(rid));
+            ledView = findViewById(rid.getField(STATE_XML_NAME).getInt(rid));
         } catch (IllegalAccessException | NoSuchFieldException ex) {
             Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -53,8 +53,8 @@ public class StateCustomImageButton extends LinearLayout {
         return customImageButton;
     }
 
-    public StateView getState() {
-        return stateView;
+    public LEDView getLED() {
+        return ledView;
     }
 
     private void onButtonClick() {

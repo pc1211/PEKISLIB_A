@@ -56,7 +56,7 @@ public final class CustomButton extends Button {
         pressedColor = ((color != null) ? Color.parseColor(COLOR_PREFIX + color) : UNDEFINED);
     }
 
-    public void updateColor() {
+    public void updateDisplayColor() {
         int color;
 
         color = ((buttonState.equals(BUTTON_STATES.UNPRESSED)) ? unpressedColor : pressedColor);
@@ -79,7 +79,7 @@ public final class CustomButton extends Button {
             clickDownInButtonZone = true;
             buttonState = BUTTON_STATES.PRESSED;
             v.getParent().requestDisallowInterceptTouchEvent(true);   //  Une listView éventuelle (qui contient des items avec ce contrôle et voudrait scroller) ne pourra voler l'événement ACTION_MOVE de ce contrôle
-            updateColor();
+            updateDisplayColor();
             return true;
         }
         if ((action == MotionEvent.ACTION_MOVE) || (action == MotionEvent.ACTION_UP)) {
@@ -91,7 +91,7 @@ public final class CustomButton extends Button {
                     if (action == MotionEvent.ACTION_UP) {
                         long nowm = System.currentTimeMillis();
                         buttonState = BUTTON_STATES.UNPRESSED;
-                        updateColor();
+                        updateDisplayColor();
                         if ((nowm - lastClickUpTime) >= minClickTimeInterval) {   //  OK pour traiter le click
                             lastClickUpTime = nowm;
                             performClick();
@@ -102,7 +102,7 @@ public final class CustomButton extends Button {
                 } else {
                     clickDownInButtonZone = false;
                     buttonState = BUTTON_STATES.UNPRESSED;
-                    updateColor();
+                    updateDisplayColor();
                 }
             }
             return (action == MotionEvent.ACTION_MOVE);

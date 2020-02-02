@@ -14,32 +14,32 @@ import java.util.EnumMap;
 
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
 
-public final class StateView extends View {
+public final class LEDView extends View {
     //region Constantes
     public enum STATES {
         ON("FF0000"), OFF("808080");
 
-        private String colorDefaultValue;
+        private String ledColorDefaultValue;
 
-        STATES(String colorDefaultValue) {
-            this.colorDefaultValue = colorDefaultValue;
+        STATES(String ledColorDefaultValue) {
+            this.ledColorDefaultValue = ledColorDefaultValue;
         }
 
-        public String DEFAULT_COLOR() {
-            return colorDefaultValue;
+        public String DEFAULT_LED_COLOR() {
+            return ledColorDefaultValue;
         }
     }
 
     //endregion
     //region Variables
-    private EnumMap<STATES, Integer> stateColorsMap;
+    private EnumMap<STATES, Integer> ledColorsMap;
     private STATES state;
     private RectF canvasRect;
     private Paint paint;
     private int cornerRadius;
     //endregion
 
-    public StateView(Context context, AttributeSet attrs) {
+    public LEDView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
@@ -49,7 +49,7 @@ public final class StateView extends View {
         paint = new Paint();
         paint.setAntiAlias(true);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
-        setupStateColorsMap();
+        setupLEDColorsMap();
     }
 
     @Override
@@ -64,20 +64,20 @@ public final class StateView extends View {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         paint = null;
-        stateColorsMap.clear();
-        stateColorsMap = null;
+        ledColorsMap.clear();
+        ledColorsMap = null;
     }
 
     public void setState(STATES state) {
         this.state = state;
     }
 
-    public void setStateColor(STATES state, String color) {
-        stateColorsMap.put(state, Color.parseColor(COLOR_PREFIX + color));
+    public void setLEDColor(STATES state, String color) {
+        ledColorsMap.put(state, Color.parseColor(COLOR_PREFIX + color));
     }
 
-    public void updateColor() {
-        invalidate();;
+    public void updateDisplay() {
+        invalidate();
     }
 
     @Override
@@ -85,14 +85,14 @@ public final class StateView extends View {
         super.onDraw(canvas);
 
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
-        paint.setColor(stateColorsMap.get(state));
+        paint.setColor(ledColorsMap.get(state));
         canvas.drawRoundRect(canvasRect, cornerRadius, cornerRadius, paint);
     }
 
-    private void setupStateColorsMap() {
-        stateColorsMap = new EnumMap<STATES, Integer>(STATES.class);
+    private void setupLEDColorsMap() {
+        ledColorsMap = new EnumMap<STATES, Integer>(STATES.class);
         for (STATES stateValue : STATES.values()) {
-            stateColorsMap.put(stateValue, Color.parseColor(COLOR_PREFIX + stateValue.DEFAULT_COLOR()));
+            ledColorsMap.put(stateValue, Color.parseColor(COLOR_PREFIX + stateValue.DEFAULT_LED_COLOR()));
         }
     }
 

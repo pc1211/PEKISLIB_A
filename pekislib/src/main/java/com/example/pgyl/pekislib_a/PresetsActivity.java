@@ -319,7 +319,7 @@ public class PresetsActivity extends Activity {
             buttons[command.INDEX()].setUnpressedColor((needSpecialColor) ? SPECIAL_FIELD_UNPRESSED_COLOR : BUTTON_STATES.UNPRESSED.DEFAULT_COLOR());
             buttons[command.INDEX()].setPressedColor((needSpecialColor) ? SPECIAL_FIELD_PRESSED_COLOR : BUTTON_STATES.PRESSED.DEFAULT_COLOR());
         }
-        buttons[command.INDEX()].updateColor();
+        buttons[command.INDEX()].updateDisplayColor();
     }
 
     private void updateDisplayButtonColors() {
