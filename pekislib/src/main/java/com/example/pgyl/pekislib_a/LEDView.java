@@ -50,6 +50,7 @@ public final class LEDView extends View {
         paint.setAntiAlias(true);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
         setupLEDColorsMap();
+        invalidate();
     }
 
     @Override
@@ -70,13 +71,11 @@ public final class LEDView extends View {
 
     public void setState(STATES state) {
         this.state = state;
+        invalidate();
     }
 
     public void setLEDColor(STATES state, String color) {
         ledColorsMap.put(state, Color.parseColor(COLOR_PREFIX + color));
-    }
-
-    public void updateDisplay() {
         invalidate();
     }
 

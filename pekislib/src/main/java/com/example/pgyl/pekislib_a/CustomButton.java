@@ -35,8 +35,6 @@ public final class CustomButton extends Button {
         final long MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE = 0;   //   Interval de temps (ms) minimum imposé entre 2 click
 
         drawable = getBackground().getConstantState().newDrawable().mutate();
-        setUnpressedColor(BUTTON_STATES.UNPRESSED.DEFAULT_COLOR());
-        setPressedColor(BUTTON_STATES.PRESSED.DEFAULT_COLOR());
         buttonState = BUTTON_STATES.UNPRESSED;
         minClickTimeInterval = MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE;
         lastClickUpTime = 0;
@@ -46,17 +44,20 @@ public final class CustomButton extends Button {
                 return onButtonTouch(v, event);
             }
         });
+        setColors(BUTTON_STATES.PRESSED.DEFAULT_COLOR(), BUTTON_STATES.UNPRESSED.DEFAULT_COLOR());
     }
 
-    public void setUnpressedColor(String color) {
-        unpressedColor = ((color != null) ? Color.parseColor(COLOR_PREFIX + color) : UNDEFINED);
+    public void setColors(String pressedColor, String unpressedColor) {
+        this.pressedColor = ((pressedColor != null) ? Color.parseColor(COLOR_PREFIX + pressedColor) : UNDEFINED);
+        this.unpressedColor = ((unpressedColor != null) ? Color.parseColor(COLOR_PREFIX + unpressedColor) : UNDEFINED);
+        updateDisplayColor();
     }
 
-    public void setPressedColor(String color) {
-        pressedColor = ((color != null) ? Color.parseColor(COLOR_PREFIX + color) : UNDEFINED);
+    public void setMinClickTimeInterval(long minClickTimeInterval) {
+        this.minClickTimeInterval = minClickTimeInterval;
     }
 
-    public void updateDisplayColor() {
+    private void updateDisplayColor() {
         int color;
 
         color = ((buttonState.equals(BUTTON_STATES.UNPRESSED)) ? unpressedColor : pressedColor);
@@ -67,10 +68,6 @@ public final class CustomButton extends Button {
         }
         setBackground(drawable);
         invalidate();
-    }
-
-    public void setMinClickTimeInterval(long minClickTimeInterval) {
-        this.minClickTimeInterval = minClickTimeInterval;
     }
 
     private boolean onButtonTouch(View v, MotionEvent event) {

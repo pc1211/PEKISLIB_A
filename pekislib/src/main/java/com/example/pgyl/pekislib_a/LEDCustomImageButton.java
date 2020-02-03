@@ -49,12 +49,16 @@ public class LEDCustomImageButton extends LinearLayout {
         });
     }
 
-    public CustomImageButton getButton() {
-        return customImageButton;
+    public void light(boolean lightOn) {
+        ledView.setState((lightOn ? LEDView.STATES.ON : LEDView.STATES.OFF));
     }
 
-    public LEDView getLED() {
-        return ledView;
+    public void setImageResource(int resId) {
+        customImageButton.setImageResource(resId);
+    }
+
+    public void setMinClickTimeInterval(long minClickTimeInterval) {
+        customImageButton.setMinClickTimeInterval(minClickTimeInterval);
     }
 
     private void onButtonClick() {

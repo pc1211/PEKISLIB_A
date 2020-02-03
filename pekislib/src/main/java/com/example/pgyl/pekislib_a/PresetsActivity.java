@@ -155,7 +155,6 @@ public class PresetsActivity extends Activity {
                 }
             }
         }
-        updateDisplayButtonColors();
         updateDisplayButtonTexts();
         rebuildPresets();
     }
@@ -241,7 +240,7 @@ public class PresetsActivity extends Activity {
     private void onButtonClickAdd() {
         presetsHandler.createNewPreset(preset);
         rebuildDisplay();
-        updateDisplayButtonColor(COMMANDS.FIELD);
+        updateDisplayButtonFieldColor();
     }
 
     private void onButtonClickRemove() {
@@ -262,7 +261,7 @@ public class PresetsActivity extends Activity {
             dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialogInterface) {    // OK pour modifier UI sous-jacente à la boîte de dialogue
-                    updateDisplayButtonColor(COMMANDS.FIELD);
+                    updateDisplayButtonFieldColor();
                 }
             });
             dialog.show();
@@ -274,7 +273,7 @@ public class PresetsActivity extends Activity {
     private void onButtonClickDeselect() {
         if (listIndex != LIST_INDEX_DEFAULT_VALUE) {
             listIndex = LIST_INDEX_DEFAULT_VALUE;
-            updateDisplayButtonColor(COMMANDS.FIELD);
+            updateDisplayButtonFieldColor();
         } else {
             toastLong("A preset must be selected in the list", this);
         }
@@ -295,7 +294,7 @@ public class PresetsActivity extends Activity {
             listIndex = pos;
             columnIndex = COLUMN_INDEX_DEFAULT_VALUE;
             updateDisplayButtonTexts();
-            updateDisplayButtonColor(COMMANDS.FIELD);
+            updateDisplayButtonFieldColor();
         }
     }
 
@@ -310,22 +309,14 @@ public class PresetsActivity extends Activity {
         buttons[COMMANDS.NEXT_FIELD.INDEX()].setText(labelNames[columnIndex] + SYMBOL_NEXT);
     }
 
-    private void updateDisplayButtonColor(COMMANDS command) {
+    private void updateDisplayButtonFieldColor() {
         final String SPECIAL_FIELD_UNPRESSED_COLOR = "FF9A22";
         final String SPECIAL_FIELD_PRESSED_COLOR = "995400";
 
-        if (command.equals(COMMANDS.FIELD)) {
-            boolean needSpecialColor = (listIndex != LIST_INDEX_DEFAULT_VALUE);
-            buttons[command.INDEX()].setUnpressedColor((needSpecialColor) ? SPECIAL_FIELD_UNPRESSED_COLOR : BUTTON_STATES.UNPRESSED.DEFAULT_COLOR());
-            buttons[command.INDEX()].setPressedColor((needSpecialColor) ? SPECIAL_FIELD_PRESSED_COLOR : BUTTON_STATES.PRESSED.DEFAULT_COLOR());
-        }
-        buttons[command.INDEX()].updateDisplayColor();
-    }
-
-    private void updateDisplayButtonColors() {
-        for (COMMANDS command : COMMANDS.values()) {
-            updateDisplayButtonColor(command);
-        }
+        boolean needSpecialColor = (listIndex != LIST_INDEX_DEFAULT_VALUE);
+        String pressedColor = ((needSpecialColor) ? SPECIAL_FIELD_PRESSED_COLOR : BUTTON_STATES.PRESSED.DEFAULT_COLOR());
+        String unpressedColor = ((needSpecialColor) ? SPECIAL_FIELD_UNPRESSED_COLOR : BUTTON_STATES.UNPRESSED.DEFAULT_COLOR());
+        buttons[COMMANDS.FIELD.INDEX()].setColors(pressedColor, unpressedColor);
     }
 
     private void rebuildDisplay() {
@@ -433,8 +424,7 @@ public class PresetsActivity extends Activity {
 
         for (COMMANDS command : COMMANDS.values()) {
             if (command.equals(COMMANDS.OK)) {
-                buttons[command.INDEX()].setUnpressedColor(OK_UNPRESSED_COLOR_DEFAULT);
-                buttons[command.INDEX()].setPressedColor((OK_PRESSED_COLOR_DEFAULT));
+                buttons[command.INDEX()].setColors(OK_PRESSED_COLOR_DEFAULT, OK_UNPRESSED_COLOR_DEFAULT);
             }
         }
     }
