@@ -49,8 +49,20 @@ public class LEDCustomImageButton extends LinearLayout {
         });
     }
 
-    public void light(boolean lightOn) {
-        ledView.setState((lightOn ? LEDView.STATES.ON : LEDView.STATES.OFF));
+    public void setLight(boolean lightOn) {
+        if (lightOn) {
+            setLightOn();
+        } else {
+            setLightOff();
+        }
+    }
+
+    public void setLightOn() {
+        ledView.setState(LEDView.STATES.ON);
+    }
+
+    public void setLightOff() {
+        ledView.setState(LEDView.STATES.OFF);
     }
 
     public void setImageResource(int resId) {
