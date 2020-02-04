@@ -425,13 +425,7 @@ public class ColorPickerActivity extends Activity {
                 });
                 progressDrawables[colorParam.INDEX()] = (LayerDrawable) seekBars[colorParam.INDEX()].getProgressDrawable();
                 processDrawables[colorParam.INDEX()] = progressDrawables[colorParam.INDEX()].findDrawableByLayerId(android.R.id.progress);
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(InputButtonsActivity.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalArgumentException ex) {
-                Logger.getLogger(InputButtonsActivity.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (NoSuchFieldException ex) {
-                Logger.getLogger(InputButtonsActivity.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SecurityException ex) {
+            } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException ex) {
                 Logger.getLogger(InputButtonsActivity.class.getName()).log(Level.SEVERE, null, ex);
             }
         }

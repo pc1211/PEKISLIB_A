@@ -57,12 +57,32 @@ public class LEDCustomImageButton extends LinearLayout {
         }
     }
 
+    public boolean getLight() {
+        return (ledView.getState().equals(LEDView.STATES.ON) ? true : false);
+    }
+
     public void setLightOn() {
         ledView.setState(LEDView.STATES.ON);
     }
 
     public void setLightOff() {
         ledView.setState(LEDView.STATES.OFF);
+    }
+
+    public void setLEDColorOn(String onColor) {
+        ledView.setLEDColor(LEDView.STATES.ON, onColor);
+    }
+
+    public void setLEDColorOff(String offColor) {
+        ledView.setLEDColor(LEDView.STATES.OFF, offColor);
+    }
+
+    public String getLEDColorOn() {
+        return (String.format("%06X", ledView.getLEDColor(LEDView.STATES.ON)));
+    }
+
+    public String getLEDColorOff() {
+        return (String.format("%06X", ledView.getLEDColor(LEDView.STATES.OFF)));
     }
 
     public void setImageResource(int resId) {
