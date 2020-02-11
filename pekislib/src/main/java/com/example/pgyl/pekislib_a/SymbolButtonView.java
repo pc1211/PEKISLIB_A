@@ -119,7 +119,7 @@ public final class SymbolButtonView extends View {
         this.symbolRelativePositionCoeffs = symbolRelativePositionCoeffs;
     }
 
-    public void setSymbolSizeCoff(float symbolSizeCoeff) {
+    public void setSymbolSizeCoeff(float symbolSizeCoeff) {
         this.symbolSizeCoeff = symbolSizeCoeff;
     }
 
