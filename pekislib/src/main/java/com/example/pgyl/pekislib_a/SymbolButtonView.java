@@ -180,7 +180,7 @@ public final class SymbolButtonView extends View {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(Canvas canvas) {   //  Unpressed(Front/Back), Pressed(Back/Extra)
         super.onDraw(canvas);
 
         int stateFrontColor = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? backColor : frontColor);
