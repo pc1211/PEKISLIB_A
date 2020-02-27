@@ -123,24 +123,15 @@ public final class SymbolButtonView extends View {
         this.symbolSizeCoeff = symbolSizeCoeff;
     }
 
-    public void setFrontColor(String frontColor) {
+    public void setColors(String frontColor, String backColor, String extraColor) {
         this.frontColor = Color.parseColor(COLOR_PREFIX + frontColor);
-    }
-
-    public void setBackColor(String backColor) {
         this.backColor = Color.parseColor(COLOR_PREFIX + backColor);
-    }
-
-    public void setExtraColor(String extraColor) {
         this.extraColor = Color.parseColor(COLOR_PREFIX + extraColor);
+        invalidate();
     }
 
     public void setMinClickTimeInterval(long minClickTimeInterval) {
         this.minClickTimeInterval = minClickTimeInterval;
-    }
-
-    public void updateDisplay() {
-        invalidate();
     }
 
     public boolean onButtonTouch(View v, MotionEvent event) {

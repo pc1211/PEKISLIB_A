@@ -172,7 +172,6 @@ public class PresetsHandler {
     }
 
     private String whereConditionForPresets() {
-        String tt = stringShelfDatabase.getFieldName(TABLE_ID_INDEX) + " LIKE '" + TABLE_IDS.PRESET.toString() + "%'";
         return stringShelfDatabase.getFieldName(TABLE_ID_INDEX) + " LIKE '" + TABLE_IDS.PRESET.toString() + "%'";
     }
 
