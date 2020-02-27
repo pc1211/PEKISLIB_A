@@ -49,47 +49,43 @@ public class LEDCustomImageButton extends LinearLayout {
         });
     }
 
-    public void setLight(boolean lightOn) {
-        if (lightOn) {
-            setLightOn();
-        } else {
-            setLightOff();
-        }
-    }
-
-    public boolean getLight() {
+    public boolean getLEDState() {
         return (ledView.getState().equals(LEDView.STATES.ON) ? true : false);
     }
 
-    public void setLightOn() {
+    public void setLEDOn() {
         ledView.setState(LEDView.STATES.ON);
     }
 
-    public void setLightOff() {
+    public void setLEDOff() {
         ledView.setState(LEDView.STATES.OFF);
     }
 
-    public void setLEDColorOn(String onColor) {
+    public void setLEDOnColor(String onColor) {
         ledView.setLEDColor(LEDView.STATES.ON, onColor);
     }
 
-    public void setLEDColorOff(String offColor) {
+    public void setLEDOffColor(String offColor) {
         ledView.setLEDColor(LEDView.STATES.OFF, offColor);
     }
 
-    public String getLEDColorOn() {
+    public String getLEDOnColor() {
         return (String.format("%06X", ledView.getLEDColor(LEDView.STATES.ON)));
     }
 
-    public String getLEDColorOff() {
+    public String getLEDOffColor() {
         return (String.format("%06X", ledView.getLEDColor(LEDView.STATES.OFF)));
     }
 
-    public void setImageResource(int resId) {
+    public void setButtonColors(String pressedColor, String unpressedColor) {
+        customImageButton.setColors(pressedColor, unpressedColor);
+    }
+
+    public void setButtonImageResource(int resId) {
         customImageButton.setImageResource(resId);
     }
 
-    public void setMinClickTimeInterval(long minClickTimeInterval) {
+    public void setButtonMinClickTimeInterval(long minClickTimeInterval) {
         customImageButton.setMinClickTimeInterval(minClickTimeInterval);
     }
 
