@@ -5,6 +5,8 @@ import android.graphics.Point;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
+
 public class DotMatrixFont {
     private Map<Character, DotMatrixSymbol> charMap;
     private int MaxSymbolWidth;
@@ -76,8 +78,13 @@ public class DotMatrixFont {
         int textWidth = 0;
         for (int i = 0; i <= (text.length() - 1); i = i + 1) {
             symbol = charMap.get(text.charAt(i));
-            int symbolWidth = symbol.getPosInitialOffset().x + symbol.getPosFinalOffset().x;
-            textWidth = textWidth + symbolWidth;
+            if (symbol != null) {
+                int symbolWidth = symbol.getPosInitialOffset().x + symbol.getPosFinalOffset().x;
+                textWidth = textWidth + symbolWidth;
+            } else {   //  Caractère inconnu dans cette font
+                textWidth = UNDEFINED;
+                break;
+            }
         }
         symbol = null;
         return textWidth;
@@ -89,9 +96,14 @@ public class DotMatrixFont {
         int textHeight = 0;
         for (int i = 0; i <= (text.length() - 1); i = i + 1) {
             symbol = charMap.get(text.charAt(i));
-            int symbolHeight = symbol.getHeight() + symbol.getPosInitialOffset().y;
-            if (symbolHeight > textHeight) {
-                textHeight = symbolHeight;
+            if (symbol != null) {
+                int symbolHeight = symbol.getHeight() + symbol.getPosInitialOffset().y;
+                if (symbolHeight > textHeight) {
+                    textHeight = symbolHeight;
+                }
+            } else {    //  caractère inconnu dans cette font
+                textHeight = UNDEFINED;
+                break;
             }
         }
         symbol = null;
