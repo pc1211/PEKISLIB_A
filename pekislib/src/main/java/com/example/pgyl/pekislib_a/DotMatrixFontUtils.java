@@ -2,14 +2,20 @@ package com.example.pgyl.pekislib_a;
 
 public class DotMatrixFontUtils {
 
-    public static int getTextWidth(String text, DotMatrixFont dotMatrixFont) {
-        return getTextWidth(text, null, dotMatrixFont);
+    public static class TextDimensions {
+        public int width;
+        public int height;
     }
 
-    public static int getTextWidth(String text, DotMatrixFont extraFont, DotMatrixFont defaultFont) {    //  Spécifier extraFont différent de null si text mélange extraFont et defaultFont; extraFont a la priorité sur defaultFont
-        int textWidth;
+    public static TextDimensions getTextDimensions(String text, DotMatrixFont dotMatrixFont) {
+        return getTextDimensions(text, null, dotMatrixFont);
+    }
+
+    public static TextDimensions getTextDimensions(String text, DotMatrixFont extraFont, DotMatrixFont defaultFont) {   //  Spécifier extraFont différent de null si text mélange extraFont et defaultFont; extraFont a la priorité sur defaultFont
+        TextDimensions textDimensions;
         DotMatrixSymbol symbol;
 
+        textDimensions = new TextDimensions();
         String extraFontText = "";
         String defaultFontText = "";
         for (int i = 0; i <= (text.length() - 1); i = i + 1) {
@@ -25,41 +31,13 @@ public class DotMatrixFontUtils {
                 defaultFontText = defaultFontText + t;
             }
         }
-        textWidth = defaultFont.getTextWidth(defaultFontText);
+        textDimensions.width = defaultFont.getTextWidth(defaultFontText);
+        textDimensions.height = defaultFont.getTextHeight(defaultFontText);
         if (extraFont != null) {
-            textWidth = textWidth + extraFont.getTextWidth(extraFontText);
+            textDimensions.width = textDimensions.width + extraFont.getTextWidth(extraFontText);
+            textDimensions.height = Math.max(extraFont.getTextHeight(extraFontText), textDimensions.height);
         }
-        return textWidth;
-    }
-
-    public static int getTextHeight(String text, DotMatrixFont dotMatrixFont) {
-        return getTextHeight(text, null, dotMatrixFont);
-    }
-
-    public static int getTextHeight(String text, DotMatrixFont extraFont, DotMatrixFont defaultFont) {   //  Spécifier extraFont différent de null si text mélange extraFont et defaultFont; extraFont a la priorité sur defaultFont
-        int textHeight;
-        DotMatrixSymbol symbol;
-
-        String extraFontText = "";
-        String defaultFontText = "";
-        for (int i = 0; i <= (text.length() - 1); i = i + 1) {
-            String t = text.substring(i, i + 1);
-            Character ch = text.charAt(i);
-            symbol = null;
-            if (extraFont != null) {
-                symbol = extraFont.getSymbol(ch);
-            }
-            if (symbol != null) {
-                extraFontText = extraFontText + t;
-            } else {
-                defaultFontText = defaultFontText + t;
-            }
-        }
-        textHeight = defaultFont.getTextHeight(defaultFontText);
-        if (extraFont != null) {
-            textHeight = Math.max(extraFont.getTextHeight(extraFontText), textHeight);
-        }
-        return textHeight;
+        return textDimensions;
     }
 
     public static DotMatrixFont getDefaultFont() {
