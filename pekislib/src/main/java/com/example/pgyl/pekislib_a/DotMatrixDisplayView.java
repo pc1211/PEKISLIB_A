@@ -16,7 +16,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
-import static com.example.pgyl.pekislib_a.Constants.COLOR_CONTRASTER;
+import static com.example.pgyl.pekislib_a.Constants.COLOR_DIMMER;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
 
 public final class DotMatrixDisplayView extends View {  //  Affichage de caractères dans une grille de carrés avec coordonnées (x,y)  ((0,0) étant en haut à gauche de la grille)
@@ -340,7 +340,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                     }
                 }
                 int unpressedColor = grid[gridY][gridX];
-                int pressedColor = unpressedColor ^ COLOR_CONTRASTER;
+                int pressedColor = unpressedColor & COLOR_DIMMER;
                 dotPaint.setColor((buttonState.equals(BUTTON_STATES.PRESSED)) ? pressedColor : unpressedColor);
                 dotPoint.set(gridMargins.left + (float) gridStartX + (float) i * dotCellSize, gridMargins.top + (float) j * dotCellSize);
                 viewCanvas.drawRect(dotPoint.x, dotPoint.y, dotPoint.x + dotSize, dotPoint.y + dotSize, dotPaint);
