@@ -2,8 +2,8 @@ package com.example.pgyl.pekislib_a;
 
 import android.graphics.Color;
 
-import static com.example.pgyl.pekislib_a.Constants.HEX_RADIX;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_RGB_MASK;
+import static com.example.pgyl.pekislib_a.Constants.HEX_RADIX;
 
 public class ColorUtils {
     public static String RGBToHSV(String RGBColorText) {   //  RRGGBB -> HHSSVV  (HSV dégradé, en particulier H, ramené sur 255 au lieu de 360)

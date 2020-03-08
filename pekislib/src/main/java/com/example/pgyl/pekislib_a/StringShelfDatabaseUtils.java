@@ -2,11 +2,11 @@ package com.example.pgyl.pekislib_a;
 
 import com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITIES;
 
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.ACTIVITY_START_STATUS;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.TABLE_IDS;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.getActivityInfosStartStatusIndex;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.getActivityInfosTableName;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.getPekislibTableDataFieldsCount;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.TABLE_IDS;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.ACTIVITY_START_STATUS;
 
 public class StringShelfDatabaseUtils {
 

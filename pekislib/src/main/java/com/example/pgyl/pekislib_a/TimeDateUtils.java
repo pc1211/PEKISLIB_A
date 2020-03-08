@@ -10,7 +10,7 @@ import static com.example.pgyl.pekislib_a.Constants.NOT_FOUND;
 
 public class TimeDateUtils {
     public enum TIMEUNITS {
-        HOURS100(100 * 60 * 60 * 1000), DAY(24 * 60 * 60 * 1000), HOUR(60 * 60 * 1000), MIN(60 * 1000), SEC(1000), CS(10);
+        HOURS100(100 * MINUTES_PER_HOUR * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND), DAY(HOURS_PER_DAY * MINUTES_PER_HOUR * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND), HOUR(MINUTES_PER_HOUR * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND), MIN(SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND), SEC(MILLISECONDS_PER_SECOND), CS(MILLISECONDS_PER_CS);
 
         private long valueDurationMs;
 
@@ -33,6 +33,11 @@ public class TimeDateUtils {
     public static final SimpleDateFormat ddMMyyyy = new SimpleDateFormat("dd/MM/yyyy");
     public static final SimpleDateFormat HHmm = new SimpleDateFormat("HH:mm");
     public static final SimpleDateFormat HHmmss = new SimpleDateFormat("HH:mm:ss");
+    public static final int HOURS_PER_DAY = 24;
+    public static final int MINUTES_PER_HOUR = 60;
+    public static final int SECONDS_PER_MINUTE = 60;
+    public static final int MILLISECONDS_PER_SECOND = 1000;
+    public static final int MILLISECONDS_PER_CS = MILLISECONDS_PER_SECOND / 100;
 
     public static long midnightTimeMillis() {
         Calendar calendar = Calendar.getInstance();

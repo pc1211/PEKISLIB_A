@@ -33,6 +33,7 @@ public class Constants {
     public static final int HEX_RADIX = 16;
     public static final String COLOR_PREFIX = "#FF";
     public static final int COLOR_XOR_INVERTER = 0x00FFFFFF;
+    public static final int COLOR_CONTRASTER = 0x007F7F7F;
     public static final int COLOR_RGB_MASK = 0x00FFFFFF;
     public static String SHP_FILE_NAME_SUFFIX = "_preferences";
 
