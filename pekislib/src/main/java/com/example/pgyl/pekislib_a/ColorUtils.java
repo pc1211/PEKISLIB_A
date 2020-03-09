@@ -2,7 +2,7 @@ package com.example.pgyl.pekislib_a;
 
 import android.graphics.Color;
 
-import static com.example.pgyl.pekislib_a.Constants.COLOR_RGB_MASK;
+import static com.example.pgyl.pekislib_a.Constants.COLOR_MASK_AND;
 import static com.example.pgyl.pekislib_a.Constants.HEX_RADIX;
 
 public class ColorUtils {
@@ -29,7 +29,7 @@ public class ColorUtils {
         hsvStruc[0] = (float) h * 360f / 255f;
         hsvStruc[1] = (float) s / 255f;
         hsvStruc[2] = (float) v / 255f;
-        String RGBColorText = String.format("%06X", Color.HSVToColor(hsvStruc) & COLOR_RGB_MASK);
+        String RGBColorText = String.format("%06X", Color.HSVToColor(hsvStruc) & COLOR_MASK_AND);
         hsvStruc = null;
         return RGBColorText;
     }

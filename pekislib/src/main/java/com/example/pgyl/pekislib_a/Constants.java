@@ -34,7 +34,7 @@ public class Constants {
     public static final String COLOR_PREFIX = "#FF";
     public static final int COLOR_INVERTER_XOR = 0x00FFFFFF;
     public static final int COLOR_DARKENER_AND = 0xFF808080;
-    public static final int COLOR_RGB_MASK = 0x00FFFFFF;
+    public static final int COLOR_MASK_AND = 0x00FFFFFF;
     public static String SHP_FILE_NAME_SUFFIX = "_preferences";
 
 }

@@ -36,8 +36,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     private RectF gridMargins;
     private int gridStartX;
     private Rect gridRect;
-    private Rect displayRect;
-    private Rect scrollRect;
+    private Rect gridDisplayRect;
+    private Rect gridScrollRect;
     private Point scrollStart;
     private Point symbolPos;
     private float dotCellSize;
@@ -109,7 +109,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         int ws = wm;   // Largeur souhaitée = Largeur proposée
 
         calcInternalDimensions(wm);
-        int h = (int) (gridMargins.top + dotCellSize * ((float) displayRect.height() - 1) + dotSize + gridMargins.bottom + 0.5f);
+        int h = (int) (gridMargins.top + dotCellSize * ((float) gridDisplayRect.height() - 1) + dotSize + gridMargins.bottom + 0.5f);
         int hs = h;    // Hauteur souhaitée
 
         int w = ws;
@@ -142,128 +142,37 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         backCornerRadius = (Math.min(w, h) * BACK_CORNER_RADIUS) / 200;
     }
 
-    public void setGridRect(Rect gridRect) {   //  Grille sous-jacente de stockage des valeurs affichées  (left=0, top=0, right=width, bottom=height)
-        this.gridRect = gridRect;
-        gridColorValues = new int[gridRect.height()][gridRect.width()];
-    }
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
 
-    public Rect getGridRect() {
-        return gridRect;
-    }
-
-    public void setDisplayRect(Rect displayRect) {   //  Emplacement de l'affichage (sous-rectangle de la grille gridRect) (left>=gridRect.left, top>=gridRect.top, right<=gridRect.right, bottom<=gridRect.bottom)
-        this.displayRect = displayRect;
-    }
-
-    public Rect getDisplayRect() {
-        return displayRect;
-    }
-
-    public void setScrollRect(Rect scrollRect) {   //   Zone à scroller (sous-rectangle de la grille gridRect) (left>=gridRect.left, top>=gridRect.top, right<=gridRect.right, bottom<=gridRect.bottom)
-        this.scrollRect = scrollRect;
-        noScroll();
-    }
-
-    public Rect getScrollRect() {
-        return scrollRect;
-    }
-
-    public Point getSymbolPos() {
-        return symbolPos;
-    }
-
-    public void setSymbolPos(int x, int y) {
-        symbolPos.set(x, y);
-    }
-
-    public void setDisplayMarginCoeffs(RectF displayMarginCoeffs) {   //  Marges autour de l'affichage (en % de largeur totale)
-        this.displayMarginCoeffs = displayMarginCoeffs;
-    }
-
-    public void setDotRightMarginCoeff(int dotRightMarginCoeff) {   //  Marge droite pour chaque carré (en % de largeur d'un carré)
-        this.dotRightMarginCoeff = dotRightMarginCoeff;
-    }
-
-    public void fillGridRect(Rect rect, String color) {
-        int colValue = Color.parseColor(COLOR_PREFIX + color);
-        for (int i = rect.left; i <= (rect.right - 1); i = i + 1) {
-            for (int j = rect.top; j <= (rect.bottom - 1); j = j + 1) {
-                gridColorValues[j][i] = colValue;
+        drawing = true;
+        viewCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
+        for (int i = 0; i <= (gridDisplayRect.width() - 1); i = i + 1) {
+            int gridX = gridDisplayRect.left + i;
+            if ((gridX >= gridScrollRect.left) && (gridX <= (gridScrollRect.right - 1))) {  //  On est dans une zone éventuellement en cours de scroll
+                gridX = gridX + scrollStart.x - gridScrollRect.left;
+                if (gridX >= gridScrollRect.right) {
+                    gridX = gridX - gridScrollRect.width();
+                }
+            }
+            for (int j = 0; j <= (gridDisplayRect.height() - 1); j = j + 1) {
+                int gridY = gridDisplayRect.top + j;
+                if ((gridY >= gridScrollRect.top) && (gridY <= (gridScrollRect.bottom - 1))) {   //  On est dans une zone éventuellement en cours de scroll
+                    gridY = gridY + scrollStart.y - gridScrollRect.top;
+                    if (gridY >= gridScrollRect.bottom) {
+                        gridY = gridY - gridScrollRect.height();
+                    }
+                }
+                dotPaint.setColor((buttonState.equals(BUTTON_STATES.PRESSED)) ? gridColorValues[gridY][gridX] & COLOR_DARKENER_AND : gridColorValues[gridY][gridX]);
+                dotPoint.set(gridMargins.left + (float) gridStartX + (float) i * dotCellSize, gridMargins.top + (float) j * dotCellSize);
+                viewCanvas.drawRect(dotPoint.x, dotPoint.y, dotPoint.x + dotSize, dotPoint.y + dotSize, dotPaint);
             }
         }
-    }
-
-    public void setGridDot(int x, int y, String color) {
-        gridColorValues[y][x] = Color.parseColor(COLOR_PREFIX + color);
-    }
-
-    public void setBackColor(String color) {
-        this.backColor = Color.parseColor(COLOR_PREFIX + color);
-    }
-
-    public boolean isDrawing() {
-        return drawing;
-    }
-
-    public void scrollLeft() {
-        scrollStart.x = scrollStart.x + 1;
-        if (scrollStart.x >= scrollRect.right) {
-            scrollStart.x = scrollRect.left;
-        }
-    }
-
-    public void scrollRight() {
-        scrollStart.x = scrollStart.x - 1;
-        if (scrollStart.x < scrollRect.left) {
-            scrollStart.x = scrollRect.right - 1;
-        }
-    }
-
-    public void scrollTop() {
-        scrollStart.y = scrollStart.y + 1;
-        if (scrollStart.y >= scrollRect.bottom) {
-            scrollStart.y = scrollRect.top;
-        }
-    }
-
-    public void scrollBottom() {
-        scrollStart.y = scrollStart.y - 1;
-        if (scrollStart.y < scrollRect.top) {
-            scrollStart.y = scrollRect.bottom - 1;
-        }
-    }
-
-    public void noScroll() {
-        scrollStart.set(scrollRect.left, scrollRect.top);
-    }
-
-    public void writeText(String text, String color, DotMatrixFont dotMatrixFont) {
-        writeText(text, color, null, dotMatrixFont);
-    }
-
-    public void writeText(String text, String color, DotMatrixFont extraFont, DotMatrixFont defaultFont) {   //  A partir de symbolPos; Spécifier extraFont différent de null si text mélange extraFont et defaultFont; extraFont a la priorité sur defaultFont
-        DotMatrixSymbol symbol;
-
-        int colValue = Color.parseColor(COLOR_PREFIX + color);
-        for (int i = 0; i <= (text.length() - 1); i = i + 1) {
-            Character ch = text.charAt(i);
-            symbol = null;
-            if (extraFont != null) {
-                symbol = extraFont.getSymbol(ch);
-            }
-            if (symbol == null) {
-                symbol = defaultFont.getSymbol(ch);
-            }
-            drawSymbol(symbol, colValue);
-        }
-    }
-
-    public void setMinClickTimeInterval(long minClickTimeInterval) {
-        this.minClickTimeInterval = minClickTimeInterval;
-    }
-
-    public void updateDisplay() {
-        invalidate();
+        viewCanvasBackPaint.setColor(backColor);
+        viewCanvas.drawRoundRect(viewCanvasRect, backCornerRadius, backCornerRadius, viewCanvasBackPaint);
+        canvas.drawBitmap(viewBitmap, 0, 0, null);
+        drawing = false;
     }
 
     private boolean onButtonTouch(View v, MotionEvent event) {
@@ -305,37 +214,128 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         return false;
     }
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
+    public void setGridRect(Rect gridRect) {   //  Grille sous-jacente de stockage des valeurs affichées  (left=0, top=0, right=width, bottom=height)
+        this.gridRect = gridRect;
+        gridColorValues = new int[gridRect.height()][gridRect.width()];
+    }
 
-        drawing = true;
-        viewCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
-        for (int i = 0; i <= (displayRect.width() - 1); i = i + 1) {
-            int gridX = displayRect.left + i;
-            if ((gridX >= scrollRect.left) && (gridX <= (scrollRect.right - 1))) {  //  On est dans une zone éventuellement en cours de scroll
-                gridX = gridX + scrollStart.x - scrollRect.left;
-                if (gridX >= scrollRect.right) {
-                    gridX = gridX - scrollRect.width();
-                }
-            }
-            for (int j = 0; j <= (displayRect.height() - 1); j = j + 1) {
-                int gridY = displayRect.top + j;
-                if ((gridY >= scrollRect.top) && (gridY <= (scrollRect.bottom - 1))) {   //  On est dans une zone éventuellement en cours de scroll
-                    gridY = gridY + scrollStart.y - scrollRect.top;
-                    if (gridY >= scrollRect.bottom) {
-                        gridY = gridY - scrollRect.height();
-                    }
-                }
-                dotPaint.setColor((buttonState.equals(BUTTON_STATES.PRESSED)) ? gridColorValues[gridY][gridX] & COLOR_DARKENER_AND : gridColorValues[gridY][gridX]);
-                dotPoint.set(gridMargins.left + (float) gridStartX + (float) i * dotCellSize, gridMargins.top + (float) j * dotCellSize);
-                viewCanvas.drawRect(dotPoint.x, dotPoint.y, dotPoint.x + dotSize, dotPoint.y + dotSize, dotPaint);
+    public Rect getGridRect() {
+        return gridRect;
+    }
+
+    public void setGridDisplayRect(Rect gridDisplayRect) {   //  Emplacement de l'affichage (sous-rectangle de la grille gridRect) (left>=gridRect.left, top>=gridRect.top, right<=gridRect.right, bottom<=gridRect.bottom)
+        this.gridDisplayRect = gridDisplayRect;
+    }
+
+    public Rect getGridDisplayRect() {
+        return gridDisplayRect;
+    }
+
+    public void setGridScrollRect(Rect gridScrollRect) {   //   Zone à scroller (sous-rectangle de la grille gridRect) (left>=gridRect.left, top>=gridRect.top, right<=gridRect.right, bottom<=gridRect.bottom)
+        this.gridScrollRect = gridScrollRect;
+        noScroll();
+    }
+
+    public Rect getGridScrollRect() {
+        return gridScrollRect;
+    }
+
+    public void setSymbolPos(int x, int y) {
+        symbolPos.set(x, y);
+    }
+
+    public Point getSymbolPos() {
+        return symbolPos;
+    }
+
+    public void setDisplayMarginCoeffs(RectF displayMarginCoeffs) {   //  Marges autour de l'affichage (en % de largeur totale)
+        this.displayMarginCoeffs = displayMarginCoeffs;
+    }
+
+    public void setDotRightMarginCoeff(int dotRightMarginCoeff) {   //  Marge droite pour chaque carré (en % de largeur d'un carré)
+        this.dotRightMarginCoeff = dotRightMarginCoeff;
+    }
+
+    public void setBackColor(String color) {
+        this.backColor = Color.parseColor(COLOR_PREFIX + color);
+    }
+
+    public boolean isDrawing() {
+        return drawing;
+    }
+
+    public void scrollLeft() {
+        scrollStart.x = scrollStart.x + 1;
+        if (scrollStart.x >= gridScrollRect.right) {
+            scrollStart.x = gridScrollRect.left;
+        }
+    }
+
+    public void scrollRight() {
+        scrollStart.x = scrollStart.x - 1;
+        if (scrollStart.x < gridScrollRect.left) {
+            scrollStart.x = gridScrollRect.right - 1;
+        }
+    }
+
+    public void scrollTop() {
+        scrollStart.y = scrollStart.y + 1;
+        if (scrollStart.y >= gridScrollRect.bottom) {
+            scrollStart.y = gridScrollRect.top;
+        }
+    }
+
+    public void scrollBottom() {
+        scrollStart.y = scrollStart.y - 1;
+        if (scrollStart.y < gridScrollRect.top) {
+            scrollStart.y = gridScrollRect.bottom - 1;
+        }
+    }
+
+    public void noScroll() {
+        scrollStart.set(gridScrollRect.left, gridScrollRect.top);
+    }
+
+    public void setMinClickTimeInterval(long minClickTimeInterval) {
+        this.minClickTimeInterval = minClickTimeInterval;
+    }
+
+    public void updateDisplay() {
+        invalidate();
+    }
+
+    public void setGridDot(int x, int y, String color) {
+        gridColorValues[y][x] = Color.parseColor(COLOR_PREFIX + color);
+    }
+
+    public void fillGridSubRect(Rect rect, String color) {
+        int colValue = Color.parseColor(COLOR_PREFIX + color);
+        for (int i = rect.left; i <= (rect.right - 1); i = i + 1) {
+            for (int j = rect.top; j <= (rect.bottom - 1); j = j + 1) {
+                gridColorValues[j][i] = colValue;
             }
         }
-        viewCanvasBackPaint.setColor(backColor);
-        viewCanvas.drawRoundRect(viewCanvasRect, backCornerRadius, backCornerRadius, viewCanvasBackPaint);
-        canvas.drawBitmap(viewBitmap, 0, 0, null);
-        drawing = false;
+    }
+
+    public void writeText(String text, String color, DotMatrixFont dotMatrixFont) {
+        writeText(text, color, null, dotMatrixFont);
+    }
+
+    public void writeText(String text, String color, DotMatrixFont extraFont, DotMatrixFont defaultFont) {   //  A partir de symbolPos; Spécifier extraFont différent de null si text mélange extraFont et defaultFont; extraFont a la priorité sur defaultFont
+        DotMatrixSymbol symbol;
+
+        int colValue = Color.parseColor(COLOR_PREFIX + color);
+        for (int i = 0; i <= (text.length() - 1); i = i + 1) {
+            Character ch = text.charAt(i);
+            symbol = null;
+            if (extraFont != null) {
+                symbol = extraFont.getSymbol(ch);
+            }
+            if (symbol == null) {
+                symbol = defaultFont.getSymbol(ch);
+            }
+            drawSymbol(symbol, colValue);
+        }
     }
 
     private void drawSymbol(DotMatrixSymbol symbol, int colValue) {   //  A partir de symbolPos
@@ -355,9 +355,9 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
 
     private void calcInternalDimensions(int viewWidth) {  // Ajustement à un entier pour éviter le dessin d'une grille irrrégulière dans la largeur ou hauteur de ses éléments
         gridMargins = new RectF((int) ((float) viewWidth * displayMarginCoeffs.left + 0.5f), (int) ((float) viewWidth * displayMarginCoeffs.top + 0.5f), (int) ((float) viewWidth * displayMarginCoeffs.right + 0.5f), (int) ((float) viewWidth * displayMarginCoeffs.bottom + 0.5f));
-        dotCellSize = (int) (((float) viewWidth - (gridMargins.left + gridMargins.right)) / (float) displayRect.width());
+        dotCellSize = (int) (((float) viewWidth - (gridMargins.left + gridMargins.right)) / (float) gridDisplayRect.width());
         dotSize = (int) (dotCellSize / (1 + dotRightMarginCoeff) + 0.5f);
-        gridStartX = (int) (((float) viewWidth - (gridMargins.left + (float) displayRect.width() * dotCellSize + gridMargins.right)) / 2 + 0.5f);
+        gridStartX = (int) (((float) viewWidth - (gridMargins.left + (float) gridDisplayRect.width() * dotCellSize + gridMargins.right)) / 2 + 0.5f);
     }
 
     private void setupDotPaint() {
