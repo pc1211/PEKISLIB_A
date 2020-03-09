@@ -16,7 +16,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
-import static com.example.pgyl.pekislib_a.Constants.COLOR_DIMMER;
+import static com.example.pgyl.pekislib_a.Constants.COLOR_DARKENER_AND;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
 
 public final class DotMatrixDisplayView extends View {  //  Affichage de caractères dans une grille de carrés avec coordonnées (x,y)  ((0,0) étant en haut à gauche de la grille)
@@ -31,7 +31,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     private onCustomClickListener mOnCustomClickListener;
 
     //region Variables
-    private int[][] grid;
+    private int[][] gridColorValues;
     private RectF displayMarginCoeffs;
     private RectF gridMargins;
     private int gridStartX;
@@ -56,8 +56,6 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     private BUTTON_STATES buttonState;
     private boolean clickDownInButtonZone;
     private Rect buttonZone;
-    private int onColor;
-    private int offColor;
     private int backColor;
     //endregion
 
@@ -95,7 +93,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
 
-        grid = null;
+        gridColorValues = null;
         viewCanvasBackPaint = null;
         viewCanvas = null;
         dotPaint = null;
@@ -146,7 +144,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
 
     public void setGridRect(Rect gridRect) {   //  Grille sous-jacente de stockage des valeurs affichées  (left=0, top=0, right=width, bottom=height)
         this.gridRect = gridRect;
-        grid = new int[gridRect.height()][gridRect.width()];
+        gridColorValues = new int[gridRect.height()][gridRect.width()];
     }
 
     public Rect getGridRect() {
@@ -186,32 +184,21 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         this.dotRightMarginCoeff = dotRightMarginCoeff;
     }
 
-    public void fillRectOn(Rect rect) {
-        fillRect(rect, onColor);
+    public void fillGridRect(Rect rect, String color) {
+        int colValue = Color.parseColor(COLOR_PREFIX + color);
+        for (int i = rect.left; i <= (rect.right - 1); i = i + 1) {
+            for (int j = rect.top; j <= (rect.bottom - 1); j = j + 1) {
+                gridColorValues[j][i] = colValue;
+            }
+        }
     }
 
-    public void fillRectOff(Rect rect) {
-        fillRect(rect, offColor);
+    public void setGridDot(int x, int y, String color) {
+        gridColorValues[y][x] = Color.parseColor(COLOR_PREFIX + color);
     }
 
-    public void setDotOn(int x, int y) {
-        grid[y][x] = onColor;
-    }
-
-    public void setDotOff(int x, int y) {
-        grid[y][x] = offColor;
-    }
-
-    public void setOnColor(String onColor) {
-        this.onColor = Color.parseColor(COLOR_PREFIX + onColor);
-    }
-
-    public void setOffColor(String offColor) {
-        this.offColor = Color.parseColor(COLOR_PREFIX + offColor);
-    }
-
-    public void setBackColor(String backColor) {
-        this.backColor = Color.parseColor(COLOR_PREFIX + backColor);
+    public void setBackColor(String color) {
+        this.backColor = Color.parseColor(COLOR_PREFIX + color);
     }
 
     public boolean isDrawing() {
@@ -250,13 +237,14 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         scrollStart.set(scrollRect.left, scrollRect.top);
     }
 
-    public void writeText(String text, DotMatrixFont dotMatrixFont) {
-        writeText(text, null, dotMatrixFont);
+    public void writeText(String text, String color, DotMatrixFont dotMatrixFont) {
+        writeText(text, color, null, dotMatrixFont);
     }
 
-    public void writeText(String text, DotMatrixFont extraFont, DotMatrixFont defaultFont) {   //  A partir de symbolPos; Spécifier extraFont différent de null si text mélange extraFont et defaultFont; extraFont a la priorité sur defaultFont
+    public void writeText(String text, String color, DotMatrixFont extraFont, DotMatrixFont defaultFont) {   //  A partir de symbolPos; Spécifier extraFont différent de null si text mélange extraFont et defaultFont; extraFont a la priorité sur defaultFont
         DotMatrixSymbol symbol;
 
+        int colValue = Color.parseColor(COLOR_PREFIX + color);
         for (int i = 0; i <= (text.length() - 1); i = i + 1) {
             Character ch = text.charAt(i);
             symbol = null;
@@ -266,7 +254,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
             if (symbol == null) {
                 symbol = defaultFont.getSymbol(ch);
             }
-            drawSymbol(symbol);
+            drawSymbol(symbol, colValue);
         }
     }
 
@@ -339,9 +327,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                         gridY = gridY - scrollRect.height();
                     }
                 }
-                int unpressedColor = grid[gridY][gridX];
-                int pressedColor = unpressedColor & COLOR_DIMMER;
-                dotPaint.setColor((buttonState.equals(BUTTON_STATES.PRESSED)) ? pressedColor : unpressedColor);
+                dotPaint.setColor((buttonState.equals(BUTTON_STATES.PRESSED)) ? gridColorValues[gridY][gridX] & COLOR_DARKENER_AND : gridColorValues[gridY][gridX]);
                 dotPoint.set(gridMargins.left + (float) gridStartX + (float) i * dotCellSize, gridMargins.top + (float) j * dotCellSize);
                 viewCanvas.drawRect(dotPoint.x, dotPoint.y, dotPoint.x + dotSize, dotPoint.y + dotSize, dotPaint);
             }
@@ -352,7 +338,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         drawing = false;
     }
 
-    private void drawSymbol(DotMatrixSymbol symbol) {   //  A partir de symbolPos
+    private void drawSymbol(DotMatrixSymbol symbol, int colValue) {   //  A partir de symbolPos
         int[][] symbolData = symbol.getData();
         symbolPos.offset(symbol.getPosInitialOffset().x, symbol.getPosInitialOffset().y);   //  Appliquer un décalage avant l'affichage du symbole
         for (int i = 0; i <= (symbol.getWidth() - 1); i = i + 1) {
@@ -360,19 +346,11 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
             for (int j = 0; j <= (symbol.getHeight() - 1); j = j + 1) {
                 int gridY = symbolPos.y + j;
                 if (symbolData[j][i] == 1) {
-                    grid[gridY][gridX] = onColor;
+                    gridColorValues[gridY][gridX] = colValue;
                 }
             }
         }
         symbolPos.offset(symbol.getPosFinalOffset().x, symbol.getPosFinalOffset().y);   //  Prêt pour l'affichage du symbole suivant
-    }
-
-    private void fillRect(Rect rect, int value) {
-        for (int i = rect.left; i <= (rect.right - 1); i = i + 1) {
-            for (int j = rect.top; j <= (rect.bottom - 1); j = j + 1) {
-                grid[j][i] = value;
-            }
-        }
     }
 
     private void calcInternalDimensions(int viewWidth) {  // Ajustement à un entier pour éviter le dessin d'une grille irrrégulière dans la largeur ou hauteur de ses éléments
