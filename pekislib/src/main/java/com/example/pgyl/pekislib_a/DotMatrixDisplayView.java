@@ -56,7 +56,6 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     private BUTTON_STATES buttonState;
     private boolean clickDownInButtonZone;
     private Rect buttonZone;
-    private int backColor;
     //endregion
 
     public DotMatrixDisplayView(Context context, AttributeSet attrs) {
@@ -69,6 +68,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         final float DISPLAY_DOT_RIGHT_MARGIN_COEFF_DEFAULT = 0.2f;   //  Distance entre carrés (% de largeur d'un carré)
         final Point DEFAULT_FONT_SYMBOL_POS_DEFAULT = new Point(0, 0);   //  Position du prochain symbole à afficher (en coordonnées de la grille (x,y), (0,0) étant le carré en haut à gauche)
         final long MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE = 0;   //   Interval de temps (ms) minimum imposé entre 2 click
+        final String BACK_COLOR_DEFAULT = "000000";
 
         displayMarginCoeffs = DISPLAY_MARGIN_SIZE_COEFFS_DEFAULT;
         dotRightMarginCoeff = DISPLAY_DOT_RIGHT_MARGIN_COEFF_DEFAULT;
@@ -76,6 +76,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         scrollStart = new Point();
         setupDotPaint();
         setupViewCanvasBackPaint();
+        setBackColor(BACK_COLOR_DEFAULT);
         dotPoint = new PointF();
         drawing = false;
         buttonState = BUTTON_STATES.UNPRESSED;
@@ -169,7 +170,6 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                 viewCanvas.drawRect(dotPoint.x, dotPoint.y, dotPoint.x + dotSize, dotPoint.y + dotSize, dotPaint);
             }
         }
-        viewCanvasBackPaint.setColor(backColor);
         viewCanvas.drawRoundRect(viewCanvasRect, backCornerRadius, backCornerRadius, viewCanvasBackPaint);
         canvas.drawBitmap(viewBitmap, 0, 0, null);
         drawing = false;
@@ -244,6 +244,10 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         symbolPos.set(x, y);
     }
 
+    public void setSymbolPos(Point sp) {
+        symbolPos.set(sp.x, sp.y);
+    }
+
     public Point getSymbolPos() {
         return symbolPos;
     }
@@ -257,7 +261,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     }
 
     public void setBackColor(String color) {
-        this.backColor = Color.parseColor(COLOR_PREFIX + color);
+        viewCanvasBackPaint.setColor(Color.parseColor(COLOR_PREFIX + color));
     }
 
     public boolean isDrawing() {
@@ -304,11 +308,11 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         invalidate();
     }
 
-    public void setGridDot(int x, int y, String color) {
+    public void setDot(int x, int y, String color) {
         gridColorValues[y][x] = Color.parseColor(COLOR_PREFIX + color);
     }
 
-    public void fillGridSubRect(Rect rect, String color) {
+    public void fillRect(Rect rect, String color) {
         int colValue = Color.parseColor(COLOR_PREFIX + color);
         for (int i = rect.left; i <= (rect.right - 1); i = i + 1) {
             for (int j = rect.top; j <= (rect.bottom - 1); j = j + 1) {
@@ -334,13 +338,14 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
             if (symbol == null) {
                 symbol = defaultFont.getSymbol(ch);
             }
+            symbolPos.offset(symbol.getPosInitialOffset().x, symbol.getPosInitialOffset().y);   //  Appliquer un décalage avant l'affichage du symbole
             drawSymbol(symbol, colValue);
+            symbolPos.offset(symbol.getPosFinalOffset().x, symbol.getPosFinalOffset().y);   //  Prêt pour l'affichage du symbole suivant
         }
     }
 
     private void drawSymbol(DotMatrixSymbol symbol, int colValue) {   //  A partir de symbolPos
         int[][] symbolData = symbol.getData();
-        symbolPos.offset(symbol.getPosInitialOffset().x, symbol.getPosInitialOffset().y);   //  Appliquer un décalage avant l'affichage du symbole
         for (int i = 0; i <= (symbol.getWidth() - 1); i = i + 1) {
             int gridX = symbolPos.x + i;
             for (int j = 0; j <= (symbol.getHeight() - 1); j = j + 1) {
@@ -350,7 +355,6 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                 }
             }
         }
-        symbolPos.offset(symbol.getPosFinalOffset().x, symbol.getPosFinalOffset().y);   //  Prêt pour l'affichage du symbole suivant
     }
 
     private void calcInternalDimensions(int viewWidth) {  // Ajustement à un entier pour éviter le dessin d'une grille irrrégulière dans la largeur ou hauteur de ses éléments
