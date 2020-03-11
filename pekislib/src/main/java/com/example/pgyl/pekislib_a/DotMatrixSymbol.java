@@ -2,13 +2,14 @@ package com.example.pgyl.pekislib_a;
 
 import android.graphics.Point;
 
+import static com.example.pgyl.pekislib_a.PointRectUtils.RectDimensions;
+
 public class DotMatrixSymbol {
     private Character ch;             //  Caractère représenté
     private int[][] data;             //  Données de forme du symbole
-    private Point posInitialOffset;   //  Repositionnement du symbole avant affichage
-    private Point posFinalOffset;     //  Repositionnement pour le prochain symbole à afficher
-    private int width;                //  Largeur du symbole
-    private int height;               //  Hauteur du symbole
+    private boolean overwrite;        //  True si surcharge le symbole précédent
+    private Point posOffset;          //  Si surcharge, Offset de repositionnement éventuel avant affichage, par rapport à la position du symbole précédent
+    private RectDimensions dimensions; // Dimensions du symbole
 
     public DotMatrixSymbol(Character ch, int[][] data) {
         this.ch = ch;
@@ -17,11 +18,12 @@ public class DotMatrixSymbol {
     }
 
     private void init() {
-        height = data.length;   //  Hauteur du symbole
-        width = 0;
-        for (int i = 0; i <= (height - 1); i = i + 1) {
-            if (data[i].length > width) {      //   Chercher la largeur max. du symbole
-                width = data[i].length;
+        posOffset = new Point(0, 0);
+        dimensions = new RectDimensions(0, 0);
+        dimensions.height = data.length;   //  Hauteur du symbole
+        for (int i = 0; i <= (dimensions.height - 1); i = i + 1) {
+            if (data[i].length > dimensions.width) {      //   Chercher la largeur max. du symbole
+                dimensions.width = data[i].length;
             }
         }
     }
@@ -34,28 +36,25 @@ public class DotMatrixSymbol {
         return data;
     }
 
-    public int getWidth() {    //  Pour le set, cf init()
-        return width;
+    public RectDimensions getDimensions() {    //  Pour le set, cf init()
+        return dimensions;
     }
 
-    public int getHeight() {   //  Pour le set, cf init()
-        return height;
+    public boolean isOverwrite() {
+        return overwrite;
     }
 
-    public Point getPosInitialOffset() {
-        return posInitialOffset;
+    public void setOverwrite(boolean overwrite) {
+        this.overwrite = overwrite;
     }
 
-    public void setPosInitialOffset(Point posInitialOffset) {
-        this.posInitialOffset = posInitialOffset;
+    public Point getPosOffset() {
+        return posOffset;
     }
 
-    public Point getPosFinalOffset() {
-        return posFinalOffset;
-    }
-
-    public void setPosFinalOffset(Point posFinalOffset) {
-        this.posFinalOffset = posFinalOffset;
+    public void setPosOffset(int x, int y) {
+        posOffset.x = x;
+        posOffset.y = y;
     }
 
 }

@@ -7,6 +7,16 @@ import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
 
 public class PointRectUtils {  //  Routines adaptées à des coordonnées (0,0) en haut à gauche de leur canvas
 
+    public static class RectDimensions {
+        public int width;
+        public int height;
+
+        RectDimensions(int width, int height) {
+            this.width = width;
+            this.height = height;
+        }
+    }
+
     public static RectF getCircleBoundingRect(PointF centerPoint, float radius) {
         return new RectF(centerPoint.x - radius, centerPoint.y - radius, centerPoint.x + radius, centerPoint.y + radius);
     }

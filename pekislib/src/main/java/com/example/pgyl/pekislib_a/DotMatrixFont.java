@@ -1,16 +1,13 @@
 package com.example.pgyl.pekislib_a;
 
-import android.graphics.Point;
-
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
+import static com.example.pgyl.pekislib_a.PointRectUtils.RectDimensions;
 
 public class DotMatrixFont {
     private Map<Character, DotMatrixSymbol> charMap;
-    private int MaxSymbolWidth;
-    private int MaxSymbolHeight;
+    private RectDimensions symbolDimensions;
     private int rightMargin;
 
     public DotMatrixFont() {
@@ -22,8 +19,6 @@ public class DotMatrixFont {
 
         charMap = new HashMap<Character, DotMatrixSymbol>();
         rightMargin = RIGHT_MARGIN_DEFAULT;
-        MaxSymbolWidth = 0;
-        MaxSymbolHeight = 0;
     }
 
     public void close() {
@@ -35,79 +30,54 @@ public class DotMatrixFont {
         return charMap.get(ch);
     }
 
-    public int getMaxSymbolWidth() {
-        return MaxSymbolWidth;
-    }
-
-    public int getMaxSymbolHeight() {
-        return MaxSymbolHeight;
-    }
-
     public void setSymbols(DotMatrixSymbol[] symbols) {
+        symbolDimensions = new RectDimensions(0, 0);
         for (int i = 0; i <= (symbols.length - 1); i = i + 1) {
             charMap.put(symbols[i].getCh(), symbols[i]);
-            symbols[i].setPosInitialOffset(new Point(0, 0));
-            symbols[i].setPosFinalOffset(new Point(symbols[i].getWidth() + rightMargin, 0));
-            if (symbols[i].getWidth() > MaxSymbolWidth) {    //  Chercher la largeur max. d'un symbole
-                MaxSymbolWidth = symbols[i].getWidth();
+            symbols[i].setOverwrite(false);                 //  Symbole régulier par défaut (cad pas de surcharge)
+            symbols[i].setPosOffset(0, 0);
+            if (symbols[i].getDimensions().width > symbolDimensions.width) {    //  Chercher la largeur max. d'un symbole
+                symbolDimensions.width = symbols[i].getDimensions().width;
             }
-            if (symbols[i].getHeight() > MaxSymbolHeight) {    //  Chercher la hauteur max. d'un symbole
-                MaxSymbolHeight = symbols[i].getHeight();
+            if (symbols[i].getDimensions().height > symbolDimensions.height) {    //  Chercher la hauteur max. d'un symbole
+                symbolDimensions.height = symbols[i].getDimensions().height;
             }
         }
+    }
+
+    public RectDimensions getSymbolDimensions() {
+        return symbolDimensions;
+    }
+
+    public void setRightMargin(int rightMargin) {   //  Marge droite pour chaque symbole (en nombre de carrés)
+        this.rightMargin = rightMargin;
     }
 
     public int getRightMargin() {
         return rightMargin;
     }
 
-    public void setRightMargin(int rightMargin) {   //  Marge droite pour chaque symbole (en nombre de carrés)
+    public RectDimensions getTextDimensions(String text) {
         DotMatrixSymbol symbol;
+        RectDimensions textDimensions;
 
-        for (Map.Entry<Character, DotMatrixSymbol> entry : charMap.entrySet()) {
-            symbol = entry.getValue();
-            symbol.getPosFinalOffset().x = symbol.getWidth() + rightMargin;  //  Adapter chaque symbole à la nouvelle marge droite
-        }
-        symbol = null;
-        this.rightMargin = rightMargin;
-    }
-
-    public int getTextWidth(String text) {   // Largeur nécessaire pour afficher un texte (symboles avec marge droite comprise)
-        DotMatrixSymbol symbol;
-
-        int textWidth = 0;
+        textDimensions = new RectDimensions(0, 0);
         for (int i = 0; i <= (text.length() - 1); i = i + 1) {
             symbol = charMap.get(text.charAt(i));
             if (symbol != null) {
-                int symbolWidth = symbol.getPosInitialOffset().x + symbol.getPosFinalOffset().x;
-                textWidth = textWidth + symbolWidth;
-            } else {   //  Caractère inconnu dans cette font
-                textWidth = UNDEFINED;
-                break;
-            }
-        }
-        symbol = null;
-        return textWidth;
-    }
-
-    public int getTextHeight(String text) {   // Hauteur nécessaire pour afficher un texte
-        DotMatrixSymbol symbol;
-
-        int textHeight = 0;
-        for (int i = 0; i <= (text.length() - 1); i = i + 1) {
-            symbol = charMap.get(text.charAt(i));
-            if (symbol != null) {
-                int symbolHeight = symbol.getHeight() + symbol.getPosInitialOffset().y;
-                if (symbolHeight > textHeight) {
-                    textHeight = symbolHeight;
+                int netSymbolWidth = (!symbol.isOverwrite() ? symbol.getDimensions().width + rightMargin : 0);  //  Les symboles de surcharge ne sont pas comptés
+                textDimensions.width = textDimensions.width + netSymbolWidth;
+                int netSymbolHeight = (!symbol.isOverwrite() ? symbol.getDimensions().height : 0);
+                if (netSymbolHeight > textDimensions.height) {
+                    textDimensions.height = netSymbolHeight;
                 }
-            } else {    //  caractère inconnu dans cette font
-                textHeight = UNDEFINED;
+            } else {   //  Caractère inconnu dans cette font
+                textDimensions = null;
                 break;
             }
         }
         symbol = null;
-        return textHeight;
+        return textDimensions;
     }
 
 }
