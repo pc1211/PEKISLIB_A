@@ -40,7 +40,6 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     private Rect gridScrollRect;
     private Point scrollStart;
     private Point symbolPos;
-    private Point oldSymbolPos;
     private float dotCellSize;
     private float dotSize;
     private float dotRightMarginCoeff;
@@ -74,7 +73,6 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         displayMarginCoeffs = DISPLAY_MARGIN_SIZE_COEFFS_DEFAULT;
         dotRightMarginCoeff = DISPLAY_DOT_RIGHT_MARGIN_COEFF_DEFAULT;
         symbolPos = DEFAULT_FONT_SYMBOL_POS_DEFAULT;
-        oldSymbolPos = new Point();
         scrollStart = new Point();
         setupDotPaint();
         setupViewCanvasBackPaint();
@@ -329,13 +327,11 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
 
     public void writeText(String text, String color, DotMatrixFont extraFont, DotMatrixFont defaultFont) {   //  A partir de symbolPos; Spécifier extraFont différent de null si text mélange extraFont et defaultFont; extraFont a la priorité sur defaultFont
         DotMatrixFont font = null;
-        DotMatrixSymbol symbol = null;
-        DotMatrixFont oldFont = null;
-        DotMatrixSymbol oldSymbol = null;
 
         int colValue = Color.parseColor(COLOR_PREFIX + color);
         for (int i = 0; i <= (text.length() - 1); i = i + 1) {
             Character ch = text.charAt(i);
+            DotMatrixSymbol symbol = null;
             if (extraFont != null) {
                 font = extraFont;
                 symbol = font.getSymbol(ch);
@@ -345,24 +341,14 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                 symbol = font.getSymbol(ch);
             }
             //  Le symbole et sa fonte ont été déterminés
-            if (symbol.isOverwrite()) {   //  Symbole de surcharge du symbole régulier précédent (=> Ne pas placer en début de text ! :))
-                symbolPos.set(oldSymbolPos.x + symbol.getPosOffset().x, oldSymbolPos.y + symbol.getPosOffset().y);   //  Appliquer un décalage éventuel avant l'affichage du symbole de surcharge
-                drawSymbol(symbol, colValue);
-                font = oldFont;   //  Repartir du dernier symbole régulier
-                symbol = oldSymbol;
-                symbolPos.set(oldSymbolPos.x, oldSymbolPos.y);
-            } else {
-                drawSymbol(symbol, colValue);
-                oldFont = font;   //  Dernier symbole régulier
-                oldSymbol = symbol;
-                oldSymbolPos.set(symbolPos.x, symbolPos.y);
+            symbolPos.offset(symbol.getPosOffset().x, symbol.getPosOffset().y);   //  Appliquer un décalage éventuel avant l'affichage (si symbole de surcharge)
+            drawSymbol(symbol, colValue);
+            symbolPos.offset(-symbol.getPosOffset().x, -symbol.getPosOffset().y);   //  Retour au bercail
+            if (!symbol.isOverwrite()) {
+                symbolPos.offset(symbol.getDimensions().width + font.getRightMargin(), 0);   //  Prêt pour l'affichage du symbole suivant, sur la même ligne
             }
-            symbolPos.offset(symbol.getDimensions().width + font.getRightMargin(), 0);   //  Prêt pour l'affichage du symbole suivant le dernier symbole régulier, sur la même ligne
-            symbol = null;
         }
         font = null;
-        oldFont = null;
-        oldSymbol = null;
     }
 
     private void drawSymbol(DotMatrixSymbol symbol, int colValue) {   //  A partir de symbolPos

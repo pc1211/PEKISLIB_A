@@ -45,10 +45,10 @@ import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatu
 import static com.example.pgyl.pekislib_a.TimeDateUtils.TIMEUNITS;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.ddMMyyyy;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.formattedStringTimeDate;
-import static com.example.pgyl.pekislib_a.TimeDateUtils.hmsToMs;
-import static com.example.pgyl.pekislib_a.TimeDateUtils.msToHms;
-import static com.example.pgyl.pekislib_a.TimeDateUtils.msToXhms;
-import static com.example.pgyl.pekislib_a.TimeDateUtils.xhmsToMs;
+import static com.example.pgyl.pekislib_a.TimeDateUtils.msToTimeFormatD;
+import static com.example.pgyl.pekislib_a.TimeDateUtils.msToTimeFormatDL;
+import static com.example.pgyl.pekislib_a.TimeDateUtils.timeFormatDLToMs;
+import static com.example.pgyl.pekislib_a.TimeDateUtils.timeFormatDToMs;
 
 public class InputButtonsActivity extends Activity {
     //region Constantes
@@ -157,7 +157,7 @@ public class InputButtonsActivity extends Activity {
                         ";", ":", NA, NA, NA, NA, NA, SPECIAL_BUTTONS.CASE.toString(),
                         NA, NA, NA, NA, NA, NA, NA, SPECIAL_BUTTONS.NEXTP.toString()}),
 
-        TIME_HMS(
+        TIME_FORMAT_D(
                 new String[]{   //  Portrait
                         "1", "2", "3", SPECIAL_BUTTONS.BACK.toString(),
                         "4", "5", "6", SPECIAL_BUTTONS.CLEAR.toString(),
@@ -169,16 +169,17 @@ public class InputButtonsActivity extends Activity {
                         "7", "8", "9", NA, NA, NA, NA, NA,
                         NA, "0", NA, NA, NA, NA, NA, NA}),
 
-        TIME_XHMS(
+        TIME_FORMAT_DL(
                 new String[]{   //  Portrait
                         "1", "2", "3", SPECIAL_BUTTONS.BACK.toString(),
                         "4", "5", "6", SPECIAL_BUTTONS.CLEAR.toString(),
                         "7", "8", "9", NA,
                         NA, "0", NA, NA,
-                        "h", "m", "s", "c"},
+                        "h", "m", "s", NA,
+                        "t", "u", NA, NA},
                 new String[]{   //  Paysage
-                        "1", "2", "3", "h", "m", "s", "c", SPECIAL_BUTTONS.BACK.toString(),
-                        "4", "5", "6", NA, NA, NA, NA, SPECIAL_BUTTONS.CLEAR.toString(),
+                        "1", "2", "3", "h", "m", "s", NA, SPECIAL_BUTTONS.BACK.toString(),
+                        "4", "5", "6", "t", "u", NA, NA, SPECIAL_BUTTONS.CLEAR.toString(),
                         "7", "8", "9", NA, NA, NA, NA, NA,
                         NA, "0", NA, NA, NA, NA, NA, NA}),
 
@@ -376,7 +377,7 @@ public class InputButtonsActivity extends Activity {
         setupStringShelfDatabase();
         editString = getCurrentValueInInputButtonsActivity(stringShelfDatabase, tableName, columnIndex);
         keyboard = KEYBOARDS.valueOf(getKeyboard(stringShelfDatabase, tableName, columnIndex));
-        if ((keyboard.equals(KEYBOARDS.TIME_HMS)) || (keyboard.equals(KEYBOARDS.TIME_XHMS))) {
+        if ((keyboard.equals(KEYBOARDS.TIME_FORMAT_D)) || (keyboard.equals(KEYBOARDS.TIME_FORMAT_DL))) {
             timeUnit = TIMEUNITS.valueOf(getTimeUnit(stringShelfDatabase, tableName, columnIndex));
         }
         buttonTexts = getButtonTexts(keyboard);
@@ -388,11 +389,11 @@ public class InputButtonsActivity extends Activity {
             pageIndex = CURRENT_PAGE_INDEX_DEFAULT_VALUE;
             caze = CASES.NO_CASE;
             append = APPEND_DEFAULT_VALUE;
-            if (keyboard.equals(KEYBOARDS.TIME_HMS)) {
-                editString = msToHms(Long.parseLong(editString), timeUnit);
+            if (keyboard.equals(KEYBOARDS.TIME_FORMAT_D)) {
+                editString = msToTimeFormatD(Long.parseLong(editString), timeUnit);
             }
-            if (keyboard.equals(KEYBOARDS.TIME_XHMS)) {
-                editString = msToXhms(Long.parseLong(editString), timeUnit);
+            if (keyboard.equals(KEYBOARDS.TIME_FORMAT_DL)) {
+                editString = msToTimeFormatDL(Long.parseLong(editString), timeUnit);
             }
         } else {
             pageIndex = getSHPcurrentPageIndex();
@@ -442,20 +443,20 @@ public class InputButtonsActivity extends Activity {
         if (error.equals(noErrorMessage())) {
             if (smin == null) {
                 smin = candidate;
-                if (keyboard.equals(KEYBOARDS.TIME_HMS)) {
-                    smin = String.valueOf(hmsToMs(candidate));
+                if (keyboard.equals(KEYBOARDS.TIME_FORMAT_D)) {
+                    smin = String.valueOf(timeFormatDToMs(candidate));
                 }
-                if (keyboard.equals(KEYBOARDS.TIME_XHMS)) {
-                    smin = String.valueOf(xhmsToMs(candidate));
+                if (keyboard.equals(KEYBOARDS.TIME_FORMAT_DL)) {
+                    smin = String.valueOf(timeFormatDLToMs(candidate));
                 }
             }
             if (smax == null) {
                 smax = candidate;
-                if (keyboard.equals(KEYBOARDS.TIME_HMS)) {
-                    smax = String.valueOf(hmsToMs(candidate));
+                if (keyboard.equals(KEYBOARDS.TIME_FORMAT_D)) {
+                    smax = String.valueOf(timeFormatDToMs(candidate));
                 }
-                if (keyboard.equals(KEYBOARDS.TIME_XHMS)) {
-                    smax = String.valueOf(xhmsToMs(candidate));
+                if (keyboard.equals(KEYBOARDS.TIME_FORMAT_DL)) {
+                    smax = String.valueOf(timeFormatDLToMs(candidate));
                 }
             }
             error = parseCandidate(candidate, smin, smax);
@@ -580,11 +581,11 @@ public class InputButtonsActivity extends Activity {
             if ((keyboard.equals(KEYBOARDS.ALPHANUM)) || (keyboard.equals(KEYBOARDS.ASCII))) {
                 ret = parseAlphanum(candidate, smin, smax);
             }
-            if (keyboard.equals(KEYBOARDS.TIME_HMS)) {
-                ret = parseTimeHMS(candidate, smin, smax);
+            if (keyboard.equals(KEYBOARDS.TIME_FORMAT_D)) {
+                ret = parseTimeFormatD(candidate, smin, smax);
             }
-            if (keyboard.equals(KEYBOARDS.TIME_XHMS)) {
-                ret = parseTimeXHMS(candidate, smin, smax);
+            if (keyboard.equals(KEYBOARDS.TIME_FORMAT_DL)) {
+                ret = parseTimeFormatDL(candidate, smin, smax);
             }
             if (keyboard.equals(KEYBOARDS.DATE_JJMMAAAA)) {
                 ret = parseDATEJJMMAAAA(candidate, smin, smax);
@@ -608,11 +609,11 @@ public class InputButtonsActivity extends Activity {
     private String normalizedCandidate(String candidate) {
         String ret = candidate;
         if (candidate.length() >= 1) {
-            if (keyboard.equals(KEYBOARDS.TIME_HMS)) {
-                ret = String.valueOf(hmsToMs(candidate));
+            if (keyboard.equals(KEYBOARDS.TIME_FORMAT_D)) {
+                ret = String.valueOf(timeFormatDToMs(candidate));
             }
-            if (keyboard.equals(KEYBOARDS.TIME_XHMS)) {
-                ret = String.valueOf(xhmsToMs(candidate));
+            if (keyboard.equals(KEYBOARDS.TIME_FORMAT_DL)) {
+                ret = String.valueOf(timeFormatDLToMs(candidate));
             }
             if (keyboard.equals(KEYBOARDS.DATE_JJMMAAAA)) {
                 ret = formattedStringTimeDate(candidate, ddMMyyyy);
@@ -652,34 +653,34 @@ public class InputButtonsActivity extends Activity {
         return ret;
     }
 
-    private String parseTimeHMS(String sed, String smin, String smax) {
+    private String parseTimeFormatD(String sed, String smin, String smax) {
         String ret = noErrorMessage();
-        long ms = hmsToMs(sed);
+        long ms = timeFormatDToMs(sed);
         if (ms != ERROR_VALUE) {
             if (ms < Long.parseLong(smin)) {
-                ret = errorMessageMin(msToHms(Long.parseLong(smin), timeUnit));
+                ret = errorMessageMin(msToTimeFormatD(Long.parseLong(smin), timeUnit));
             }
             if (ms > Long.parseLong(smax)) {
-                ret = errorMessageMax(msToHms(Long.parseLong(smax), timeUnit));
+                ret = errorMessageMax(msToTimeFormatD(Long.parseLong(smax), timeUnit));
             }
         } else {
-            ret = errorMessageParse(KEYBOARDS.TIME_HMS);
+            ret = errorMessageParse(KEYBOARDS.TIME_FORMAT_D);
         }
         return ret;
     }
 
-    private String parseTimeXHMS(String sed, String smin, String smax) {
+    private String parseTimeFormatDL(String sed, String smin, String smax) {
         String ret = noErrorMessage();
-        long ms = xhmsToMs(sed);
+        long ms = timeFormatDLToMs(sed);
         if (ms != ERROR_VALUE) {
             if (ms < Long.parseLong(smin)) {
-                ret = errorMessageMin(msToXhms(Long.parseLong(smin), timeUnit));
+                ret = errorMessageMin(msToTimeFormatDL(Long.parseLong(smin), timeUnit));
             }
             if (ms > Long.parseLong(smax)) {
-                ret = errorMessageMax(msToXhms(Long.parseLong(smax), timeUnit));
+                ret = errorMessageMax(msToTimeFormatDL(Long.parseLong(smax), timeUnit));
             }
         } else {
-            ret = errorMessageParse(KEYBOARDS.TIME_XHMS);
+            ret = errorMessageParse(KEYBOARDS.TIME_FORMAT_DL);
         }
         return ret;
     }

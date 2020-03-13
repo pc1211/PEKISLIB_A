@@ -41,7 +41,7 @@ import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentVal
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatusInInputButtonsActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatusInPresetsActivity;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.TIMEUNITS;
-import static com.example.pgyl.pekislib_a.TimeDateUtils.msToHms;
+import static com.example.pgyl.pekislib_a.TimeDateUtils.msToTimeFormatD;
 
 public class PresetsActivity extends Activity {
     //region Constantes
@@ -302,8 +302,8 @@ public class PresetsActivity extends Activity {
         final String SYMBOL_NEXT = " >";   //  Pour signifier qu'on peut passer au champ suivant en poussant sur le bouton
 
         String fieldText = preset[columnIndex];
-        if ((keyboards[columnIndex].equals(KEYBOARDS.TIME_HMS.toString())) || (keyboards[columnIndex].equals(KEYBOARDS.TIME_XHMS.toString()))) {
-            fieldText = msToHms(Long.parseLong(fieldText), TIMEUNITS.valueOf(timeUnits[columnIndex]));
+        if ((keyboards[columnIndex].equals(KEYBOARDS.TIME_FORMAT_D.toString())) || (keyboards[columnIndex].equals(KEYBOARDS.TIME_FORMAT_DL.toString()))) {
+            fieldText = msToTimeFormatD(Long.parseLong(fieldText), TIMEUNITS.valueOf(timeUnits[columnIndex]));
         }
         buttons[COMMANDS.FIELD.INDEX()].setText(fieldText);
         buttons[COMMANDS.NEXT_FIELD.INDEX()].setText(labelNames[columnIndex] + SYMBOL_NEXT);

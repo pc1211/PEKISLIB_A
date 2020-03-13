@@ -65,11 +65,11 @@ public class DotMatrixFont {
         for (int i = 0; i <= (text.length() - 1); i = i + 1) {
             symbol = charMap.get(text.charAt(i));
             if (symbol != null) {
-                int netSymbolWidth = (!symbol.isOverwrite() ? symbol.getDimensions().width + rightMargin : 0);  //  Les symboles de surcharge ne sont pas comptés
-                textDimensions.width = textDimensions.width + netSymbolWidth;
-                int netSymbolHeight = (!symbol.isOverwrite() ? symbol.getDimensions().height : 0);
-                if (netSymbolHeight > textDimensions.height) {
-                    textDimensions.height = netSymbolHeight;
+                if (!symbol.isOverwrite()) {   //  Les symboles de surcharge ne sont pas comptés
+                    textDimensions.width = textDimensions.width + symbol.getDimensions().width + rightMargin;
+                    if (symbol.getDimensions().height > textDimensions.height) {
+                        textDimensions.height = symbol.getDimensions().height;
+                    }
                 }
             } else {   //  Caractère inconnu dans cette font
                 textDimensions = null;

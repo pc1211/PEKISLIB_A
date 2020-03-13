@@ -13,7 +13,7 @@ import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.TABLE_IDS;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getKeyboards;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getTimeUnits;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.TIMEUNITS;
-import static com.example.pgyl.pekislib_a.TimeDateUtils.msToHms;
+import static com.example.pgyl.pekislib_a.TimeDateUtils.msToTimeFormatD;
 
 public class PresetsHandler {
     //region Variables
@@ -130,8 +130,8 @@ public class PresetsHandler {
         String ret = "";
         for (int j = TABLE_DATA_INDEX; j <= (preset.length - 1); j = j + 1) {   //  Exclure le champ ID
             String s = preset[j];
-            if ((keyboards[j].equals(KEYBOARDS.TIME_HMS.toString())) || (keyboards[j].equals(KEYBOARDS.TIME_XHMS.toString()))) {
-                s = msToHms(Long.parseLong(s), TIMEUNITS.valueOf(timeUnits[j]));
+            if ((keyboards[j].equals(KEYBOARDS.TIME_FORMAT_D.toString())) || (keyboards[j].equals(KEYBOARDS.TIME_FORMAT_DL.toString()))) {
+                s = msToTimeFormatD(Long.parseLong(s), TIMEUNITS.valueOf(timeUnits[j]));
             }
             ret = ret + s;
             if (j < (preset.length - 1)) {
