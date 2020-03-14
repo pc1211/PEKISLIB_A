@@ -176,10 +176,10 @@ public class InputButtonsActivity extends Activity {
                         "7", "8", "9", NA,
                         NA, "0", NA, NA,
                         "h", "m", "s", NA,
-                        "t", "u", NA, NA},
+                        "t", "u", "v", NA},
                 new String[]{   //  Paysage
                         "1", "2", "3", "h", "m", "s", NA, SPECIAL_BUTTONS.BACK.toString(),
-                        "4", "5", "6", "t", "u", NA, NA, SPECIAL_BUTTONS.CLEAR.toString(),
+                        "4", "5", "6", "t", "u", "v", NA, SPECIAL_BUTTONS.CLEAR.toString(),
                         "7", "8", "9", NA, NA, NA, NA, NA,
                         NA, "0", NA, NA, NA, NA, NA, NA}),
 
