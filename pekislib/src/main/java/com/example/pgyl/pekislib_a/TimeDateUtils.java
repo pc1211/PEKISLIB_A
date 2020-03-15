@@ -31,7 +31,7 @@ public class TimeDateUtils {
             this.numberFormatD = numberFormatD;
             this.separatorD = separatorD;
             this.separatorDL = separatorDL;
-            this.nextDecodeUnit = this;   //  nextDecodeUnit sera calculé au 1er appel de getNextDecodeUnit ("lazy")
+            this.nextDecodeUnit = null;   //  nextDecodeUnit sera calculé au 1er appel de getFirstDecodeUnit
         }
 
         public long MS() {
@@ -58,28 +58,12 @@ public class TimeDateUtils {
             return tag;
         }
 
-        public TIME_UNITS getNextDecodeUnit() {  //  Obtenir la prochaine unité à décoder (en format D ou DL)
-            if (this.equals(nextDecodeUnit)) {  //  nextDecodeUnit est calculé au 1er appel de getNextDecodeUnit ("lazy")
-                if (this.equals(TIME_UNITS.HOUR)) {
-                    nextDecodeUnit = TIME_UNITS.MIN;   //  On décode les minutes après les heures
-                }
-                if (this.equals(TIME_UNITS.MIN)) {
-                    nextDecodeUnit = TIME_UNITS.SEC;
-                }
-                if (this.equals(TIME_UNITS.SEC)) {
-                    nextDecodeUnit = TIME_UNITS.TS;
-                }
-                if (this.equals(TIME_UNITS.TS)) {
-                    nextDecodeUnit = TIME_UNITS.HS;
-                }
-                if (this.equals(TIME_UNITS.HS)) {
-                    nextDecodeUnit = TIME_UNITS.MS;
-                }
-                if (this.equals(TIME_UNITS.MS)) {   //  MS est la dernière unité à décoder => null
-                    nextDecodeUnit = null;
-                }
-            }
+        public TIME_UNITS getNextDecodeUnit() {  //  Obtenir la prochaine unité à décoder (en format D ou DL) (après avoir appelé getFirstDecodeUnit pour initialisation (lazy))
             return nextDecodeUnit;
+        }
+
+        public void setNextDecodeUnit(TIME_UNITS nextDecodeUnit) {
+            this.nextDecodeUnit = nextDecodeUnit;
         }
     }
 
@@ -90,6 +74,19 @@ public class TimeDateUtils {
     public static final int MINUTES_PER_HOUR = 60;
     public static final int SECONDS_PER_MINUTE = 60;
     public static final int MILLISECONDS_PER_SECOND = 1000;
+
+    private static TIME_UNITS getFirstDecodeUnit() {  //  1e unité à décoder et initialisation (lazy) de nextDecodeUnit de chaque unité
+        TIME_UNITS ret = TIME_UNITS.HOUR;
+        if (ret.getNextDecodeUnit() == null) {  //  nextDecodeUnit pas encore initialisés
+            TIME_UNITS.HOUR.setNextDecodeUnit(TIME_UNITS.MIN);   //  On décode les minutes après les heures
+            TIME_UNITS.MIN.setNextDecodeUnit(TIME_UNITS.SEC);
+            TIME_UNITS.SEC.setNextDecodeUnit(TIME_UNITS.TS);
+            TIME_UNITS.TS.setNextDecodeUnit(TIME_UNITS.HS);
+            TIME_UNITS.HS.setNextDecodeUnit(TIME_UNITS.MS);
+            TIME_UNITS.MS.setNextDecodeUnit(null);   //  MS est la dernière unité à décoder
+        }
+        return ret;
+    }
 
     public static long midnightTimeMillis() {
         Calendar calendar = Calendar.getInstance();
@@ -259,10 +256,6 @@ public class TimeDateUtils {
         }
         tud = null;
         return ret;
-    }
-
-    private static TIME_UNITS getFirstDecodeUnit() {  //  1e unité à décoder
-        return TIME_UNITS.HOUR;
     }
 
 }
