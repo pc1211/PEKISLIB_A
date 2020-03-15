@@ -20,10 +20,10 @@ public class TimeDateUtils {
         MS(MILLISECONDS_PER_SECOND / 1000, "%01d", "", "v");  //  1000e de seconde
 
         private long durationMs;       //  Durée de l'unité (en millisecondes)
-        private String numberFormatD;  //  Format pour nombres si temps exprimé en format D (HH:MM:SS.nnn); Il n'y a pas de format pour format DL (...h...m...s...t...u...v)
+        private String numberFormatD;  //  Format pour nombres si temps exprimé en format D (HH:MM:SS.nnn); Il n'y a pas de format pour format DL (...h...m...s...t...u...v); ; HOURS100 et DAY ne sont pas concernés par un décodage de formatD ou DL
         private String separatorD;     //  Séparateur se trouvant après l'unité si format D; Si "" => Il n'existe pas de séparateur spécifique pour les fractions de seconde (TS, HS, MS)
         private String separatorDL;    //  Séparateur se trouvant après l'unité si format DL; sert uniquement à un encodage direct (p.ex. 00:00:00.06 entré comme 6u mais aussi éventuellement comme 0s06 )
-        private long tag;              //  Pour stockage temporaire d'un nombre associé à l'unité pendant une conversion (p.ex. si HOUR => stocke un nombre d'heures)
+        private long tag;              //  Pour stockage temporaire d'un nombre associé à l'unité pendant une conversion (p.ex. HOUR.setTag(20) => stocke 20 heures dans HOUR)
         private TIME_UNITS nextDecodeUnit;   //  Prochaine unité à décoder dans le format D ou DL  (H->M->S...)
 
         TIME_UNITS(long durationMs, String numberFormatD, String separatorD, String separatorDL) {
@@ -31,7 +31,7 @@ public class TimeDateUtils {
             this.numberFormatD = numberFormatD;
             this.separatorD = separatorD;
             this.separatorDL = separatorDL;
-            this.nextDecodeUnit = null;
+            this.nextDecodeUnit = this;   //  nextDecodeUnit sera calculé au 1er appel de getNextDecodeUnit ("lazy")
         }
 
         public long MS() {
@@ -50,35 +50,36 @@ public class TimeDateUtils {
             return separatorDL;
         }
 
-        public TIME_UNITS getNextDecodeUnit() {  //  Obtenir la prochaine unité à décoder (en format D ou DL); HOURS100 et DAY ne sont pas concernés par un décodage de formatD ou DL
-            if (nextDecodeUnit == null) {  //  nextDecodeUnit est calculé au 1er appel de getNextDecodeUnit
-                if (!this.equals(TIME_UNITS.MS)) {   //  MS est la dernière unité => reste null
-                    if (this.equals(TIME_UNITS.HOUR)) {
-                        nextDecodeUnit = TIME_UNITS.MIN;   //  On décode les minutes après les heures
-                    }
-                    if (this.equals(TIME_UNITS.MIN)) {
-                        nextDecodeUnit = TIME_UNITS.SEC;
-                    }
-                    if (this.equals(TIME_UNITS.SEC)) {
-                        nextDecodeUnit = TIME_UNITS.TS;
-                    }
-                    if (this.equals(TIME_UNITS.TS)) {
-                        nextDecodeUnit = TIME_UNITS.HS;
-                    }
-                    if (this.equals(TIME_UNITS.HS)) {
-                        nextDecodeUnit = TIME_UNITS.MS;
-                    }
-                }
-            }
-            return nextDecodeUnit;
-        }
-
         public void setTag(long tag) {
             this.tag = tag;
         }
 
         public long getTag() {
             return tag;
+        }
+
+        public TIME_UNITS getNextDecodeUnit() {  //  Obtenir la prochaine unité à décoder (en format D ou DL)
+            if (this.equals(nextDecodeUnit)) {  //  nextDecodeUnit est calculé au 1er appel de getNextDecodeUnit ("lazy")
+                if (this.equals(TIME_UNITS.HOUR)) {
+                    nextDecodeUnit = TIME_UNITS.MIN;   //  On décode les minutes après les heures
+                }
+                if (this.equals(TIME_UNITS.MIN)) {
+                    nextDecodeUnit = TIME_UNITS.SEC;
+                }
+                if (this.equals(TIME_UNITS.SEC)) {
+                    nextDecodeUnit = TIME_UNITS.TS;
+                }
+                if (this.equals(TIME_UNITS.TS)) {
+                    nextDecodeUnit = TIME_UNITS.HS;
+                }
+                if (this.equals(TIME_UNITS.HS)) {
+                    nextDecodeUnit = TIME_UNITS.MS;
+                }
+                if (this.equals(TIME_UNITS.MS)) {   //  MS est la dernière unité à décoder => null
+                    nextDecodeUnit = null;
+                }
+            }
+            return nextDecodeUnit;
         }
     }
 
@@ -131,7 +132,7 @@ public class TimeDateUtils {
         String ret = "";
         long p = timeUnit.MS();
         long n = p * ((ms + (p / 2)) / p);  //  Arrondir à l'unité nécessaire
-        TIME_UNITS tu = TIME_UNITS.HOUR;   //  1e unité à décoder
+        TIME_UNITS tu = getFirstDecodeUnit();
         do {
             long q = n / tu.MS();
             ret = ret + String.format(tu.NUMBER_FORMAT_D(), q);
@@ -150,7 +151,7 @@ public class TimeDateUtils {
         String ret = "";
         long p = timeUnit.MS();
         long n = p * ((ms + (p / 2)) / p);  //  Arrondir à l'unité nécessaire
-        TIME_UNITS tu = TIME_UNITS.HOUR;   //  1e unité à décoder
+        TIME_UNITS tu = getFirstDecodeUnit();
         do {
             long q = n / tu.MS();
             ret = ret + q;
@@ -176,7 +177,7 @@ public class TimeDateUtils {
 
     public static boolean timeFormatDToTIMEUNITSTags(String timeFormatD) {
         String str = timeFormatD;
-        TIME_UNITS tu = TIME_UNITS.HOUR;   //  1e unité à décoder
+        TIME_UNITS tu = getFirstDecodeUnit();
         boolean ret = true;
         try {
             do {
@@ -215,7 +216,7 @@ public class TimeDateUtils {
 
     public static boolean timeFormatDLToTIMEUNITSTags(String timeFormatDL) {
         String str = timeFormatDL;
-        TIME_UNITS tu = TIME_UNITS.HOUR;   //  1e unité à décoder
+        TIME_UNITS tu = getFirstDecodeUnit();
         TIME_UNITS tud = null;   // Contiendra la dernière unité précisée p.ex. 2m30 => MIN; 2h30s => SEC
         boolean ret = true;
         try {
@@ -245,7 +246,7 @@ public class TimeDateUtils {
                         } else {   //  concerne MIN, SEC   (p.ex. 2h50 => MIN = 50 ou 2h14m56 => SEC = 56)
                             tun.setTag(Long.parseLong(str));   //  attribution du tout à cette unité
                         }
-                    } else {    //  concerne MS => Que faire ??? ( p.ex 7h4v15 ???)
+                    } else {    //  tun=null => concerne MS => Que faire ??? ( p.ex 7h4v15 ???)
                         ret = false;   //  Désolé
                     }
                     tun = null;
@@ -258,6 +259,10 @@ public class TimeDateUtils {
         }
         tud = null;
         return ret;
+    }
+
+    private static TIME_UNITS getFirstDecodeUnit() {  //  1e unité à décoder
+        return TIME_UNITS.HOUR;
     }
 
 }
