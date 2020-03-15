@@ -40,7 +40,7 @@ import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentPre
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentValueInInputButtonsActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatusInInputButtonsActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatusInPresetsActivity;
-import static com.example.pgyl.pekislib_a.TimeDateUtils.TIMEUNITS;
+import static com.example.pgyl.pekislib_a.TimeDateUtils.TIME_UNITS;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.msToTimeFormatD;
 
 public class PresetsActivity extends Activity {
@@ -303,7 +303,7 @@ public class PresetsActivity extends Activity {
 
         String fieldText = preset[columnIndex];
         if ((keyboards[columnIndex].equals(KEYBOARDS.TIME_FORMAT_D.toString())) || (keyboards[columnIndex].equals(KEYBOARDS.TIME_FORMAT_DL.toString()))) {
-            fieldText = msToTimeFormatD(Long.parseLong(fieldText), TIMEUNITS.valueOf(timeUnits[columnIndex]));
+            fieldText = msToTimeFormatD(Long.parseLong(fieldText), TIME_UNITS.valueOf(timeUnits[columnIndex]));
         }
         buttons[COMMANDS.FIELD.INDEX()].setText(fieldText);
         buttons[COMMANDS.NEXT_FIELD.INDEX()].setText(labelNames[columnIndex] + SYMBOL_NEXT);

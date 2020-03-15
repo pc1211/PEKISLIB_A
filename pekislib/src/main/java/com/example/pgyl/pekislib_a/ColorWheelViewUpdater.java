@@ -2,7 +2,7 @@ package com.example.pgyl.pekislib_a;
 
 import android.os.Handler;
 
-import static com.example.pgyl.pekislib_a.TimeDateUtils.TIMEUNITS;
+import static com.example.pgyl.pekislib_a.TimeDateUtils.TIME_UNITS;
 
 public class ColorWheelViewUpdater {
     //region Constantes
@@ -40,8 +40,8 @@ public class ColorWheelViewUpdater {
         final int FPS = 50;
 
         this.rotationAngle = rotationAngle;
-        duration = (long) (Math.abs(rotationAngle) / (WHEEL_ROTATION_ANGULAR_SPEED / TIMEUNITS.SEC.MS()));
-        updateInterval = TIMEUNITS.SEC.MS() / FPS;
+        duration = (long) (Math.abs(rotationAngle) / (WHEEL_ROTATION_ANGULAR_SPEED / TIME_UNITS.SEC.MS()));
+        updateInterval = TIME_UNITS.SEC.MS() / FPS;
         initm = nowm;
         prevAngle = 0;
         inAutomatic = false;

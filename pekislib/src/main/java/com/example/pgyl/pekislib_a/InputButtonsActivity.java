@@ -42,7 +42,7 @@ import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getTimeUnit;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.isColdStartStatusInInputButtonsActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentValueInInputButtonsActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatusInInputButtonsActivity;
-import static com.example.pgyl.pekislib_a.TimeDateUtils.TIMEUNITS;
+import static com.example.pgyl.pekislib_a.TimeDateUtils.TIME_UNITS;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.ddMMyyyy;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.formattedStringTimeDate;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.msToTimeFormatD;
@@ -330,7 +330,7 @@ public class InputButtonsActivity extends Activity {
     private int pages;
     private int pageIndex;
     private CASES caze;
-    private TIMEUNITS timeUnit;
+    private TIME_UNITS timeUnit;
     private boolean append;             //  True si les caractères entrés s'ajoutent à la chaîne d'entrée
     private String tableName;
     private int columnIndex;
@@ -378,7 +378,7 @@ public class InputButtonsActivity extends Activity {
         editString = getCurrentValueInInputButtonsActivity(stringShelfDatabase, tableName, columnIndex);
         keyboard = KEYBOARDS.valueOf(getKeyboard(stringShelfDatabase, tableName, columnIndex));
         if ((keyboard.equals(KEYBOARDS.TIME_FORMAT_D)) || (keyboard.equals(KEYBOARDS.TIME_FORMAT_DL))) {
-            timeUnit = TIMEUNITS.valueOf(getTimeUnit(stringShelfDatabase, tableName, columnIndex));
+            timeUnit = TIME_UNITS.valueOf(getTimeUnit(stringShelfDatabase, tableName, columnIndex));
         }
         buttonTexts = getButtonTexts(keyboard);
         pages = ((buttonTexts.length - 1) / BUTTONS_PER_PAGE) + 1;
