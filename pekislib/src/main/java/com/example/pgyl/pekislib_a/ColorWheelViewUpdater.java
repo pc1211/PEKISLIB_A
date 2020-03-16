@@ -40,8 +40,8 @@ public class ColorWheelViewUpdater {
         final int FPS = 50;
 
         this.rotationAngle = rotationAngle;
-        duration = (long) (Math.abs(rotationAngle) / (WHEEL_ROTATION_ANGULAR_SPEED / TIME_UNITS.SEC.MS()));
-        updateInterval = TIME_UNITS.SEC.MS() / FPS;
+        duration = (long) (Math.abs(rotationAngle) / (WHEEL_ROTATION_ANGULAR_SPEED / TIME_UNITS.SEC.DURATION_MS()));
+        updateInterval = TIME_UNITS.SEC.DURATION_MS() / FPS;
         initm = nowm;
         prevAngle = 0;
         inAutomatic = false;
