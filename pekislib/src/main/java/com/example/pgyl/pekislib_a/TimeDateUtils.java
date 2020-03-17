@@ -66,7 +66,7 @@ public class TimeDateUtils {
     public static final int SECONDS_PER_MINUTE = 60;
     public static final int MILLISECONDS_PER_SECOND = 1000;
 
-    private static TIME_UNITS getFirstDecodeUnit() {  //  1e unité à décoder et initialisation (lazy) de nextDecodeUnit de chaque unité
+    public static TIME_UNITS getFirstDecodeUnit() {  //  1e unité à décoder et initialisation (lazy) de nextDecodeUnit de chaque unité
         TIME_UNITS ret = TIME_UNITS.HOUR;
         if (ret.getNextDecodeUnit() == null) {  //  nextDecodeUnit pas encore initialisés
             TIME_UNITS.HOUR.setNextDecodeUnit(TIME_UNITS.MIN);   //  On décode les minutes après les heures
