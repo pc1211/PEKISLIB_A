@@ -16,7 +16,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
-import static com.example.pgyl.pekislib_a.Constants.COLOR_DARKENER_AND;
+import static com.example.pgyl.pekislib_a.Constants.COLOR_MASK_AND;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
 
 public final class DotMatrixDisplayView extends View {  //  Affichage de caractères dans une grille de carrés avec coordonnées (x,y)  ((0,0) étant en haut à gauche de la grille)
@@ -165,7 +165,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                         gridY = gridY - gridScrollRect.height();
                     }
                 }
-                dotPaint.setColor((buttonState.equals(BUTTON_STATES.PRESSED)) ? gridColorValues[gridY][gridX] & COLOR_DARKENER_AND : gridColorValues[gridY][gridX]);
+                dotPaint.setColor((buttonState.equals(BUTTON_STATES.PRESSED)) ? rgbContrast(gridColorValues[gridY][gridX]) : gridColorValues[gridY][gridX]);
                 dotPoint.set(gridMargins.left + (float) gridStartX + (float) i * dotCellSize, gridMargins.top + (float) j * dotCellSize);
                 viewCanvas.drawRect(dotPoint.x, dotPoint.y, dotPoint.x + dotSize, dotPoint.y + dotSize, dotPaint);
             }
@@ -173,6 +173,11 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         viewCanvas.drawRoundRect(viewCanvasRect, backCornerRadius, backCornerRadius, viewCanvasBackPaint);
         canvas.drawBitmap(viewBitmap, 0, 0, null);
         drawing = false;
+    }
+
+    private int rgbContrast(int colorValue) {  //  Rotation des couleurs pour faire un contraste
+        int c = colorValue & COLOR_MASK_AND;   //  FFRRGGBB AND 00FFFFFF => 00RRGGBB;
+        return ((c >> 8) | (c << 16)) | (~COLOR_MASK_AND);   //  (0000RRGG  OR  GGBB0000) => GGBBRRGG; OR  FF000000 => FFBBRRGG  (cad rotation à droite)
     }
 
     private boolean onButtonTouch(View v, MotionEvent event) {
