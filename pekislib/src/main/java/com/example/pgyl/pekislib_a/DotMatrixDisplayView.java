@@ -179,10 +179,11 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         final int BITS_PER_COLOR_COMPONENT = 8;
         final int COLOR_COMPONENT_HIGH_FILTER = 0x00808080;   //  Pour garder seulement les bits les plus lourds de chaque composante couleur (R, G et B) => On n'a plus que des couleurs pures (sombres)
 
-        int a = colorValue & COLOR_COMPONENT_HIGH_FILTER;
-        int ret = a;
+        int rgb = colorValue & COLOR_COMPONENT_HIGH_FILTER;
+        int ret = rgb;
         for (int i = 1; i <= (BITS_PER_COLOR_COMPONENT - 1); i = i + 1) {    //  Dupliquer le bit le plus lourd (bit 7) de chaque composante couleur sur toute sa taille => couleurs pures claires
-            ret = ret + (a >> i);   //  Dupliquer dans le bit 7-i
+            rgb = rgb >> 1;
+            ret = ret | rgb;   //  Dupliquer dans le bit 7-i
         }
         return ret | (~COLOR_MASK_AND);   //  Restaurer le pr√©fixe de couleur
     }
