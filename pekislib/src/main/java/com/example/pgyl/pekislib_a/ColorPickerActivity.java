@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 import static com.example.pgyl.pekislib_a.ColorUtils.HSVToRGB;
 import static com.example.pgyl.pekislib_a.Constants.ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
-import static com.example.pgyl.pekislib_a.Constants.COLOR_MASK_AND;
+import static com.example.pgyl.pekislib_a.Constants.COLOR_MASK;
 import static com.example.pgyl.pekislib_a.Constants.HEX_RADIX;
 import static com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITIES;
 import static com.example.pgyl.pekislib_a.Constants.SHP_FILE_NAME_SUFFIX;
@@ -273,7 +273,7 @@ public class ColorPickerActivity extends Activity {
                 hsvStruc[0] = (float) seekBars[COLOR_PARAMS.RED_HUE.INDEX()].getProgress() / 65535f * 360f;
                 hsvStruc[1] = (float) seekBars[COLOR_PARAMS.GREEN_SAT.INDEX()].getProgress() / 65535f;
                 hsvStruc[2] = (float) seekBars[COLOR_PARAMS.BLUE_VAL.INDEX()].getProgress() / 65535f;
-                colors[colorIndex] = String.format("%06X", Color.HSVToColor(hsvStruc) & COLOR_MASK_AND);
+                colors[colorIndex] = String.format("%06X", Color.HSVToColor(hsvStruc) & COLOR_MASK);
             }
             updateDisplayButtonTextColorValue();
             colorWheelView.setColor(colorIndex - 1, colors[colorIndex]);  //  colorWheelView ne stocke pas le 1er élément (ID)

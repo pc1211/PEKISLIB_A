@@ -13,7 +13,7 @@ import android.view.View;
 import java.util.EnumMap;
 
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
-import static com.example.pgyl.pekislib_a.Constants.COLOR_MASK_AND;
+import static com.example.pgyl.pekislib_a.Constants.COLOR_MASK;
 
 public final class LEDView extends View {
     //region Constantes
@@ -85,7 +85,7 @@ public final class LEDView extends View {
     }
 
     public String getLEDColor(STATES state) {
-        return (String.format("%06X", ledColorsMap.get(state) & COLOR_MASK_AND));
+        return (String.format("%06X", ledColorsMap.get(state) & COLOR_MASK));
     }
 
     @Override

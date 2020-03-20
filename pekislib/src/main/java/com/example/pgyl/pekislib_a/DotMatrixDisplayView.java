@@ -16,7 +16,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
-import static com.example.pgyl.pekislib_a.Constants.COLOR_MASK_AND;
+import static com.example.pgyl.pekislib_a.Constants.COLOR_INVERTER;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
 
 public final class DotMatrixDisplayView extends View {  //  Affichage de caractères dans une grille de carrés avec coordonnées (x,y)  ((0,0) étant en haut à gauche de la grille)
@@ -165,7 +165,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                         gridY = gridY - gridScrollRect.height();
                     }
                 }
-                dotPaint.setColor((buttonState.equals(BUTTON_STATES.PRESSED)) ? rgbContrast(gridColorValues[gridY][gridX]) : gridColorValues[gridY][gridX]);
+                dotPaint.setColor((buttonState.equals(BUTTON_STATES.PRESSED)) ? gridColorValues[gridY][gridX] ^ COLOR_INVERTER : gridColorValues[gridY][gridX]);
                 dotPoint.set(gridMargins.left + (float) gridStartX + (float) i * dotCellSize, gridMargins.top + (float) j * dotCellSize);
                 viewCanvas.drawRect(dotPoint.x, dotPoint.y, dotPoint.x + dotSize, dotPoint.y + dotSize, dotPaint);
             }
@@ -173,19 +173,6 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         viewCanvas.drawRoundRect(viewCanvasRect, backCornerRadius, backCornerRadius, viewCanvasBackPaint);
         canvas.drawBitmap(viewBitmap, 0, 0, null);
         drawing = false;
-    }
-
-    private int rgbContrast(int colorValue) {
-        final int BITS_PER_COLOR_COMPONENT = 8;
-        final int COLOR_COMPONENT_HIGH_FILTER = 0x00808080;   //  Pour garder seulement les bits les plus lourds de chaque composante couleur (R, G et B) => On n'a plus que des couleurs pures (sombres)
-
-        int rgb = colorValue & COLOR_COMPONENT_HIGH_FILTER;
-        int ret = rgb;
-        for (int i = 1; i <= (BITS_PER_COLOR_COMPONENT - 1); i = i + 1) {    //  Dupliquer le bit le plus lourd (bit 7) de chaque composante couleur sur toute sa taille => couleurs pures claires
-            rgb = rgb >> 1;
-            ret = ret | rgb;   //  Dupliquer dans le bit 7-i
-        }
-        return ret | (~COLOR_MASK_AND);   //  Restaurer le préfixe de couleur
     }
 
     private boolean onButtonTouch(View v, MotionEvent event) {
