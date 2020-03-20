@@ -175,9 +175,16 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         drawing = false;
     }
 
-    private int rgbContrast(int colorValue) {  //  Rotation des couleurs pour faire un contraste
-        int c = colorValue & COLOR_MASK_AND;   //  FFRRGGBB AND 00FFFFFF => 00RRGGBB;
-        return ((c >> 8) | (c << 16)) | (~COLOR_MASK_AND);   //  (0000RRGG  OR  GGBB0000) => GGBBRRGG; OR  FF000000 => FFBBRRGG  (cad rotation à droite)
+    private int rgbContrast(int colorValue) {
+        final int BITS_PER_COLOR_COMPONENT = 8;
+        final int COLOR_COMPONENT_HIGH_FILTER = 0x00808080;   //  Pour garder seulement les bits les plus lourds de chaque composante couleur (R, G et B) => On n'a plus que des couleurs pures (sombres)
+
+        int a = colorValue & COLOR_COMPONENT_HIGH_FILTER;
+        int ret = a;
+        for (int i = 1; i <= (BITS_PER_COLOR_COMPONENT - 1); i = i + 1) {    //  Dupliquer le bit le plus lourd (bit 7) de chaque composante couleur sur toute sa taille => couleurs pures claires
+            ret = ret + (a >> i);   //  Dupliquer dans le bit 7-i
+        }
+        return ret | (~COLOR_MASK_AND);   //  Restaurer le préfixe de couleur
     }
 
     private boolean onButtonTouch(View v, MotionEvent event) {
