@@ -9,35 +9,27 @@ import static com.example.pgyl.pekislib_a.Constants.ERROR_VALUE;
 import static com.example.pgyl.pekislib_a.Constants.NOT_FOUND;
 
 public class TimeDateUtils {
-    private static class TimeUnitFormat {
-        String numberFormat;
-        String separator;
-
-        TimeUnitFormat(String numberFormat, String separator) {
-            this.numberFormat = numberFormat;   //  Format pour nombre de l'unité TIME_UNITS
-            this.separator = separator;         //  Séparateur suivant l'unité TIME_UNITS
-        }
-    }
-
     public enum TIME_UNITS {
-        HOURS100(100 * MINUTES_PER_HOUR * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND, null, null),
-        DAY(HOURS_PER_DAY * MINUTES_PER_HOUR * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND, null, null),
-        HOUR(MINUTES_PER_HOUR * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND, new TimeUnitFormat("%02d", ":"), new TimeUnitFormat(null, "h")),
-        MIN(SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND, new TimeUnitFormat("%02d", ":"), new TimeUnitFormat(null, "m")),
-        SEC(MILLISECONDS_PER_SECOND, new TimeUnitFormat("%02d", "."), new TimeUnitFormat(null, "s")),
-        TS(MILLISECONDS_PER_SECOND / 10, new TimeUnitFormat("%01d", ""), new TimeUnitFormat(null, "t")),    //  10e de seconde
-        HS(MILLISECONDS_PER_SECOND / 100, new TimeUnitFormat("%01d", ""), new TimeUnitFormat(null, "u")),   //  100e de seconde
-        MS(MILLISECONDS_PER_SECOND / 1000, new TimeUnitFormat("%01d", ""), new TimeUnitFormat(null, "v"));  //  1000e de seconde
+        HOURS100(100 * MINUTES_PER_HOUR * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND, null, null, null),
+        DAY(HOURS_PER_DAY * MINUTES_PER_HOUR * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND, null, null, null),
+        HOUR(MINUTES_PER_HOUR * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND, "%02d", ":", "h"),
+        MIN(SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND, "%02d", ":", "m"),
+        SEC(MILLISECONDS_PER_SECOND, "%02d", ".", "s"),
+        TS(MILLISECONDS_PER_SECOND / 10, "%01d", "", "t"),    //  10e de seconde
+        HS(MILLISECONDS_PER_SECOND / 100, "%01d", "", "u"),   //  100e de seconde
+        MS(MILLISECONDS_PER_SECOND / 1000, "%01d", "", "v");  //  1000e de seconde
 
-        private long durationMs;          //  Durée de l'unité (en millisecondes)
-        private TimeUnitFormat formatD;      //  HH:MM:SS.nnn               p.ex. 03:00:02.000,  00:02:00.06
-        private TimeUnitFormat formatDL;     //  ...h...m...s...t...u...v   p.ex. 3h2s,          2m6u ou 2m0s06
-        private TIME_UNITS nextTimeUnit;  //  Prochaine unité à décoder (H->M->S...)
+        private long durationMs;              //  Durée de l'unité (en millisecondes)
+        private String formatDNumberFormat;   //  Format D:  HH:MM:SS.nnn               p.ex. 03:00:02.000,  00:02:00.06
+        private String formatDSeparator;
+        private String formatDLSeparator;     //  Format DL:   ...h...m...s...t...u...v   p.ex. 3h2s,          2m6u ou 2m0s06
+        private TIME_UNITS nextTimeUnit;      //  Prochaine unité à décoder (H->M->S...)
 
-        TIME_UNITS(long durationMs, TimeUnitFormat formatD, TimeUnitFormat formatDL) {
+        TIME_UNITS(long durationMs, String formatDNumberFormat, String formatDSeparator, String formatDLSeparator) {
             this.durationMs = durationMs;
-            this.formatD = formatD;
-            this.formatDL = formatDL;
+            this.formatDNumberFormat = formatDNumberFormat;
+            this.formatDSeparator = formatDSeparator;
+            this.formatDLSeparator = formatDLSeparator;
             this.nextTimeUnit = null;   //  nextDecodeUnit sera calculé au 1er appel de getFirstTimeUnit
         }
 
@@ -46,15 +38,15 @@ public class TimeDateUtils {
         }
 
         public String FORMAT_D_SEPARATOR() {
-            return formatD.separator;
+            return formatDSeparator;
         }
 
         public String FORMAT_DL_SEPARATOR() {
-            return formatDL.separator;
+            return formatDLSeparator;
         }
 
         public String FORMAT_D_NUMBER_FORMAT() {
-            return formatD.numberFormat;
+            return formatDNumberFormat;
         }
 
         public TIME_UNITS getNextTimeUnit() {  //  Obtenir la prochaine unité à décoder (en format D ou DL) (après avoir appelé getFirstTimeUnit pour initialisation (lazy))
