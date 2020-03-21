@@ -9,14 +9,14 @@ import static com.example.pgyl.pekislib_a.Constants.ERROR_VALUE;
 import static com.example.pgyl.pekislib_a.Constants.NOT_FOUND;
 
 public class TimeDateUtils {
-    public static class TimeUnitFormat {
+    private static class TimeUnitFormat {
+        String numberFormat;
+        String separator;
+
         TimeUnitFormat(String numberFormat, String separator) {
             this.numberFormat = numberFormat;   //  Format pour nombre de l'unité TIME_UNITS
             this.separator = separator;         //  Séparateur suivant l'unité TIME_UNITS
         }
-
-        public String numberFormat;
-        public String separator;
     }
 
     public enum TIME_UNITS {
@@ -45,12 +45,16 @@ public class TimeDateUtils {
             return durationMs;
         }
 
-        public TimeUnitFormat FORMAT_D() {
-            return formatD;
+        public String FORMAT_D_SEPARATOR() {
+            return formatD.separator;
         }
 
-        public TimeUnitFormat FORMAT_DL() {
-            return formatDL;
+        public String FORMAT_DL_SEPARATOR() {
+            return formatDL.separator;
+        }
+
+        public String FORMAT_D_NUMBER_FORMAT() {
+            return formatD.numberFormat;
         }
 
         public TIME_UNITS getNextTimeUnit() {  //  Obtenir la prochaine unité à décoder (en format D ou DL) (après avoir appelé getFirstTimeUnit pour initialisation (lazy))
@@ -127,13 +131,13 @@ public class TimeDateUtils {
         TIME_UNITS tu = getFirstTimeUnit();
         do {
             long q = n / tu.DURATION_MS();
-            ret = ret + String.format(tu.FORMAT_D().numberFormat, q);
+            ret = ret + String.format(tu.FORMAT_D_NUMBER_FORMAT(), q);
             if (!tu.equals(timeUnit)) {
                 n = n - q * tu.DURATION_MS();
             } else {
                 break;  //  Pas de séparateur pour terminer
             }
-            ret = ret + tu.FORMAT_D().separator;
+            ret = ret + tu.FORMAT_D_SEPARATOR();
             tu = tu.getNextTimeUnit();
         } while (tu != null);
         return ret;
@@ -147,8 +151,8 @@ public class TimeDateUtils {
         do {
             long q = n / tu.DURATION_MS();
             ret = ret + q;
-            if (tu.FORMAT_D().separator.length() != 0)   //  Si HOUR, MIN, SEC => ajouter le séparateur DL prévu
-                ret = ret + tu.FORMAT_DL().separator;   //  Pas de format de nombre en format DL;
+            if (tu.FORMAT_D_SEPARATOR().length() != 0)   //  Si HOUR, MIN, SEC => ajouter le séparateur DL prévu
+                ret = ret + tu.FORMAT_DL_SEPARATOR();   //  Pas de format de nombre en format DL;
             if (!tu.equals(timeUnit)) {
                 n = n - q * tu.DURATION_MS();
             } else {
@@ -166,7 +170,7 @@ public class TimeDateUtils {
         try {
             do {
                 if (str.length() > 0) {
-                    int i = str.indexOf(tu.formatD.separator);
+                    int i = str.indexOf(tu.FORMAT_D_SEPARATOR());
                     if (i > 0) {   //  Séparateur (non vide) trouvé  = concerne HOUR, MIN, SEC
                         msCount = msCount + tu.DURATION_MS() * Long.parseLong(str.substring(0, i));   //  Avant le séparateur
                         str = str.substring(i + 1);   //  Après le séparateur
@@ -197,7 +201,7 @@ public class TimeDateUtils {
         try {
             int k = -1;   //  Séparateur de l'unité précédente
             do {   //  Attribuer tout ce qui est posible aux unités précisées
-                int i = str.indexOf(tu.formatDL.separator);  //  Séparateur DL n'est jamais vide => i<>0
+                int i = str.indexOf(tu.FORMAT_DL_SEPARATOR());  //  Séparateur DL n'est jamais vide => i<>0
                 if (i != NOT_FOUND) {  //  Séparateur trouvé
                     msCount = msCount + tu.DURATION_MS() * Long.parseLong(str.substring(k + 1, i));   //  Après le séparateur de l'unité précédente et avant le séparateur de l'unité en cours
                     k = i;
@@ -210,7 +214,7 @@ public class TimeDateUtils {
                     TIME_UNITS tun = tud.getNextTimeUnit();  //  la 1e unité parmi les unités non précisées
                     str = str.substring(k + 1);   //  Après la dernière unité précisée
                     if (tun != null) {
-                        if (tun.formatD.separator.length() == 0) {   //  concerne TS, HS, MS => Il reste <TS> ou <TS><HS> ou <TS><HS><MS> à attribuer  (p.ex. 3s45 => TS=4 HS=5)
+                        if (tun.FORMAT_D_SEPARATOR().length() == 0) {   //  concerne TS, HS, MS => Il reste <TS> ou <TS><HS> ou <TS><HS><MS> à attribuer  (p.ex. 3s45 => TS=4 HS=5)
                             do {
                                 msCount = msCount + tun.DURATION_MS() * Long.parseLong(str.substring(0, 1));   //  Un seul caractère par unité
                                 str = str.substring(1);

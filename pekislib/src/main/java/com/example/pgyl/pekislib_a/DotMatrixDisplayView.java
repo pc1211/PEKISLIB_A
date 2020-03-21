@@ -29,9 +29,9 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
 
     private onCustomClickListener mOnCustomClickListener;
 
-    public class stateColors {
-        public int pressed;
-        public int unpressed;
+    private class stateColors {
+        int pressed;
+        int unpressed;
     }
 
     //region Variables
