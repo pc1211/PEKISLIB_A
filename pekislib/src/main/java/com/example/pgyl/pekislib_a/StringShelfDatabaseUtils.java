@@ -91,11 +91,11 @@ public class StringShelfDatabaseUtils {
     //endregion
 
     //region INPUT_BUTTONS
-    public static String getCurrentValueInInputButtonsActivity(StringShelfDatabase stringShelfDatabase, String tableName, int index) {
+    public static String getCurrentEntryInInputButtonsActivity(StringShelfDatabase stringShelfDatabase, String tableName, int index) {
         return stringShelfDatabase.selectFieldByIdOrCreate(tableName, TABLE_IDS.CURRENT.toString() + PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), index);
     }
 
-    public static void setCurrentValueInInputButtonsActivity(StringShelfDatabase stringShelfDatabase, String tableName, int index, String value) {
+    public static void setCurrentEntryInInputButtonsActivity(StringShelfDatabase stringShelfDatabase, String tableName, int index, String value) {
         stringShelfDatabase.insertOrReplaceFieldById(tableName, TABLE_IDS.CURRENT.toString() + PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), index, value);
     }
     //endregion
