@@ -34,6 +34,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         int unpressed;
     }
 
+    public enum SCROLL_DIRECTIONS {LEFT, RIGHT, TOP, BOTTOM}
+
     //region Variables
     private stateColors[][] gridColorValues;
     private RectF displayMarginCoeffs;
@@ -275,6 +277,23 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
 
     public boolean isDrawing() {
         return drawing;
+    }
+
+    public void scroll(SCROLL_DIRECTIONS scrollDirection) {
+        switch (scrollDirection) {
+            case LEFT:
+                scrollLeft();
+                break;
+            case TOP:
+                scrollTop();
+                break;
+            case RIGHT:
+                scrollRight();
+                break;
+            case BOTTOM:
+                scrollBottom();
+                break;
+        }
     }
 
     public void scrollLeft() {
