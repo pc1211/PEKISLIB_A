@@ -31,6 +31,7 @@ public class ColorWheelViewUpdater {
     }
 
     public void close() {
+        handlerTime.removeCallbacks(runnableTime);
         runnableTime = null;
         handlerTime = null;
         colorWheelView = null;

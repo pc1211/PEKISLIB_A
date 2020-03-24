@@ -244,7 +244,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caractÃ
 
     public void setGridScrollRect(Rect gridScrollRect) {   //   Zone Ã  scroller (sous-rectangle de la grille gridRect) (left>=gridRect.left, top>=gridRect.top, right<=gridRect.right, bottom<=gridRect.bottom)
         this.gridScrollRect = gridScrollRect;
-        noScroll();
+        resetScrollStart();
     }
 
     public Rect getGridScrollRect() {
@@ -324,7 +324,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caractÃ
         }
     }
 
-    public void noScroll() {
+    public void resetScrollStart() {
         scrollStart.set(gridScrollRect.left, gridScrollRect.top);
     }
 
