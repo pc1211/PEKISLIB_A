@@ -1,15 +1,15 @@
 package com.example.pgyl.pekislib_a;
 
-import static com.example.pgyl.pekislib_a.PointRectUtils.RectDimensions;
+import static com.example.pgyl.pekislib_a.MiscUtils.BiDimensions;
 
 public class DotMatrixFontUtils {
 
-    public static RectDimensions getFontRectDimensions(String text, DotMatrixFont dotMatrixFont) {
-        return getFontRectDimensions(text, null, dotMatrixFont);
+    public static BiDimensions getFontTextDimensions(String text, DotMatrixFont dotMatrixFont) {
+        return getFontTextDimensions(text, null, dotMatrixFont);
     }
 
-    public static RectDimensions getFontRectDimensions(String text, DotMatrixFont extraFont, DotMatrixFont defaultFont) {   //  Spécifier extraFont différent de null si text mélange extraFont et defaultFont; extraFont a la priorité sur defaultFont
-        RectDimensions fontRectDimensions;
+    public static BiDimensions getFontTextDimensions(String text, DotMatrixFont extraFont, DotMatrixFont defaultFont) {   //  Spécifier extraFont différent de null si text mélange extraFont et defaultFont; extraFont a la priorité sur defaultFont
+        BiDimensions fontTextDimensions;
         DotMatrixSymbol symbol;
 
         String extraFontText = "";
@@ -27,12 +27,12 @@ public class DotMatrixFontUtils {
                 defaultFontText = defaultFontText + t;
             }
         }
-        fontRectDimensions = defaultFont.getTextDimensions(defaultFontText);
+        fontTextDimensions = defaultFont.getTextDimensions(defaultFontText);
         if (extraFont != null) {
-            fontRectDimensions.width = fontRectDimensions.width + extraFont.getTextDimensions(extraFontText).width;
-            fontRectDimensions.height = Math.max(extraFont.getTextDimensions(extraFontText).height, fontRectDimensions.height);
+            fontTextDimensions.width = fontTextDimensions.width + extraFont.getTextDimensions(extraFontText).width;
+            fontTextDimensions.height = Math.max(extraFont.getTextDimensions(extraFontText).height, fontTextDimensions.height);
         }
-        return fontRectDimensions;
+        return fontTextDimensions;
     }
 
     public static DotMatrixFont getDefaultFont() {

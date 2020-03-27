@@ -3,11 +3,11 @@ package com.example.pgyl.pekislib_a;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.example.pgyl.pekislib_a.PointRectUtils.RectDimensions;
+import static com.example.pgyl.pekislib_a.MiscUtils.BiDimensions;
 
 public class DotMatrixFont {
     private Map<Character, DotMatrixSymbol> charMap;
-    private RectDimensions symbolDimensions;
+    private BiDimensions dimensions;   //  Dimensions de la fonte; Egales aux dimensions d'un symbole si tous les symboles ont les mêmes dimensions
     private int rightMargin;
 
     public DotMatrixFont() {
@@ -31,22 +31,22 @@ public class DotMatrixFont {
     }
 
     public void setSymbols(DotMatrixSymbol[] symbols) {
-        symbolDimensions = new RectDimensions(0, 0);
+        dimensions = new BiDimensions(0, 0);
         for (int i = 0; i <= (symbols.length - 1); i = i + 1) {
             charMap.put(symbols[i].getCh(), symbols[i]);
             symbols[i].setOverwrite(false);                 //  Symbole régulier par défaut (cad pas de surcharge)
             symbols[i].setPosOffset(0, 0);
-            if (symbols[i].getDimensions().width > symbolDimensions.width) {    //  Chercher la largeur max. d'un symbole
-                symbolDimensions.width = symbols[i].getDimensions().width;
+            if (symbols[i].getDimensions().width > dimensions.width) {    //  Chercher la largeur max. d'un symbole
+                dimensions.width = symbols[i].getDimensions().width;
             }
-            if (symbols[i].getDimensions().height > symbolDimensions.height) {    //  Chercher la hauteur max. d'un symbole
-                symbolDimensions.height = symbols[i].getDimensions().height;
+            if (symbols[i].getDimensions().height > dimensions.height) {    //  Chercher la hauteur max. d'un symbole
+                dimensions.height = symbols[i].getDimensions().height;
             }
         }
     }
 
-    public RectDimensions getSymbolDimensions() {
-        return symbolDimensions;
+    public BiDimensions getDimensions() {
+        return dimensions;
     }
 
     public void setRightMargin(int rightMargin) {   //  Marge droite pour chaque symbole (en nombre de carrés)
@@ -57,11 +57,11 @@ public class DotMatrixFont {
         return rightMargin;
     }
 
-    public RectDimensions getTextDimensions(String text) {
+    public BiDimensions getTextDimensions(String text) {
         DotMatrixSymbol symbol;
-        RectDimensions textDimensions;
+        BiDimensions textDimensions;
 
-        textDimensions = new RectDimensions(0, 0);
+        textDimensions = new BiDimensions(0, 0);
         for (int i = 0; i <= (text.length() - 1); i = i + 1) {
             symbol = charMap.get(text.charAt(i));
             if (symbol != null) {

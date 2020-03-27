@@ -2,14 +2,14 @@ package com.example.pgyl.pekislib_a;
 
 import android.graphics.Point;
 
-import static com.example.pgyl.pekislib_a.PointRectUtils.RectDimensions;
+import static com.example.pgyl.pekislib_a.MiscUtils.BiDimensions;
 
 public class DotMatrixSymbol {
     private Character ch;             //  Caractère représenté
     private int[][] data;             //  Données de forme du symbole
     private boolean overwrite;        //  True si surcharge le symbole précédent
     private Point posOffset;          //  Si surcharge, Offset de repositionnement éventuel avant affichage, par rapport à la position du symbole précédent
-    private RectDimensions dimensions; // Dimensions du symbole
+    private BiDimensions dimensions;  // Dimensions du symbole
 
     public DotMatrixSymbol(Character ch, int[][] data) {
         this.ch = ch;
@@ -19,7 +19,7 @@ public class DotMatrixSymbol {
 
     private void init() {
         posOffset = new Point(0, 0);
-        dimensions = new RectDimensions(0, 0);
+        dimensions = new BiDimensions(0, 0);
         dimensions.height = data.length;   //  Hauteur du symbole
         for (int i = 0; i <= (dimensions.height - 1); i = i + 1) {
             if (data[i].length > dimensions.width) {      //   Chercher la largeur max. du symbole
@@ -36,7 +36,7 @@ public class DotMatrixSymbol {
         return data;
     }
 
-    public RectDimensions getDimensions() {    //  Pour le set, cf init()
+    public BiDimensions getDimensions() {    //  Pour le set, cf init()
         return dimensions;
     }
 

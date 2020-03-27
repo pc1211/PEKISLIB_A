@@ -9,6 +9,16 @@ import java.util.Locale;
 
 public class MiscUtils {
 
+    public static class BiDimensions {
+        public int width;
+        public int height;
+
+        BiDimensions(int width, int height) {
+            this.width = width;
+            this.height = height;
+        }
+    }
+
     public static void msgBox(String string, Context context) {        //  Ex:  msgBox("ERROR: Invalid number", this)
         AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
         dlgAlert.setMessage(string);
