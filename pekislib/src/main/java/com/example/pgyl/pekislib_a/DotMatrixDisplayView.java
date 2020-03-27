@@ -115,7 +115,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
 
         int ws = wm;   // Largeur souhaitée = Largeur proposée
 
-        calcInternalDimensions(wm);
+        setupDimensions(wm);
         int h = (int) (margins.top + dotCellSize * ((float) displayRect.height() - 1) + dotSize + margins.bottom + 0.5f);
         int hs = h;    // Hauteur souhaitée
 
@@ -142,7 +142,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
 
         super.onSizeChanged(w, h, oldw, oldh);
 
-        calcInternalDimensions(w);
+        setupDimensions(w);
         viewBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         viewCanvas = new Canvas(viewBitmap);
         viewCanvasRect = new RectF(0, 0, w, h);
@@ -396,7 +396,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         }
     }
 
-    private void calcInternalDimensions(int viewWidth) {  // Ajustement à un entier pour éviter le dessin d'une grille irrrégulière dans la largeur ou hauteur de ses éléments
+    private void setupDimensions(int viewWidth) {  // Ajustement à un entier pour éviter le dessin d'une grille irrrégulière dans la largeur ou hauteur de ses éléments
         margins = new RectF((int) ((float) viewWidth * displayMarginCoeffs.left + 0.5f), (int) ((float) viewWidth * displayMarginCoeffs.top + 0.5f), (int) ((float) viewWidth * displayMarginCoeffs.right + 0.5f), (int) ((float) viewWidth * displayMarginCoeffs.bottom + 0.5f));
         dotCellSize = (int) (((float) viewWidth - (margins.left + margins.right)) / (float) displayRect.width());
         dotSize = (int) (dotCellSize / (1 + dotRightMarginCoeff) + 0.5f);
