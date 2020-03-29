@@ -60,6 +60,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
     private long minClickTimeInterval;
     private long lastClickUpTime;
     private BUTTON_STATES buttonState;
+    private boolean invertOn;
     private boolean clickDownInButtonZone;
     private Rect buttonZone;
     //endregion
@@ -86,6 +87,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         dotPoint = new PointF();
         drawing = false;
         buttonState = BUTTON_STATES.UNPRESSED;
+        invertOn = false;
         minClickTimeInterval = MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE;
         lastClickUpTime = 0;
         setOnTouchListener(new OnTouchListener() {
@@ -171,7 +173,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
                         gridY = gridY - scrollRect.height();
                     }
                 }
-                dotPaint.setColor((buttonState.equals(BUTTON_STATES.PRESSED)) ? colorValues[gridY][gridX].pressed : colorValues[gridY][gridX].unpressed);
+                dotPaint.setColor(((buttonState.equals(BUTTON_STATES.PRESSED)) ^ invertOn) ? colorValues[gridY][gridX].pressed : colorValues[gridY][gridX].unpressed);
                 dotPoint.set(margins.left + (float) gridStartX + (float) i * dotCellSize, margins.top + (float) j * dotCellSize);
                 viewCanvas.drawRect(dotPoint.x, dotPoint.y, dotPoint.x + dotSize, dotPoint.y + dotSize, dotPaint);
             }
@@ -273,6 +275,14 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
 
     public void setBackColor(String color) {
         viewCanvasBackPaint.setColor(Color.parseColor(COLOR_PREFIX + color));
+    }
+
+    public void invert() {
+        this.invertOn = !invertOn;
+    }
+
+    public void setInvertOn(boolean invertOn) {
+        this.invertOn = !invertOn;
     }
 
     public boolean isDrawing() {
