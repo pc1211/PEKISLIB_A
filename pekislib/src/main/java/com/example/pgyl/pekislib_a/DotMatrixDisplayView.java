@@ -44,7 +44,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     private Rect gridRect;
     private Rect displayRect;
     private Rect scrollRect;
-    private Point scrollStart;
+    private Point scrollOffset;
     private Point symbolPos;
     private float dotCellSize;
     private float dotSize;
@@ -73,14 +73,15 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     private void init() {
         final RectF DISPLAY_MARGIN_SIZE_COEFFS_DEFAULT = new RectF(0.02f, 0.02f, 0.02f, 0.02f);   //  Marge autour de la grille (% de largeur totale)
         final float DISPLAY_DOT_RIGHT_MARGIN_COEFF_DEFAULT = 0.2f;   //  Distance entre carrés (% de largeur d'un carré)
-        final Point DEFAULT_FONT_SYMBOL_POS_DEFAULT = new Point(0, 0);   //  Position du prochain symbole à afficher (en coordonnées de la grille (x,y), (0,0) étant le carré en haut à gauche)
+        final Point SYMBOL_POS_DEFAULT = new Point(0, 0);   //  Position du prochain symbole à afficher (en coordonnées de la grille (x,y), (0,0) étant le carré en haut à gauche)
+        final Point SCROLL_OFFSET_DEFAULT = new Point(0, 0);   //  Décalage à partir de scrollRect (la partie de la grille qui est à scroller)
         final long MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE = 0;   //   Interval de temps (ms) minimum imposé entre 2 click
-        final String BACK_COLOR_DEFAULT = "000000";
+        final String BACK_COLOR_DEFAULT = "000000";   //  Couleur du fond sur lequel repose la grille
 
         displayMarginCoeffs = DISPLAY_MARGIN_SIZE_COEFFS_DEFAULT;
         dotRightMarginCoeff = DISPLAY_DOT_RIGHT_MARGIN_COEFF_DEFAULT;
-        symbolPos = DEFAULT_FONT_SYMBOL_POS_DEFAULT;
-        scrollStart = new Point();
+        symbolPos = SYMBOL_POS_DEFAULT;
+        scrollOffset = SCROLL_OFFSET_DEFAULT;
         setupDotPaint();
         setupViewCanvasBackPaint();
         setBackColor(BACK_COLOR_DEFAULT);
@@ -160,7 +161,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         for (int i = 0; i <= (displayRect.width() - 1); i = i + 1) {
             int gridX = displayRect.left + i;
             if ((gridX >= scrollRect.left) && (gridX <= (scrollRect.right - 1))) {  //  On est dans une zone éventuellement en cours de scroll
-                gridX = gridX + scrollStart.x - scrollRect.left;
+                gridX = gridX + scrollOffset.x;
                 if (gridX >= scrollRect.right) {
                     gridX = gridX - scrollRect.width();
                 }
@@ -168,7 +169,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
             for (int j = 0; j <= (displayRect.height() - 1); j = j + 1) {
                 int gridY = displayRect.top + j;
                 if ((gridY >= scrollRect.top) && (gridY <= (scrollRect.bottom - 1))) {   //  On est dans une zone éventuellement en cours de scroll
-                    gridY = gridY + scrollStart.y - scrollRect.top;
+                    gridY = gridY + scrollOffset.y;
                     if (gridY >= scrollRect.bottom) {
                         gridY = gridY - scrollRect.height();
                     }
@@ -244,9 +245,9 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         return displayRect;
     }
 
-    public void setScrollRect(Rect scrollRect) {   //   Zone à scroller (sous-rectangle de la grille gridRect) (left>=gridRect.left, top>=gridRect.top, right<=gridRect.right, bottom<=gridRect.bottom)
+    public void setScrollRect(Rect scrollRect) {   //   Zone à scroller (partie de la grille gridRect)
         this.scrollRect = scrollRect;
-        resetScrollStart();
+        resetScrollOffset();
     }
 
     public Rect getScrollRect() {
@@ -279,7 +280,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
 
     public void invert() {
         this.invertOn = !invertOn;
-    }
+    }   //  Inverser les couleurs lors du onDraw; Peut être appelé plusieurs fois de suite avec le bon intervalle de temps pour créer un effet de flash
 
     public void setInvertOn(boolean invertOn) {
         this.invertOn = !invertOn;
@@ -307,35 +308,35 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     }
 
     public void scrollLeft() {
-        scrollStart.x = scrollStart.x + 1;
-        if (scrollStart.x >= scrollRect.right) {
-            scrollStart.x = scrollRect.left;
+        scrollOffset.x = scrollOffset.x + 1;
+        if (scrollOffset.x >= scrollRect.width()) {
+            scrollOffset.x = 0;
         }
     }
 
     public void scrollRight() {
-        scrollStart.x = scrollStart.x - 1;
-        if (scrollStart.x < scrollRect.left) {
-            scrollStart.x = scrollRect.right - 1;
+        scrollOffset.x = scrollOffset.x - 1;
+        if (scrollOffset.x < 0) {
+            scrollOffset.x = scrollRect.width() - 1;
         }
     }
 
     public void scrollTop() {
-        scrollStart.y = scrollStart.y + 1;
-        if (scrollStart.y >= scrollRect.bottom) {
-            scrollStart.y = scrollRect.top;
+        scrollOffset.y = scrollOffset.y + 1;
+        if (scrollOffset.y >= scrollRect.height()) {
+            scrollOffset.y = 0;
         }
     }
 
     public void scrollBottom() {
-        scrollStart.y = scrollStart.y - 1;
-        if (scrollStart.y < scrollRect.top) {
-            scrollStart.y = scrollRect.bottom - 1;
+        scrollOffset.y = scrollOffset.y - 1;
+        if (scrollOffset.y < 0) {
+            scrollOffset.y = scrollRect.height() - 1;
         }
     }
 
-    public void resetScrollStart() {
-        scrollStart.set(scrollRect.left, scrollRect.top);
+    public void resetScrollOffset() {
+        scrollOffset.set(0, 0);
     }
 
     public void setMinClickTimeInterval(long minClickTimeInterval) {
@@ -392,13 +393,13 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         font = null;
     }
 
-    private void drawSymbol(DotMatrixSymbol symbol, int ColValue) {   //  A partir de symbolPos
+    private void drawSymbol(DotMatrixSymbol symbol, int ColValue) {   //  A partir de symbolPos; Seuls les points correspondant au traçage du symbole (valeurs 1) sont remplacés
         int[][] symbolData = symbol.getData();
         for (int i = 0; i <= (symbol.getDimensions().width - 1); i = i + 1) {
             int gridX = symbolPos.x + i;
             for (int j = 0; j <= (symbol.getDimensions().height - 1); j = j + 1) {
                 int gridY = symbolPos.y + j;
-                if (symbolData[j][i] == 1) {
+                if (symbolData[j][i] == 1) {   //  Valeur 1 => Point à remplacer dans la grille
                     colorValues[gridY][gridX].pressed = colorValues[gridY][gridX].unpressed;
                     colorValues[gridY][gridX].unpressed = ColValue;
                 }
