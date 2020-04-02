@@ -30,26 +30,38 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
 
     private onCustomClickListener mOnCustomClickListener;
 
-    private class stateColors {
+    private class StateColors {
         int pressed;
         int unpressed;
+    }
+
+    private class DimensionsSet {
+        int width;
+        int height;
+        RectF margins;
+        float dotCellSize;
+        float dotSize;
+        int gridStartX;
+
+        DimensionsSet() {
+            margins = new RectF();
+        }
     }
 
     public enum SCROLL_DIRECTIONS {LEFT, RIGHT, TOP, BOTTOM}
 
     //region Variables
-    private stateColors[][] colorValues;
-    private RectF displayMarginCoeffs;
-    private RectF margins;
-    private int gridStartX;
+    private StateColors[][] colorValues;
+    private RectF marginCoeffs;
+    private DimensionsSet dimensionsSet;
+    private DimensionsSet dimensionsSetTemp;
+    private BiDimensions maxDimensions;
     private Rect gridRect;
     private Rect displayRect;
     private Rect scrollRect;
     private Point scrollOffset;
     private Point symbolPos;
-    private float dotCellSize;
-    private float dotSize;
-    private float dotRightMarginCoeff;
+    private float interDotDistanceCoeff;
     private Paint dotPaint;
     private PointF dotPoint;
     private boolean drawing;
@@ -72,27 +84,30 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     }
 
     private void init() {
-        final RectF DISPLAY_MARGIN_SIZE_COEFFS_DEFAULT = new RectF(0.02f, 0.02f, 0.02f, 0.02f);   //  Marge autour de la grille (% de largeur totale)
-        final float DISPLAY_DOT_RIGHT_MARGIN_COEFF_DEFAULT = 0.2f;   //  Distance entre carrés (% de largeur d'un carré)
+        final RectF MARGIN_SIZE_COEFFS_DEFAULT = new RectF(0.02f, 0.02f, 0.02f, 0.02f);   //  Marge autour de la grille (% de largeur totale)
+        final float INTER_DOT_DISTANCE_COEFF_DEFAULT = 0.2f;   //  Distance entre carrés (% de largeur d'un carré)
         final Point SYMBOL_POS_DEFAULT = new Point(0, 0);   //  Position du prochain symbole à afficher (en coordonnées de la grille (x,y), (0,0) étant le carré en haut à gauche)
         final Point SCROLL_OFFSET_DEFAULT = new Point(0, 0);   //  Décalage à partir de scrollRect (la partie de la grille qui est à scroller)
         final long MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE = 0;   //   Interval de temps (ms) minimum imposé entre 2 click
         final String BACK_COLOR_DEFAULT = "000000";   //  Couleur du fond sur lequel repose la grille
 
-        displayMarginCoeffs = DISPLAY_MARGIN_SIZE_COEFFS_DEFAULT;
-        dotRightMarginCoeff = DISPLAY_DOT_RIGHT_MARGIN_COEFF_DEFAULT;
+        marginCoeffs = MARGIN_SIZE_COEFFS_DEFAULT;
+        interDotDistanceCoeff = INTER_DOT_DISTANCE_COEFF_DEFAULT;
         symbolPos = SYMBOL_POS_DEFAULT;
         scrollOffset = SCROLL_OFFSET_DEFAULT;
-        margins = new RectF();
-        setupDotPaint();
-        setupViewCanvasBackPaint();
-        setBackColor(BACK_COLOR_DEFAULT);
+        dimensionsSet = new DimensionsSet();
+        dimensionsSetTemp = new DimensionsSet();
+        maxDimensions = new BiDimensions(0, 0);
         dotPoint = new PointF();
         drawing = false;
         buttonState = BUTTON_STATES.UNPRESSED;
         invertOn = false;
         minClickTimeInterval = MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE;
         lastClickUpTime = 0;
+
+        setupDotPaint();
+        setupViewCanvasBackPaint();
+        setBackColor(BACK_COLOR_DEFAULT);
         setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -105,6 +120,9 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
 
+        dimensionsSet = null;
+        dimensionsSetTemp = null;
+        maxDimensions = null;
         colorValues = null;
         viewCanvasBackPaint = null;
         viewCanvas = null;
@@ -121,6 +139,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         BiDimensions maxDimensions = getMaxDimensions(wm, hm);
         int ws = maxDimensions.width;
         int hs = maxDimensions.height;
+        setupDimensions(dimensionsSet, ws);
 
         int w = ws;
         if (mw == MeasureSpec.EXACTLY) {
@@ -145,7 +164,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
 
         super.onSizeChanged(w, h, oldw, oldh);
 
-        setupDimensions(w);
+        setupDimensions(dimensionsSet, getMaxDimensions(w, h).width);
         viewBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         viewCanvas = new Canvas(viewBitmap);
         viewCanvasRect = new RectF(0, 0, w, h);
@@ -175,8 +194,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                     }
                 }
                 dotPaint.setColor(((buttonState.equals(BUTTON_STATES.PRESSED)) ^ invertOn) ? colorValues[gridY][gridX].pressed : colorValues[gridY][gridX].unpressed);
-                dotPoint.set(margins.left + (float) gridStartX + (float) i * dotCellSize, margins.top + (float) j * dotCellSize);
-                viewCanvas.drawRect(dotPoint.x, dotPoint.y, dotPoint.x + dotSize, dotPoint.y + dotSize, dotPaint);
+                dotPoint.set(dimensionsSet.margins.left + (float) dimensionsSet.gridStartX + (float) i * dimensionsSet.dotCellSize, dimensionsSet.margins.top + (float) j * dimensionsSet.dotCellSize);
+                viewCanvas.drawRect(dotPoint.x, dotPoint.y, dotPoint.x + dimensionsSet.dotSize, dotPoint.y + dimensionsSet.dotSize, dotPaint);
             }
         }
         viewCanvas.drawRoundRect(viewCanvasRect, backCornerRadius, backCornerRadius, viewCanvasBackPaint);
@@ -225,10 +244,10 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
 
     public void setGridRect(Rect gridRect) {   //  Grille sous-jacente de stockage des valeurs affichées  (left=0, top=0, right=width, bottom=height)
         this.gridRect = gridRect;
-        colorValues = new stateColors[gridRect.height()][gridRect.width()];
+        colorValues = new StateColors[gridRect.height()][gridRect.width()];
         for (int i = 0; i <= (gridRect.width() - 1); i = i + 1) {
             for (int j = 0; j <= (gridRect.height() - 1); j = j + 1) {
-                colorValues[j][i] = new stateColors();
+                colorValues[j][i] = new StateColors();
             }
         }
     }
@@ -266,12 +285,12 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         return symbolPos;
     }
 
-    public void setDisplayMarginCoeffs(RectF displayMarginCoeffs) {   //  Marges autour de l'affichage (en % de largeur totale)
-        this.displayMarginCoeffs = displayMarginCoeffs;
+    public void setMarginCoeffs(RectF marginCoeffs) {   //  Marges autour de l'affichage (en % de largeur totale)
+        this.marginCoeffs = marginCoeffs;
     }
 
-    public void setDotRightMarginCoeff(int dotRightMarginCoeff) {   //  Marge droite pour chaque carré (en % de largeur d'un carré)
-        this.dotRightMarginCoeff = dotRightMarginCoeff;
+    public void setInterDotDistanceCoeff(int interDotDistanceCoeff) {   //  Distance entre chaque carré (en % de largeur d'un carré)
+        this.interDotDistanceCoeff = interDotDistanceCoeff;
     }
 
     public void setBackColor(String color) {
@@ -419,44 +438,52 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         viewCanvasBackPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OVER));
     }
 
-    private void setupDimensions(int viewWidth) {  // Ajustement à un entier pour éviter le dessin d'une grille irrrégulière dans la largeur ou hauteur de ses éléments
-        margins.set((int) ((float) viewWidth * displayMarginCoeffs.left + 0.5f), (int) ((float) viewWidth * displayMarginCoeffs.top + 0.5f), (int) ((float) viewWidth * displayMarginCoeffs.right + 0.5f), (int) ((float) viewWidth * displayMarginCoeffs.bottom + 0.5f));
-        dotCellSize = (int) (((float) viewWidth - (margins.left + margins.right)) / (float) displayRect.width());
-        dotSize = (int) (dotCellSize / (1 + dotRightMarginCoeff) + 0.5f);
-        gridStartX = (int) (((float) viewWidth - (margins.left + (float) displayRect.width() * dotCellSize + margins.right)) / 2 + 0.5f);
+    private void setupDimensions(DimensionsSet gridDimensions, int viewWidth) {  // Ajustement à un entier pour éviter le dessin d'une grille irrégulière dans la largeur ou hauteur de ses éléments
+        gridDimensions.width = viewWidth;
+        gridDimensions.margins.set(getMarginSize(gridDimensions.width, marginCoeffs.left), getMarginSize(gridDimensions.width, marginCoeffs.top), getMarginSize(gridDimensions.width, marginCoeffs.right), getMarginSize(gridDimensions.width, marginCoeffs.bottom));
+        gridDimensions.dotCellSize = (int) (((float) viewWidth - (gridDimensions.margins.left + gridDimensions.margins.right)) / (float) displayRect.width());
+        gridDimensions.dotSize = (int) (gridDimensions.dotCellSize / (1 + interDotDistanceCoeff) + 0.5f);
+        gridDimensions.gridStartX = (int) (((float) viewWidth - (gridDimensions.margins.left + (float) displayRect.width() * gridDimensions.dotCellSize + gridDimensions.margins.right)) / 2 + 0.5f);
+        gridDimensions.height = (int) (dimensionsSetTemp.margins.top + dimensionsSetTemp.dotCellSize * ((float) displayRect.height() - 1) + dimensionsSetTemp.dotSize + dimensionsSetTemp.margins.bottom + 0.5f);
     }
 
-    private int getHeightAfterSetupDimensions(int width) {
-        setupDimensions(width);
-        return (int) (margins.top + dotCellSize * ((float) displayRect.height() - 1) + dotSize + margins.bottom + 0.5f);
+    private int getMarginSize(int length, float marginCoeff) {
+        return (int) ((float) length * marginCoeff + 0.5f);
     }
 
     private BiDimensions getMaxDimensions(int proposedWidth, int proposedHeight) {
-        double y;
-        double old_y;
+        float y;
+        float oldY;
+        float target;
 
-        double x = proposedWidth;
-        y = getHeightAfterSetupDimensions((int) x);
-        if (y > proposedHeight) {  //  Trop haut pour cette largeur => Trouver la largeur maximum (par la méthode de la sécante) telle que la hauteur correspondante ne dépasse pas proposedHeight
-            double a = x * .75;     //  guess 1
-            double b = a * .9;      //  guess 2
-            double t = proposedHeight;
+        float x = proposedWidth;
+        target = proposedHeight;
+        setupDimensions(dimensionsSetTemp, (int) x);
+        y = dimensionsSetTemp.height - target;
+        if (y > 0) {  //  Hauteur dépasse target pour la largeur x => Trouver la largeur maximum (par la méthode de la sécante) telle que la hauteur correspondante ne dépasse pas target
+            float a = x * .75f;     //  guess 1
+            float b = a * .9f;      //  guess 2
             x = a;
-            double r = getHeightAfterSetupDimensions((int) x) - t;
+            setupDimensions(dimensionsSetTemp, (int) x);
+            float r = dimensionsSetTemp.height - target;
             x = b;
-            double s = getHeightAfterSetupDimensions((int) x) - t;
+            setupDimensions(dimensionsSetTemp, (int) x);
+            float s = dimensionsSetTemp.height - target;
             do {
-                old_y = y;
-                double c = b - s * (b - a) / (s - r);
+                oldY = y;
+                float c = b - s * (b - a) / (s - r);
                 x = c;
-                y = getHeightAfterSetupDimensions((int) x) - t;
+                setupDimensions(dimensionsSetTemp, (int) x);
+                y = dimensionsSetTemp.height - target;
                 b = a;
                 s = r;
                 a = c;
                 r = y;
-            } while (Math.abs(y - old_y) > 1);
+            } while (Math.abs(y - oldY) > 1);
         }
-        return new BiDimensions((int) x, (int) (y + proposedHeight));
+        maxDimensions.width = (int) x;
+        maxDimensions.height = (int) (y + target);
+        return maxDimensions;
     }
 
 }
