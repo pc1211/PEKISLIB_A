@@ -17,6 +17,7 @@ import android.view.View;
 
 import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
+import static com.example.pgyl.pekislib_a.MiscUtils.BiDimensions;
 
 public final class DotMatrixDisplayView extends View {  //  Affichage de caractères dans une grille de carrés avec coordonnées (x,y)  ((0,0) étant en haut à gauche de la grille)
     public interface onCustomClickListener {
@@ -82,6 +83,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         dotRightMarginCoeff = DISPLAY_DOT_RIGHT_MARGIN_COEFF_DEFAULT;
         symbolPos = SYMBOL_POS_DEFAULT;
         scrollOffset = SCROLL_OFFSET_DEFAULT;
+        margins = new RectF();
         setupDotPaint();
         setupViewCanvasBackPaint();
         setBackColor(BACK_COLOR_DEFAULT);
@@ -116,11 +118,9 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         int mh = MeasureSpec.getMode(heightMeasureSpec);
         int hm = MeasureSpec.getSize(heightMeasureSpec);
 
-        int ws = wm;   // Largeur souhaitée = Largeur proposée
-
-        setupDimensions(wm);
-        int h = (int) (margins.top + dotCellSize * ((float) displayRect.height() - 1) + dotSize + margins.bottom + 0.5f);
-        int hs = h;    // Hauteur souhaitée
+        BiDimensions maxDimensions = getMaxDimensions(wm, hm);
+        int ws = maxDimensions.width;
+        int hs = maxDimensions.height;
 
         int w = ws;
         if (mw == MeasureSpec.EXACTLY) {
@@ -129,7 +129,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         if (mw == MeasureSpec.AT_MOST) {
             w = Math.min(ws, wm);
         }
-        h = hs;
+        int h = hs;
         if (mh == MeasureSpec.EXACTLY) {
             h = hm;
         }
@@ -407,13 +407,6 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         }
     }
 
-    private void setupDimensions(int viewWidth) {  // Ajustement à un entier pour éviter le dessin d'une grille irrrégulière dans la largeur ou hauteur de ses éléments
-        margins = new RectF((int) ((float) viewWidth * displayMarginCoeffs.left + 0.5f), (int) ((float) viewWidth * displayMarginCoeffs.top + 0.5f), (int) ((float) viewWidth * displayMarginCoeffs.right + 0.5f), (int) ((float) viewWidth * displayMarginCoeffs.bottom + 0.5f));
-        dotCellSize = (int) (((float) viewWidth - (margins.left + margins.right)) / (float) displayRect.width());
-        dotSize = (int) (dotCellSize / (1 + dotRightMarginCoeff) + 0.5f);
-        gridStartX = (int) (((float) viewWidth - (margins.left + (float) displayRect.width() * dotCellSize + margins.right)) / 2 + 0.5f);
-    }
-
     private void setupDotPaint() {
         dotPaint = new Paint();
         dotPaint.setAntiAlias(true);
@@ -424,6 +417,46 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         viewCanvasBackPaint = new Paint();
         viewCanvasBackPaint.setAntiAlias(true);
         viewCanvasBackPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OVER));
+    }
+
+    private void setupDimensions(int viewWidth) {  // Ajustement à un entier pour éviter le dessin d'une grille irrrégulière dans la largeur ou hauteur de ses éléments
+        margins.set((int) ((float) viewWidth * displayMarginCoeffs.left + 0.5f), (int) ((float) viewWidth * displayMarginCoeffs.top + 0.5f), (int) ((float) viewWidth * displayMarginCoeffs.right + 0.5f), (int) ((float) viewWidth * displayMarginCoeffs.bottom + 0.5f));
+        dotCellSize = (int) (((float) viewWidth - (margins.left + margins.right)) / (float) displayRect.width());
+        dotSize = (int) (dotCellSize / (1 + dotRightMarginCoeff) + 0.5f);
+        gridStartX = (int) (((float) viewWidth - (margins.left + (float) displayRect.width() * dotCellSize + margins.right)) / 2 + 0.5f);
+    }
+
+    private int getHeightAfterSetupDimensions(int width) {
+        setupDimensions(width);
+        return (int) (margins.top + dotCellSize * ((float) displayRect.height() - 1) + dotSize + margins.bottom + 0.5f);
+    }
+
+    private BiDimensions getMaxDimensions(int proposedWidth, int proposedHeight) {
+        double y;
+        double old_y;
+
+        double x = proposedWidth;
+        y = getHeightAfterSetupDimensions((int) x);
+        if (y > proposedHeight) {  //  Trop haut pour cette largeur => Trouver la largeur maximum (par la méthode de la sécante) telle que la hauteur correspondante ne dépasse pas proposedHeight
+            double a = x * .75;     //  guess 1
+            double b = a * .9;      //  guess 2
+            double t = proposedHeight;
+            x = a;
+            double r = getHeightAfterSetupDimensions((int) x) - t;
+            x = b;
+            double s = getHeightAfterSetupDimensions((int) x) - t;
+            do {
+                old_y = y;
+                double c = b - s * (b - a) / (s - r);
+                x = c;
+                y = getHeightAfterSetupDimensions((int) x) - t;
+                b = a;
+                s = r;
+                a = c;
+                r = y;
+            } while (Math.abs(y - old_y) > 1);
+        }
+        return new BiDimensions((int) x, (int) (y + proposedHeight));
     }
 
 }
