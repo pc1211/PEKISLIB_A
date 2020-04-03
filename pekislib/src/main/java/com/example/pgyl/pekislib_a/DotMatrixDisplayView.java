@@ -452,37 +452,30 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     }
 
     private BiDimensions getMaxDimensions(int proposedWidth, int proposedHeight) {
-        float y;
-        float oldY;
-        float target;
+        int xTop = proposedWidth;
+        int hMax = proposedHeight;
+        int xMin = 0;
+        int xCand = 0;
+        int yCand = 0;
+        int x = xTop;
+        do {
+            setupDimensions(dimensionsSetTemp, x);
+            int y = dimensionsSetTemp.height;
+            if (y <= hMax) {
+                xCand = x;   //  On a un candidat !
+                yCand = y;
+                if ((x == xTop) || (y == hMax)) {   //  Trouvé !
+                    break;
+                }
+                xMin = x;   //  Examiner maintenant l'intervalle [x,xTop]
+            } else {
+                xTop = x;    // Examiner maintenant l'intervalle [xMin,x]
+            }
+            x = (xMin + xTop) / 2;
+        } while (x < (xTop - 1));
 
-        float x = proposedWidth;
-        target = proposedHeight;
-        setupDimensions(dimensionsSetTemp, (int) x);
-        y = dimensionsSetTemp.height - target;
-        if (y > 0) {  //  Hauteur dépasse target pour la largeur x => Trouver la largeur maximum (par la méthode de la sécante) telle que la hauteur correspondante ne dépasse pas target
-            float a = x * .75f;     //  guess 1
-            float b = a * .9f;      //  guess 2
-            x = a;
-            setupDimensions(dimensionsSetTemp, (int) x);
-            float r = dimensionsSetTemp.height - target;
-            x = b;
-            setupDimensions(dimensionsSetTemp, (int) x);
-            float s = dimensionsSetTemp.height - target;
-            do {
-                oldY = y;
-                float c = b - s * (b - a) / (s - r);
-                x = c;
-                setupDimensions(dimensionsSetTemp, (int) x);
-                y = dimensionsSetTemp.height - target;
-                b = a;
-                s = r;
-                a = c;
-                r = y;
-            } while (Math.abs(y - oldY) > 1);
-        }
-        maxDimensions.width = (int) x;
-        maxDimensions.height = (int) (y + target);
+        maxDimensions.width = xCand;
+        maxDimensions.height = yCand;
         return maxDimensions;
     }
 
