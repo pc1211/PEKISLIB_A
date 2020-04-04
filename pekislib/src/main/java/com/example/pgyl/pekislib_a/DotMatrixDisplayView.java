@@ -457,22 +457,29 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         int xMin = 0;
         int xCand = 0;
         int yCand = 0;
+        int oldX = 0;
         int x = xTop;
-        do {
+        while (true) {
             setupDimensions(dimensionsSetTemp, x);
             int y = dimensionsSetTemp.height;
             if (y <= hMax) {
-                xCand = x;   //  On a un candidat !
+                xCand = x;   //  On a un nouveau candidat !
                 yCand = y;
-                if ((x == xTop) || (y == hMax)) {   //  Trouv√© !
+                if ((x == xTop) || (y == hMax)) {   //  Parfait !
                     break;
                 }
                 xMin = x;   //  Examiner maintenant l'intervalle [x,xTop]
-            } else {
+            } else {   //  y > hMax
                 xTop = x;    // Examiner maintenant l'intervalle [xMin,x]
             }
+            oldX = x;
             x = (xMin + xTop) / 2;
-        } while (x < (xTop - 1));
+            if (x == oldX) {  //  On ne progresse plus; Accepter le dernier candidat
+                xCand = x;
+                yCand = y;
+                break;
+            }
+        }
 
         maxDimensions.width = xCand;
         maxDimensions.height = yCand;
