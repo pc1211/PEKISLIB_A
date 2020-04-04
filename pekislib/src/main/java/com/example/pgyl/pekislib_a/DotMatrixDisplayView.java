@@ -459,7 +459,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         int yCand = 0;
         int oldX = 0;
         int x = xTop;
-        while (true) {
+        do {
             setupDimensions(dimensionsSetTemp, x);
             int y = dimensionsSetTemp.height;
             if (y <= hMax) {
@@ -474,12 +474,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
             }
             oldX = x;
             x = (xMin + xTop) / 2;
-            if (x == oldX) {  //  On ne progresse plus; Accepter le dernier candidat
-                xCand = x;
-                yCand = y;
-                break;
-            }
-        }
+        } while (x != oldX);   //  Si x=oldX, on ne progresse plus => Accepter le dernier candidat
 
         maxDimensions.width = xCand;
         maxDimensions.height = yCand;
