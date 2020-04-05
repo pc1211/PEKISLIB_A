@@ -22,7 +22,6 @@ import static com.example.pgyl.pekislib_a.PointRectUtils.ALIGN_RIGHT_BOTTOM;
 import static com.example.pgyl.pekislib_a.PointRectUtils.FULL_SIZE_COEFF;
 import static com.example.pgyl.pekislib_a.PointRectUtils.getCircleBoundingRect;
 import static com.example.pgyl.pekislib_a.PointRectUtils.getPointInCircle;
-import static com.example.pgyl.pekislib_a.PointRectUtils.getSubRect;
 
 //  Dessiner une roue avec les couleurs à éditer
 //  ainsi qu'un marqueur SVG placé au Nord-Ouest, dirigé initialement vers le milieu de la couleur courante
@@ -302,7 +301,7 @@ public final class ColorWheelView extends View {
         Bitmap ret = Bitmap.createBitmap((int) markerCellCanvasRect.width(), (int) markerCellCanvasRect.height(), Bitmap.Config.ARGB_8888);
         Canvas markerCanvas = new Canvas(ret);
         float markerAspectRatio = (float) picture.getHeight() / (float) picture.getWidth();
-        markerCanvas.drawPicture(picture, getSubRect(markerCellCanvasRect, ALIGN_RIGHT_BOTTOM, markerAspectRatio, FULL_SIZE_COEFF));
+        markerCanvas.drawPicture(picture, PointRectUtils.getMaxSubRect(markerCellCanvasRect, ALIGN_RIGHT_BOTTOM, markerAspectRatio, FULL_SIZE_COEFF));
         return ret;
     }
 

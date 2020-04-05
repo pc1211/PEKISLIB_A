@@ -1,6 +1,7 @@
 package com.example.pgyl.pekislib_a;
 
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.graphics.RectF;
 
 import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
@@ -24,12 +25,13 @@ public class PointRectUtils {  //  Routines adaptées à des coordonnées (0,0) 
     //          Tout occuper (perte aspectRatio)         =>  (0, 0, 1, 1)
     //          Aligner en bas et occuper tout la largeur (perte aspectRatio) =>  (0, UNDEFINED, 1, 1)
     //          ...
-    public static RectF CENTER_X_Y = new RectF(UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED);
+    public static RectF ALIGN_CENTER_X_CENTER_Y = new RectF(UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED);
     public static RectF ALIGN_RIGHT_BOTTOM = new RectF(UNDEFINED, UNDEFINED, 1, 1);
+    public static RectF ALIGN_LEFT_CENTER_Y = new RectF(0, UNDEFINED, UNDEFINED, UNDEFINED);
     public static float FULL_SIZE_COEFF = 1;
     public static float SQUARE_ASPECT_RATIO = 1;
 
-    public static RectF getSubRect(RectF boundingRect, RectF relativePositionCoeffs, float aspectRatio, float sizeCoeff) {
+    public static RectF getMaxSubRect(RectF boundingRect, RectF relativePositionCoeffs, float aspectRatio, float sizeCoeff) {
         float subWidth = boundingRect.width();
         float subHeight = boundingRect.height();
         if (aspectRatio != UNDEFINED) {    //  Tenir compte de l'aspect ratio
@@ -79,4 +81,42 @@ public class PointRectUtils {  //  Routines adaptées à des coordonnées (0,0) 
         return ret;
     }
 
+    public static RectF getSubRect(Rect boundingRect, int subWidth, int subHeight, RectF relativePositionCoeffs) {
+        RectF ret = new RectF(UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED);
+        if (relativePositionCoeffs.left != UNDEFINED) {
+            ret.left = boundingRect.left + (int) (boundingRect.width() * relativePositionCoeffs.left);
+        }
+        if (relativePositionCoeffs.top != UNDEFINED) {
+            ret.top = boundingRect.top + (int) (boundingRect.height() * relativePositionCoeffs.top);
+        }
+        if (relativePositionCoeffs.right != UNDEFINED) {
+            ret.right = boundingRect.left + (int) (boundingRect.width() * relativePositionCoeffs.right);
+        }
+        if (relativePositionCoeffs.bottom != UNDEFINED) {
+            ret.bottom = boundingRect.top + (int) (boundingRect.height() * relativePositionCoeffs.bottom);
+        }
+        if ((ret.left == UNDEFINED) && (ret.right == UNDEFINED)) {
+            ret.left = boundingRect.left + (boundingRect.width() - subWidth) / 2;   //  Rien de spécifié => Centrer horizontalement
+            ret.right = ret.left + subWidth;
+        } else {
+            if (ret.left == UNDEFINED) {
+                ret.left = ret.right - subWidth;
+            }
+            if (ret.right == UNDEFINED) {
+                ret.right = ret.left + subWidth;
+            }
+        }
+        if ((ret.top == UNDEFINED) && (ret.bottom == UNDEFINED)) {
+            ret.top = boundingRect.top + (boundingRect.height() - subHeight) / 2;    //  Rien de spécifié => Centrer verticalement
+            ret.bottom = ret.top + subHeight;
+        } else {
+            if (ret.top == UNDEFINED) {
+                ret.top = ret.bottom - subHeight;
+            }
+            if (ret.bottom == UNDEFINED) {
+                ret.bottom = ret.top + subHeight;
+            }
+        }
+        return ret;
+    }
 }
