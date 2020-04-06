@@ -39,14 +39,14 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
 
     private class DimensionsSet {
         int width;               //  Largeur donnée pour l'affichage
+        Rect internalMargins;    //  Marge autour de l'affichage proprement dit
+        int dotCellSize;         //  Taille d'un carré dessiné + espace entre 2 carrés, à calculer selon le nombre de carrés en largeur (cf displayRect)
+        int dotSize;             //  Taille d'un carré dessiné (dotCellSize / (1 + Coefficient de distance entre carrés))
+        int slackWidth;          //  Compense les arrondis dûs au calcul de dotCellSize et dotSize, de telle sorte que width = slackWidth + internalMargins.left + (displayRect.width -1) * dotCellSize + dotSize + internalMargins.right
         int height;              //  internalMargins.top + (displayRect.width -1) * dotCellSize + dotSize + internalMargins.bottom
-        RectF internalMargins;   //  Marge autour de l'affichage proprement dit
-        float dotCellSize;       //  Taille d'un carré dessiné + espace entre 2 carrés, à calculer selon le nombre de carrés en largeur (cf displayRect)
-        float dotSize;           //  Taille d'un carré dessiné (dotCellSize - distance entre carrés)
-        int slackX;              //  Compense les arrondis dûs au calcul de dotCellSize et dotSize, de telle sorte que width = slackX + internalMargins.left + (displayRect.width -1) * dotCellSize + dotSize + internalMargins.right
 
         DimensionsSet() {
-            internalMargins = new RectF();
+            internalMargins = new Rect();
         }
     }
 
@@ -169,12 +169,11 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
 
         super.onSizeChanged(w, h, oldw, oldh);
 
-        BiDimensions maxDimensions = getMaxDimensions(w, h);
-        setupDimensions(dimensionsSet, maxDimensions.width);
         viewBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         viewCanvas = new Canvas(viewBitmap);
         canvasRect = new Rect(0, 0, w, h);
-        dotMatrixRect = getSubRect(canvasRect, dimensionsSet.width - dimensionsSet.slackX, dimensionsSet.height, externalMarginCoeffs);  //  internalMargins incluses
+        setupDimensions(dimensionsSet, getMaxDimensions(w, h).width);
+        dotMatrixRect = getSubRect(canvasRect, dimensionsSet.width - dimensionsSet.slackWidth, dimensionsSet.height, externalMarginCoeffs);  //  internalMargins incluses
         backCornerRadius = (Math.min(dotMatrixRect.width(), dotMatrixRect.height()) * BACK_CORNER_RADIUS) / 200;
     }
 
@@ -311,7 +310,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
 
     public void invert() {
         this.invertOn = !invertOn;
-    }   //  Inverser les couleurs lors du onDraw; Peut être appelé plusieurs fois de suite avec le bon intervalle de temps pour créer un effet de flash
+    }   //  Inverser les couleurs lors du onDraw; Peut être appelé plusieurs fois de suite avec la fréquence appropriée pour créer un effet de flash
 
     public void setInvertOn(boolean invertOn) {
         this.invertOn = !invertOn;
@@ -453,14 +452,14 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     private void setupDimensions(DimensionsSet dimensionsSet, int viewWidth) {  // Ajustement à un entier pour éviter le dessin d'une grille irrégulière dans la largeur ou hauteur de ses éléments
         dimensionsSet.width = viewWidth;
         dimensionsSet.internalMargins.set(getMarginSize(viewWidth, internalMarginCoeffs.left), getMarginSize(viewWidth, internalMarginCoeffs.top), getMarginSize(viewWidth, internalMarginCoeffs.right), getMarginSize(viewWidth, internalMarginCoeffs.bottom));
-        dimensionsSet.dotCellSize = (int) (((float) viewWidth - (dimensionsSet.internalMargins.left + dimensionsSet.internalMargins.right)) / (float) displayRect.width());
-        dimensionsSet.dotSize = (int) (dimensionsSet.dotCellSize / (1 + interDotDistanceCoeff) + 0.5f);
-        dimensionsSet.slackX = (int) ((float) viewWidth - (dimensionsSet.internalMargins.left + ((float) displayRect.width() - 1) * dimensionsSet.dotCellSize + dimensionsSetTemp.dotSize + dimensionsSet.internalMargins.right));
-        dimensionsSet.height = (int) (dimensionsSet.internalMargins.top + ((float) displayRect.height() - 1) * dimensionsSet.dotCellSize + dimensionsSetTemp.dotSize + dimensionsSet.internalMargins.bottom);
+        dimensionsSet.dotCellSize = (int) ((viewWidth - dimensionsSet.internalMargins.left - dimensionsSet.internalMargins.right) * (1 + interDotDistanceCoeff) / (displayRect.width() * (1 + interDotDistanceCoeff) - interDotDistanceCoeff));   //  Pour remplir l'espace (hors marges) avec ((displayRect.width() - 1) * dotCellSize + dotSize)) ;
+        dimensionsSet.dotSize = (int) (dimensionsSet.dotCellSize / (1 + interDotDistanceCoeff) + .5f);
+        dimensionsSet.slackWidth = viewWidth - dimensionsSet.internalMargins.left - (displayRect.width() - 1) * dimensionsSet.dotCellSize - dimensionsSetTemp.dotSize - dimensionsSet.internalMargins.right;
+        dimensionsSet.height = dimensionsSet.internalMargins.top + (displayRect.height() - 1) * dimensionsSet.dotCellSize + dimensionsSetTemp.dotSize + dimensionsSet.internalMargins.bottom;
     }
 
     private int getMarginSize(int length, float marginCoeff) {
-        return (int) ((float) length * marginCoeff + 0.5f);
+        return (int) (length * marginCoeff + 0.5f);
     }
 
     private BiDimensions getMaxDimensions(int proposedWidth, int proposedHeight) {  // Trouver les dimensions maximum d'un rectangle pouvant afficher displayRect dans un rectangle de dimensions données
