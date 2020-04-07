@@ -100,6 +100,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         interDotDistanceCoeff = INTER_DOT_DISTANCE_COEFF_DEFAULT;
         symbolPos = SYMBOL_POS_DEFAULT;
         scrollOffset = SCROLL_OFFSET_DEFAULT;
+        scrollRect = null;
         dimensionsSet = new DimensionsSet();
         dimensionsSetTemp = new DimensionsSet();
         maxDimensions = new BiDimensions(0, 0);
@@ -186,18 +187,22 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         viewCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
         for (int i = 0; i <= (displayRect.width() - 1); i = i + 1) {
             int gridX = displayRect.left + i;
-            if ((gridX >= scrollRect.left) && (gridX <= (scrollRect.right - 1))) {  //  On est dans une zone éventuellement en cours de scroll
-                gridX = gridX + scrollOffset.x;
-                if (gridX >= scrollRect.right) {
-                    gridX = gridX - scrollRect.width();
+            if (scrollRect != null) {
+                if ((gridX >= scrollRect.left) && (gridX <= (scrollRect.right - 1))) {  //  On est dans une zone éventuellement en cours de scroll
+                    gridX = gridX + scrollOffset.x;
+                    if (gridX >= scrollRect.right) {
+                        gridX = gridX - scrollRect.width();
+                    }
                 }
             }
             for (int j = 0; j <= (displayRect.height() - 1); j = j + 1) {
                 int gridY = displayRect.top + j;
-                if ((gridY >= scrollRect.top) && (gridY <= (scrollRect.bottom - 1))) {   //  On est dans une zone éventuellement en cours de scroll
-                    gridY = gridY + scrollOffset.y;
-                    if (gridY >= scrollRect.bottom) {
-                        gridY = gridY - scrollRect.height();
+                if (scrollRect != null) {
+                    if ((gridY >= scrollRect.top) && (gridY <= (scrollRect.bottom - 1))) {   //  On est dans une zone éventuellement en cours de scroll
+                        gridY = gridY + scrollOffset.y;
+                        if (gridY >= scrollRect.bottom) {
+                            gridY = gridY - scrollRect.height();
+                        }
                     }
                 }
                 dotPaint.setColor(((buttonState.equals(BUTTON_STATES.PRESSED)) ^ invertOn) ? colorValues[gridY][gridX].pressed : colorValues[gridY][gridX].unpressed);
