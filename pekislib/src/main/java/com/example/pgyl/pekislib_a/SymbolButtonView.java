@@ -17,7 +17,7 @@ import com.larvalabs.svgandroid.SVGParser;
 
 import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
-import static com.example.pgyl.pekislib_a.PointRectUtils.ALIGN_CENTER_X_CENTER_Y;
+import static com.example.pgyl.pekislib_a.PointRectUtils.ALIGN_WIDTH_HEIGHT;
 import static com.example.pgyl.pekislib_a.PointRectUtils.FULL_SIZE_COEFF;
 import static com.example.pgyl.pekislib_a.PointRectUtils.SQUARE_ASPECT_RATIO;
 
@@ -74,7 +74,7 @@ public final class SymbolButtonView extends View {
         minClickTimeInterval = MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE;
         lastClickUpTime = 0;
         symbolSizeCoeff = SIZE_COEFF_DEFAULT;
-        symbolRelativePositionCoeffs = ALIGN_CENTER_X_CENTER_Y;
+        symbolRelativePositionCoeffs = ALIGN_WIDTH_HEIGHT;
         setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -103,7 +103,7 @@ public final class SymbolButtonView extends View {
         viewBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         viewCanvas = new Canvas(viewBitmap);
         viewCanvasRect = new RectF(0, 0, w, h);
-        symbolCellCanvasRect = PointRectUtils.getMaxSubRect(viewCanvasRect, ALIGN_CENTER_X_CENTER_Y, SQUARE_ASPECT_RATIO, FULL_SIZE_COEFF);
+        symbolCellCanvasRect = PointRectUtils.getMaxSubRect(viewCanvasRect, ALIGN_WIDTH_HEIGHT, SQUARE_ASPECT_RATIO, FULL_SIZE_COEFF);
         symbolBitmap = createSymbolBitmap(symbolPicture);
         buttonZone.set(getLeft() + symbolCellCanvasRect.left, getTop() + symbolCellCanvasRect.top, getLeft() + symbolCellCanvasRect.right, getTop() + symbolCellCanvasRect.bottom);
         backCornerRadius = (Math.min(w, h) * BACK_CORNER_RADIUS) / 200;    //  Rayon pour coin arrondi (% appliqué à la moitié de la largeur ou hauteur)
