@@ -30,6 +30,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         mOnCustomClickListener = listener;
     }
 
+    public enum DOT_FORM {SQUARE, ROUND}   //  points carrés ou ronds
+
     private onCustomClickListener mOnCustomClickListener;
 
     private class StateColors {
@@ -64,7 +66,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     private Rect scrollRect;
     private Point scrollOffset;
     private Point symbolPos;
-    private float interDotSizeCoeff;
+    private float dotSpacingCoeff;
+    private boolean dotFormSquareOn;
     private Paint dotPaint;
     private PointF dotPoint;
     private boolean drawing;
@@ -90,28 +93,31 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
 
     private void init() {
         final RectF INTERNAL_MARGIN_SIZE_COEFFS_DEFAULT = new RectF(0.02f, 0.02f, 0.02f, 0.02f);   //  Marge autour de l'affichage proprement dit (% de largeur)
-        final float INTER_DOT_SIZE_COEFF_DEFAULT = 0.2f;   //  Taille de l'espace entre carrés (% de largeur d'un carré)
+        final int DOT_SPACING_COEFF_DEFAULT = 20;    //  Taille de l'espace entre carrés (% de largeur d'un carré)
+        final DOT_FORM DOT_FORM_DEFAULT = DOT_FORM.SQUARE;   //  Points carrés par défaut
+        final long MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE = 0;   //   Intervalle de temps (ms) minimum imposé entre 2 click
+        final int BACK_CORNER_RADIUS_PERCENT_DEFAULT = 35;     //  % appliqué à 1/2 largeur ou hauteur pour déterminer le rayon du coin arrondi
         final Point SYMBOL_POS_DEFAULT = new Point(0, 0);   //  Position du prochain symbole à afficher (en coordonnées de la grille (x,y), (0,0) étant le carré en haut à gauche)
         final Point SCROLL_OFFSET_DEFAULT = new Point(0, 0);   //  Décalage à partir de scrollRect (la partie de la grille qui est à scroller)
-        final long MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE = 0;   //   Interval de temps (ms) minimum imposé entre 2 click
         final String BACK_COLOR_DEFAULT = "000000";   //  Couleur du fond sur lequel repose la grille
-        final int BACK_CORNER_RADIUS_PERCENT_DEFAULT = 35;     //  % appliqué à 1/2 largeur ou hauteur pour déterminer le rayon du coin arrondi
+        final BUTTON_STATES BUTTON_STATES_DEFAULT = BUTTON_STATES.UNPRESSED;
 
-        externalMarginCoeffs = ALIGN_WIDTH_HEIGHT;   //  Positionnement par défaut de la grille dans le parent
-        internalMarginCoeffs = INTERNAL_MARGIN_SIZE_COEFFS_DEFAULT;
-        interDotSizeCoeff = INTER_DOT_SIZE_COEFF_DEFAULT;
+        setExternalMarginCoeffs(ALIGN_WIDTH_HEIGHT);   //  Positionnement par défaut de la grille dans le parent
+        setInternalMarginCoeffs(INTERNAL_MARGIN_SIZE_COEFFS_DEFAULT);
+        setDotSpacingCoeff(String.valueOf(DOT_SPACING_COEFF_DEFAULT));
+        setDotForm(DOT_FORM_DEFAULT);
+        setMinClickTimeInterval(MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE);
         backCornerRadiusPercent = BACK_CORNER_RADIUS_PERCENT_DEFAULT;
         symbolPos = SYMBOL_POS_DEFAULT;
         scrollOffset = SCROLL_OFFSET_DEFAULT;
+        buttonState = BUTTON_STATES_DEFAULT;
         scrollRect = null;
         dimensionsSet = new DimensionsSet();
         dimensionsSetTemp = new DimensionsSet();
         maxDimensions = new BiDimensions(0, 0);
         dotPoint = new PointF();
         drawing = false;
-        buttonState = BUTTON_STATES.UNPRESSED;
         invertOn = false;
-        minClickTimeInterval = MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE;
         lastClickUpTime = 0;
 
         setupDotPaint();
@@ -207,7 +213,12 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                 }
                 dotPaint.setColor(((buttonState.equals(BUTTON_STATES.PRESSED)) ^ invertOn) ? colorValues[gridY][gridX].pressed : colorValues[gridY][gridX].unpressed);
                 dotPoint.set(dotMatrixRect.left + dimensionsSet.internalMargins.left + (float) i * dimensionsSet.dotCellSize, dotMatrixRect.top + dimensionsSet.internalMargins.top + (float) j * dimensionsSet.dotCellSize);
-                viewCanvas.drawRect(dotPoint.x, dotPoint.y, dotPoint.x + dimensionsSet.dotSize, dotPoint.y + dimensionsSet.dotSize, dotPaint);
+                if (dotFormSquareOn) {  //  Point carré
+                    viewCanvas.drawRect(dotPoint.x, dotPoint.y, dotPoint.x + dimensionsSet.dotSize, dotPoint.y + dimensionsSet.dotSize, dotPaint);
+                } else {  //  Point rond
+                    int halfDotSize = dimensionsSet.dotSize / 2;
+                    viewCanvas.drawCircle(dotPoint.x + halfDotSize, dotPoint.y + halfDotSize, halfDotSize, dotPaint);
+                }
             }
         }
         viewCanvas.drawRoundRect(dotMatrixRect, backCornerRadius, backCornerRadius, viewCanvasBackPaint);
@@ -305,8 +316,12 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         setupDrawParameters();
     }
 
-    public void setInterDotSizeCoeff(String interDotSizeCoeff) {   //  Taille de l'espace entre chaque carré (en % de largeur d'un carré)
-        this.interDotSizeCoeff = Float.parseFloat(interDotSizeCoeff) / 100;
+    public void setDotForm(DOT_FORM dotForm) {
+        this.dotFormSquareOn = (dotForm.equals(DOT_FORM.SQUARE));     //  SQUARE => true; ROUND => false
+    }
+
+    public void setDotSpacingCoeff(String dotSpacingCoeff) {   //  Taille de l'espace entre chaque carré (en % de largeur d'un carré)
+        this.dotSpacingCoeff = Float.parseFloat(dotSpacingCoeff) / 100;
     }
 
     public void setInternalMarginCoeffs(RectF internalMarginCoeffs) {   //  Marges autour de l'affichage proprement dit (en % de largeur totale)
@@ -453,6 +468,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     private void setupDotPaint() {
         dotPaint = new Paint();
         dotPaint.setAntiAlias(true);
+        dotPaint.setStyle(Paint.Style.FILL);   //  Pour les poins ronds
         dotPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
     }
 
@@ -485,11 +501,11 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     }
 
     private int getDotCellSize(DimensionsSet dimensionsSet) {
-        return (int) ((dimensionsSet.width - dimensionsSet.internalMargins.left - dimensionsSet.internalMargins.right) * (1 + interDotSizeCoeff) / (displayRect.width() * (1 + interDotSizeCoeff) - interDotSizeCoeff) + .5f);
+        return (int) ((dimensionsSet.width - dimensionsSet.internalMargins.left - dimensionsSet.internalMargins.right) * (1 + dotSpacingCoeff) / (displayRect.width() * (1 + dotSpacingCoeff) - dotSpacingCoeff) + .5f);
     }
 
     private int getDotSize(DimensionsSet dimensionsSet) {
-        return (int) (dimensionsSet.dotCellSize / (1 + interDotSizeCoeff) + .5f);
+        return (int) (dimensionsSet.dotCellSize / (1 + dotSpacingCoeff) + .5f);
     }
 
     private int getSlackWidth(DimensionsSet dimensionsSet) {
