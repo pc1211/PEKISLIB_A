@@ -30,9 +30,11 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         mOnCustomClickListener = listener;
     }
 
+    private onCustomClickListener mOnCustomClickListener;
+
     public enum DOT_FORM {SQUARE, ROUND}   //  points carrés ou ronds
 
-    private onCustomClickListener mOnCustomClickListener;
+    public enum SCROLL_DIRECTIONS {LEFT, RIGHT, TOP, BOTTOM}
 
     private class StateColors {
         int pressed;
@@ -51,8 +53,6 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
             internalMargins = new Rect();
         }
     }
-
-    public enum SCROLL_DIRECTIONS {LEFT, RIGHT, TOP, BOTTOM}
 
     //region Variables
     private StateColors[][] colorValues;
@@ -92,7 +92,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     }
 
     private void init() {
-        final RectF INTERNAL_MARGIN_SIZE_COEFFS_DEFAULT = new RectF(0.02f, 0.02f, 0.02f, 0.02f);   //  Marge autour de l'affichage proprement dit (% de largeur)
+        final RectF INTERNAL_MARGIN_COEFFS_DEFAULT = new RectF(0.02f, 0.02f, 0.02f, 0.02f);   //  Marge autour de l'affichage proprement dit (% de largeur)
+        final RectF EXTERNAL_MARGIN_COEFFS_DEFAULT = ALIGN_WIDTH_HEIGHT;   //  Positionnement par défaut de la grille dans le container parent
         final int DOT_SPACING_COEFF_DEFAULT = 20;    //  Taille de l'espace entre carrés (% de largeur d'un carré)
         final DOT_FORM DOT_FORM_DEFAULT = DOT_FORM.SQUARE;   //  Points carrés par défaut
         final long MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE = 0;   //   Intervalle de temps (ms) minimum imposé entre 2 click
@@ -102,8 +103,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         final String BACK_COLOR_DEFAULT = "000000";   //  Couleur du fond sur lequel repose la grille
         final BUTTON_STATES BUTTON_STATES_DEFAULT = BUTTON_STATES.UNPRESSED;
 
-        setExternalMarginCoeffs(ALIGN_WIDTH_HEIGHT);   //  Positionnement par défaut de la grille dans le parent
-        setInternalMarginCoeffs(INTERNAL_MARGIN_SIZE_COEFFS_DEFAULT);
+        setExternalMarginCoeffs(EXTERNAL_MARGIN_COEFFS_DEFAULT);
+        setInternalMarginCoeffs(INTERNAL_MARGIN_COEFFS_DEFAULT);
         setDotSpacingCoeff(String.valueOf(DOT_SPACING_COEFF_DEFAULT));
         setDotForm(DOT_FORM_DEFAULT);
         setMinClickTimeInterval(MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE);
