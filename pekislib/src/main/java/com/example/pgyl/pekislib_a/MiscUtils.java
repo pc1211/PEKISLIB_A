@@ -14,6 +14,10 @@ public class MiscUtils {
         public int height;
 
         BiDimensions(int width, int height) {
+            set(width, height);
+        }
+
+        public void set(int width, int height) {
             this.width = width;
             this.height = height;
         }

@@ -46,7 +46,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         Rect internalMargins;    //  Marge autour de l'affichage proprement dit
         int dotCellSize;         //  Taille d'un carré + Espace entre 2 carrés, à calculer selon le nombre de carrés en largeur (cf displayRect)
         int dotSize;             //  Taille d'un carré (dotCellSize / (1 + Coefficient de taille de l'espace entre carrés))
-        int slackWidth;          //  Compense les arrondis (dûs au calcul de dotCellSize et dotSize), de telle sorte que width = slackWidth + internalMargins.left + (displayRect.width -1) * dotCellSize + dotSize + internalMargins.right
+        int slackWidth;          //  Compense les arrondis (dûs au calcul de dotCellSize et dotSize), de telle sorte que internalMargins.left + (displayRect.width -1) * dotCellSize + dotSize + internalMargins.right +slackWidth = width
         int height;              //  internalMargins.top + (displayRect.width -1) * dotCellSize + dotSize + internalMargins.bottom
 
         DimensionsSet() {
@@ -190,7 +190,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         super.onDraw(canvas);
 
         drawing = true;
-        float radius = dimensionsSet.dotSize * .5f;   //  Pour les points ronds
+        float dotRadius = dimensionsSet.dotSize * .5f;   //  Pour les points ronds
         dotCellOrigin.x = dotMatrixRect.left + dimensionsSet.internalMargins.left;   //  Coordonnée x du 1er carré d'une ligne
         viewCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
         for (int i = 0; i <= (displayRect.width() - 1); i = i + 1) {   //  Parcourir la ligne
@@ -218,7 +218,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                 if (dotFormSquareOn) {  //  Point carré
                     viewCanvas.drawRect(dotCellOrigin.x, dotCellOrigin.y, dotCellOrigin.x + dimensionsSet.dotSize, dotCellOrigin.y + dimensionsSet.dotSize, dotPaint);
                 } else {  //  Point rond
-                    viewCanvas.drawCircle(dotCellOrigin.x + radius, dotCellOrigin.y + radius, radius, dotPaint);
+                    viewCanvas.drawCircle(dotCellOrigin.x + dotRadius, dotCellOrigin.y + dotRadius, dotRadius, dotPaint);
                 }
                 dotCellOrigin.y = dotCellOrigin.y + dimensionsSet.dotCellSize;   //  Passer au prochain carré dans la colonne
             }
@@ -505,7 +505,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         return (int) (length * marginCoeff + 0.5f);
     }
 
-    private int getDotCellSize(DimensionsSet dimensionsSet) {
+    private int getDotCellSize(DimensionsSet dimensionsSet) {  //  Solution de l'équation telle que internalMargins.left + (displayRect.width -1) * dotCellSize + dotSize + internalMargins.right = width (si pas d'arrondis)
         return (int) ((dimensionsSet.width - dimensionsSet.internalMargins.left - dimensionsSet.internalMargins.right) * (1 + dotSpacingCoeff) / (displayRect.width() * (1 + dotSpacingCoeff) - dotSpacingCoeff) + .5f);
     }
 
@@ -542,8 +542,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
             x = (xMin + xTop) / 2;
         } while (x != oldX);   //  Si x=oldX, on ne progresse plus => Accepter le dernier candidat
 
-        maxDimensions.width = xBest;
-        maxDimensions.height = yBest;
+        maxDimensions.set(xBest, yBest);
         return maxDimensions;
     }
 

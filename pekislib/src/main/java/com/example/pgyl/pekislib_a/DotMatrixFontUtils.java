@@ -29,8 +29,7 @@ public class DotMatrixFontUtils {
         }
         fontTextDimensions = defaultFont.getTextDimensions(defaultFontText);
         if (extraFont != null) {
-            fontTextDimensions.width = fontTextDimensions.width + extraFont.getTextDimensions(extraFontText).width;
-            fontTextDimensions.height = Math.max(extraFont.getTextDimensions(extraFontText).height, fontTextDimensions.height);
+            fontTextDimensions.set(fontTextDimensions.width + extraFont.getTextDimensions(extraFontText).width, Math.max(extraFont.getTextDimensions(extraFontText).height, fontTextDimensions.height));
         }
         return fontTextDimensions;
     }
