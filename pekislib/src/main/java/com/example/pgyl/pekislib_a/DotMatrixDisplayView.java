@@ -42,9 +42,9 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     private class DimensionsSet {
         int width;               //  Largeur donnée pour l'affichage
         Rect internalMargins;    //  Marge autour de l'affichage proprement dit
-        int dotCellSize;         //  Taille d'un carré dessiné + espace entre 2 carrés, à calculer selon le nombre de carrés en largeur (cf displayRect)
-        int dotSize;             //  Taille d'un carré dessiné (dotCellSize / (1 + Coefficient de taille de l'espace entre carrés))
-        int slackWidth;          //  Compense les arrondis dûs au calcul de dotCellSize et dotSize, de telle sorte que width = slackWidth + internalMargins.left + (displayRect.width -1) * dotCellSize + dotSize + internalMargins.right
+        int dotCellSize;         //  Taille d'un carré + Espace entre 2 carrés, à calculer selon le nombre de carrés en largeur (cf displayRect)
+        int dotSize;             //  Taille d'un carré (dotCellSize / (1 + Coefficient de taille de l'espace entre carrés))
+        int slackWidth;          //  Compense les arrondis (dûs au calcul de dotCellSize et dotSize), de telle sorte que width = slackWidth + internalMargins.left + (displayRect.width -1) * dotCellSize + dotSize + internalMargins.right
         int height;              //  internalMargins.top + (displayRect.width -1) * dotCellSize + dotSize + internalMargins.bottom
 
         DimensionsSet() {
@@ -69,7 +69,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     private float dotSpacingCoeff;
     private boolean dotFormSquareOn;
     private Paint dotPaint;
-    private PointF dotPoint;
+    private PointF dotCellOrigin;
     private boolean drawing;
     private Bitmap viewBitmap;
     private Canvas viewCanvas;
@@ -115,7 +115,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         dimensionsSet = new DimensionsSet();
         dimensionsSetTemp = new DimensionsSet();
         maxDimensions = new BiDimensions(0, 0);
-        dotPoint = new PointF();
+        dotCellOrigin = new PointF();
         drawing = false;
         invertOn = false;
         lastClickUpTime = 0;
@@ -189,9 +189,10 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         super.onDraw(canvas);
 
         drawing = true;
-        int w = getWidth();
+        float radius = dimensionsSet.dotSize * .5f;   //  Pour les points ronds
+        dotCellOrigin.x = dotMatrixRect.left + dimensionsSet.internalMargins.left;   //  Coordonnée x du 1er carré d'une ligne
         viewCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
-        for (int i = 0; i <= (displayRect.width() - 1); i = i + 1) {
+        for (int i = 0; i <= (displayRect.width() - 1); i = i + 1) {   //  Parcourir la ligne
             int gridX = displayRect.left + i;
             if (scrollRect != null) {
                 if ((gridX >= scrollRect.left) && (gridX <= (scrollRect.right - 1))) {  //  On est dans une zone éventuellement en cours de scroll
@@ -201,7 +202,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                     }
                 }
             }
-            for (int j = 0; j <= (displayRect.height() - 1); j = j + 1) {
+            dotCellOrigin.y = dotMatrixRect.top + dimensionsSet.internalMargins.top;   //  Coordonnée y du 1er carré d'une colonne
+            for (int j = 0; j <= (displayRect.height() - 1); j = j + 1) {   //  Parcourir la colonne
                 int gridY = displayRect.top + j;
                 if (scrollRect != null) {
                     if ((gridY >= scrollRect.top) && (gridY <= (scrollRect.bottom - 1))) {   //  On est dans une zone éventuellement en cours de scroll
@@ -212,14 +214,14 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                     }
                 }
                 dotPaint.setColor(((buttonState.equals(BUTTON_STATES.PRESSED)) ^ invertOn) ? colorValues[gridY][gridX].pressed : colorValues[gridY][gridX].unpressed);
-                dotPoint.set(dotMatrixRect.left + dimensionsSet.internalMargins.left + (float) i * dimensionsSet.dotCellSize, dotMatrixRect.top + dimensionsSet.internalMargins.top + (float) j * dimensionsSet.dotCellSize);
                 if (dotFormSquareOn) {  //  Point carré
-                    viewCanvas.drawRect(dotPoint.x, dotPoint.y, dotPoint.x + dimensionsSet.dotSize, dotPoint.y + dimensionsSet.dotSize, dotPaint);
+                    viewCanvas.drawRect(dotCellOrigin.x, dotCellOrigin.y, dotCellOrigin.x + dimensionsSet.dotSize, dotCellOrigin.y + dimensionsSet.dotSize, dotPaint);
                 } else {  //  Point rond
-                    int halfDotSize = dimensionsSet.dotSize / 2;
-                    viewCanvas.drawCircle(dotPoint.x + halfDotSize, dotPoint.y + halfDotSize, halfDotSize, dotPaint);
+                    viewCanvas.drawCircle(dotCellOrigin.x + radius, dotCellOrigin.y + radius, radius, dotPaint);
                 }
+                dotCellOrigin.offset(0, dimensionsSet.dotCellSize);   //  Passer au prochain carré dans la colonne
             }
+            dotCellOrigin.offset(dimensionsSet.dotCellSize, 0);   //  Passer au prochain carré dans la ligne
         }
         viewCanvas.drawRoundRect(dotMatrixRect, backCornerRadius, backCornerRadius, viewCanvasBackPaint);
         canvas.drawBitmap(viewBitmap, 0, 0, null);
