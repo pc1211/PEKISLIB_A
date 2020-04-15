@@ -219,9 +219,9 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                 } else {  //  Point rond
                     viewCanvas.drawCircle(dotCellOrigin.x + radius, dotCellOrigin.y + radius, radius, dotPaint);
                 }
-                dotCellOrigin.offset(0, dimensionsSet.dotCellSize);   //  Passer au prochain carré dans la colonne
+                dotCellOrigin.y = dotCellOrigin.y + dimensionsSet.dotCellSize;   //  Passer au prochain carré dans la colonne
             }
-            dotCellOrigin.offset(dimensionsSet.dotCellSize, 0);   //  Passer au prochain carré dans la ligne
+            dotCellOrigin.x = dotCellOrigin.x + dimensionsSet.dotCellSize;   //  Passer au prochain carré dans la ligne
         }
         viewCanvas.drawRoundRect(dotMatrixRect, backCornerRadius, backCornerRadius, viewCanvasBackPaint);
         canvas.drawBitmap(viewBitmap, 0, 0, null);
