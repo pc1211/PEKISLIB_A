@@ -487,11 +487,13 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     }
 
     private void setupDimensions(DimensionsSet dimensionsSet, int viewWidth) {  //  Ajustement à un entier pour éviter le dessin d'une grille irrégulière dans la largeur ou hauteur de ses éléments
+        final int SLACKWIDTH_TOL_COEFF = 20;   //  Tolérance d'excès de la largeur utilisée par rapport à la largeur disponible (en % du total des marges gauche et droite)
+
         dimensionsSet.width = viewWidth;
         dimensionsSet.internalMargins.set(getMarginSize(dimensionsSet.width, internalMarginCoeffs.left), getMarginSize(dimensionsSet.width, internalMarginCoeffs.top), getMarginSize(dimensionsSet.width, internalMarginCoeffs.right), getMarginSize(dimensionsSet.width, internalMarginCoeffs.bottom));
         dimensionsSet.dotCellSize = getDotCellSize(dimensionsSet);
         dimensionsSet.dotSize = getDotSize(dimensionsSet);
-        if (getSlackWidth(dimensionsSet) < -1) {   //  Les calculs de dotCellSize et dotSize ont été trop optimistes
+        if (getSlackWidth(dimensionsSet) < -(SLACKWIDTH_TOL_COEFF * (dimensionsSet.internalMargins.left + dimensionsSet.internalMargins.right) / 100)) {   //  Les calculs de dotCellSize et dotSize ont été trop optimistes
             dimensionsSet.dotCellSize = dimensionsSet.dotCellSize - 1;
             dimensionsSet.dotSize = getDotSize(dimensionsSet);
         }
@@ -512,7 +514,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     }
 
     private int getSlackWidth(DimensionsSet dimensionsSet) {
-        return dimensionsSet.width - dimensionsSet.internalMargins.left - (displayRect.width() - 1) * dimensionsSet.dotCellSize - dimensionsSet.dotSize - dimensionsSet.internalMargins.right;
+        return dimensionsSet.width - (dimensionsSet.internalMargins.left + (displayRect.width() - 1) * dimensionsSet.dotCellSize + dimensionsSet.dotSize + dimensionsSet.internalMargins.right);
     }
 
     private BiDimensions getMaxDimensions(int proposedWidth, int proposedHeight) {  // Trouver les dimensions maximum d'un rectangle pouvant afficher displayRect dans un rectangle de dimensions données
