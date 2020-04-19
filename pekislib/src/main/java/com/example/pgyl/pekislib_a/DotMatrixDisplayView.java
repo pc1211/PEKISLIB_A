@@ -76,6 +76,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     private Bitmap dotFormOverlayBitmap;
     private Paint dotFormOverlayPaint;
     private Paint dotFormTransparentPaint;
+    private Paint dotFormOpaquePaint;
     private Rect canvasRect;
     private RectF dotMatrixRect;
     private Paint viewCanvasBackPaint;
@@ -200,8 +201,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         super.onDraw(canvas);
 
         drawing = true;
-        dotCellOrigin.x = dotMatrixRect.left + dimensionsSet.internalMargins.left;   //  Coordonnée x du 1er carré d'une ligne
         viewCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
+        dotCellOrigin.x = dotMatrixRect.left + dimensionsSet.internalMargins.left;   //  Coordonnée x du 1er carré d'une ligne
         for (int i = 0; i <= (displayRect.width() - 1); i = i + 1) {   //  Parcourir la ligne
             int gridX = displayRect.left + i;
             if (scrollRect != null) {
@@ -224,11 +225,11 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                     }
                 }
                 dotPaint.setColor(((buttonState.equals(BUTTON_STATES.PRESSED)) ^ invertOn) ? gridStateColors[gridY][gridX].pressed : gridStateColors[gridY][gridX].unpressed);
-                viewCanvas.drawRect(dotCellOrigin.x, dotCellOrigin.y, dotCellOrigin.x + dimensionsSet.dotSize, dotCellOrigin.y + dimensionsSet.dotSize, dotPaint);
-                viewCanvas.drawBitmap(dotFormOverlayBitmap, dotCellOrigin.x, dotCellOrigin.y, dotFormOverlayPaint);  //  Poser l'overlay sur le carré pour obtenir la forme souhaitée
-                dotCellOrigin.y = dotCellOrigin.y + dimensionsSet.dotCellSize;   //  Passer au point dans la colonne
+                viewCanvas.drawBitmap(dotFormOverlayBitmap, dotCellOrigin.x, dotCellOrigin.y, dotFormOverlayPaint);  //  Overlay posé sur le carré pour obtenir la forme de point souhaitée
+                viewCanvas.drawRect(dotCellOrigin.x, dotCellOrigin.y, dotCellOrigin.x + dimensionsSet.dotSize, dotCellOrigin.y + dimensionsSet.dotSize, dotPaint);   //  Le carré
+                dotCellOrigin.y = dotCellOrigin.y + dimensionsSet.dotCellSize;   //  Passer au prochain point de la colonne
             }
-            dotCellOrigin.x = dotCellOrigin.x + dimensionsSet.dotCellSize;   //  Passer au prochain point dans la ligne
+            dotCellOrigin.x = dotCellOrigin.x + dimensionsSet.dotCellSize;   //  Passer au prochain point de la ligne
         }
         viewCanvas.drawRoundRect(dotMatrixRect, backCornerRadius, backCornerRadius, viewCanvasBackPaint);
         canvas.drawBitmap(viewBitmap, 0, 0, null);
@@ -317,17 +318,13 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         this.displayRect = displayRect;
     }
 
-    public void rebuildDimensions() {
+    public void rebuildStructure() {
         setupDimensions(dimensionsSet, getWidth());
-    }
-
-    public void rebuildDrawParameters() {
         setupDrawParameters();
     }
 
     public void setDotForm(DOT_FORM dotForm) {
         this.dotForm = dotForm;     //  SQUARE ou ROUND
-        createDotFormOverlayBitmap();   //  Adapter l'overlay à la nouvelle forme
     }
 
     public void setDotSpacingCoeff(String dotSpacingCoeff) {   //  Taille de l'espace entre chaque carré (en % de largeur d'un carré)
@@ -345,7 +342,6 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     public void setBackColor(String color) {
         backColor = Color.parseColor(COLOR_PREFIX + color);
         viewCanvasBackPaint.setColor(backColor);
-        createDotFormOverlayBitmap();   //  Adapter l'overlay à la nouvelle couleur de fond
     }
 
     public void invert() {
@@ -480,13 +476,13 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     private void setupDotPaint() {
         dotPaint = new Paint();
         dotPaint.setAntiAlias(true);
-        dotPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+        dotPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OVER));
     }
 
     private void setupDotFormOverlayPaint() {
         dotFormOverlayPaint = new Paint();
         dotFormOverlayPaint.setAntiAlias(true);
-        dotFormOverlayPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OVER));
+        dotFormOverlayPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
     }
 
     private void setupDotFormTransparentPaint() {
@@ -494,7 +490,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         dotFormTransparentPaint.setAntiAlias(true);
         dotFormTransparentPaint.setColor(Color.TRANSPARENT);
         dotFormTransparentPaint.setStyle(Paint.Style.FILL);
-        dotFormTransparentPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST));
+        dotFormTransparentPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
     }
 
     private void setupViewCanvasBackPaint() {
@@ -504,9 +500,11 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     }
 
     private void setupDrawParameters() {
-        dotMatrixRect = getSubRect(canvasRect, dimensionsSet.width - dimensionsSet.slackWidth, dimensionsSet.height, externalMarginCoeffs);  //  internalMargins incluses
-        backCornerRadius = (Math.min(dotMatrixRect.width(), dotMatrixRect.height()) * backCornerRadiusPercent) / 200;
-        createDotFormOverlayBitmap();
+        if (canvasRect != null) {
+            dotMatrixRect = getSubRect(canvasRect, dimensionsSet.width - dimensionsSet.slackWidth, dimensionsSet.height, externalMarginCoeffs);  //  internalMargins incluses
+            backCornerRadius = (Math.min(dotMatrixRect.width(), dotMatrixRect.height()) * backCornerRadiusPercent) / 200;
+            createDotFormOverlayBitmap();
+        }
     }
 
     private void setupDimensions(DimensionsSet dimensionsSet, int viewWidth) {  //  Ajustement à un entier pour éviter le dessin d'une grille irrégulière dans la largeur ou hauteur de ses éléments
@@ -540,19 +538,18 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         return dimensionsSet.width - (dimensionsSet.internalMargins.left + (displayRect.width() - 1) * dimensionsSet.dotCellSize + dimensionsSet.dotSize + dimensionsSet.internalMargins.right);
     }
 
-    private void createDotFormOverlayBitmap() {   //  Créer une forme transparente sur fond de backColor, qui sera posée sur un carré pour le transformer dans la forme désirée
-        if (dimensionsSet.dotSize != 0) {
-            if (dotFormOverlayBitmap != null) {
-                dotFormOverlayBitmap.recycle();
-            }
-            dotFormOverlayBitmap = Bitmap.createBitmap(dimensionsSet.dotSize, dimensionsSet.dotSize, Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(dotFormOverlayBitmap);
-            canvas.drawColor(backColor, PorterDuff.Mode.SRC);  //  Maintenant, on va faire des trous dedans :)
-            if (dotForm.equals(DOT_FORM.SQUARE)) {
-                canvas.drawRect(0, 0, dimensionsSet.dotSize, dimensionsSet.dotSize, dotFormTransparentPaint);  //  Carré transparent (overlay inutile dans ce cas)
-            } else {  //  Point rond
-                canvas.drawCircle(dimensionsSet.dotSize * .5f, dimensionsSet.dotSize * .5f, dimensionsSet.dotSize, dotFormTransparentPaint);  //  Disque transparent
-            }
+    private void createDotFormOverlayBitmap() {   //  Créer une forme transparente sur fond de backColor, qui sera posée sur un carré pour obtenir la forme de point désirée
+        if (dotFormOverlayBitmap != null) {
+            dotFormOverlayBitmap.recycle();
+        }
+        dotFormOverlayBitmap = Bitmap.createBitmap(dimensionsSet.dotSize, dimensionsSet.dotSize, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(dotFormOverlayBitmap);
+        canvas.drawColor(backColor, PorterDuff.Mode.SRC);   //  Maintenant on va faire des trous dedans :)
+        if (dotForm.equals(DOT_FORM.SQUARE)) {
+            canvas.drawRect(0, 0, dimensionsSet.dotSize, dimensionsSet.dotSize, dotFormTransparentPaint);  //  Carré transparent (overlay inutile dans ce cas)
+        } else {  //  Point rond
+            float d = dimensionsSet.dotSize * .5f;
+            canvas.drawCircle(d, d, d, dotFormTransparentPaint);  //  Disque transparent
         }
     }
 
