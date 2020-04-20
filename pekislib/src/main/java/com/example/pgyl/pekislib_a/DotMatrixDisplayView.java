@@ -21,7 +21,7 @@ import static com.example.pgyl.pekislib_a.MiscUtils.BiDimensions;
 import static com.example.pgyl.pekislib_a.PointRectUtils.ALIGN_WIDTH_HEIGHT;
 import static com.example.pgyl.pekislib_a.PointRectUtils.getSubRect;
 
-public final class DotMatrixDisplayView extends View {  //  Affichage de caractères dans une grille de carrés avec coordonnées (x,y)  ((0,0) étant en haut à gauche de la grille)
+public final class DotMatrixDisplayView extends View {  //  Affichage de caractères dans une grille de points avec coordonnées (x,y)  ((0,0) étant en haut à gauche de la grille)
     public interface onCustomClickListener {
         void onCustomClick();
     }
@@ -32,7 +32,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
 
     private onCustomClickListener mOnCustomClickListener;
 
-    public enum DOT_FORM {SQUARE, ROUND}   //  points carrés ou ronds  (Pour obtenir des points de la forme souhaitée, un overlay (bitmap) "troué" sera posé sur des carrés)
+    public enum DOT_FORM {SQUARE, ROUND}   //  points carrés ou ronds  (Pour obtenir des points de la forme souhaitée, un pochoir sera posé sur des carrés)
 
     public enum SCROLL_DIRECTIONS {LEFT, RIGHT, TOP, BOTTOM}
 
@@ -203,7 +203,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
 
         drawing = true;
         viewCanvas.drawBitmap(dotFormOverlayBitmap, displayRect.left, displayRect.top, dotFormOverlayPaint);  //  Overlay (pochoir) posé sur les carrés pour leur donner la forme de point souhaitée
-        dotCellOrigin.x = dotMatrixRect.left + dimensionsSet.internalMargins.left;   //  Coordonnée x du 1er carré d'une ligne
+        dotCellOrigin.x = dotMatrixRect.left + dimensionsSet.internalMargins.left;   //  Coordonnée x du 1er point d'une ligne
         for (int i = 0; i <= (displayRect.width() - 1); i = i + 1) {   //  Parcourir la ligne
             int gridX = displayRect.left + i;
             if (scrollRect != null) {
@@ -214,7 +214,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                     }
                 }
             }
-            dotCellOrigin.y = dotMatrixRect.top + dimensionsSet.internalMargins.top;   //  Coordonnée y du 1er carré d'une colonne
+            dotCellOrigin.y = dotMatrixRect.top + dimensionsSet.internalMargins.top;   //  Coordonnée y du 1er point d'une colonne
             for (int j = 0; j <= (displayRect.height() - 1); j = j + 1) {   //  Parcourir la colonne
                 int gridY = displayRect.top + j;
                 if (scrollRect != null) {
@@ -226,7 +226,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                     }
                 }
                 dotPaint.setColor(((buttonState.equals(BUTTON_STATES.PRESSED)) ^ invertOn) ? gridStateColors[gridY][gridX].pressed : gridStateColors[gridY][gridX].unpressed);
-                viewCanvas.drawRect(dotCellOrigin.x, dotCellOrigin.y, dotCellOrigin.x + dimensionsSet.dotSize, dotCellOrigin.y + dimensionsSet.dotSize, dotPaint);   //  Le carré (dans ce qui reste comme espace pour lui dans le pochoir)
+                viewCanvas.drawRect(dotCellOrigin.x, dotCellOrigin.y, dotCellOrigin.x + dimensionsSet.dotSize, dotCellOrigin.y + dimensionsSet.dotSize, dotPaint);   //  Dessiner un carré (dans ce qui reste comme espace pour lui dans le pochoir)
                 dotCellOrigin.y = dotCellOrigin.y + dimensionsSet.dotCellSize;   //  Passer au prochain point de la colonne
             }
             dotCellOrigin.x = dotCellOrigin.x + dimensionsSet.dotCellSize;   //  Passer au prochain point de la ligne
@@ -546,9 +546,9 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         dotFormOverlayOpaquePaint.setColor(backColor);
         canvas.drawRoundRect(dotMatrixRect, backCornerRadius, backCornerRadius, dotFormOverlayOpaquePaint);   //  Maintenant on va faire des trous dedans :)
 
-        dotCellOrigin.x = dotMatrixRect.left + dimensionsSet.internalMargins.left;   //  Coordonnée x du 1er carré d'une ligne
+        dotCellOrigin.x = dotMatrixRect.left + dimensionsSet.internalMargins.left;   //  Coordonnée x du 1er point d'une ligne
         for (int i = 0; i <= (displayRect.width() - 1); i = i + 1) {   //  Parcourir la ligne
-            dotCellOrigin.y = dotMatrixRect.top + dimensionsSet.internalMargins.top;   //  Coordonnée y du 1er carré d'une colonne
+            dotCellOrigin.y = dotMatrixRect.top + dimensionsSet.internalMargins.top;   //  Coordonnée y du 1er point d'une colonne
             for (int j = 0; j <= (displayRect.height() - 1); j = j + 1) {   //  Parcourir la colonne
                 if (dotForm.equals(DOT_FORM.SQUARE)) {   //  Point carré
                     canvas.drawRect(dotCellOrigin.x, dotCellOrigin.y, dotCellOrigin.x + dimensionsSet.dotSize, dotCellOrigin.y + dimensionsSet.dotSize, dotFormOverlayTransparentPaint);  //  Carré transparent
@@ -562,7 +562,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         }
     }
 
-    private BiDimensions getMaxDimensions(int proposedWidth, int proposedHeight) {  // Trouver les dimensions maximum d'un rectangle pouvant afficher displayRect dans un rectangle de dimensions données
+    private BiDimensions getMaxDimensions(int proposedWidth, int proposedHeight) {   //  Trouver les dimensions maximum d'un rectangle pouvant afficher la grille dans un rectangle de dimensions données
         int xTop = proposedWidth;
         int hMax = proposedHeight;
         int xMin = 0;
