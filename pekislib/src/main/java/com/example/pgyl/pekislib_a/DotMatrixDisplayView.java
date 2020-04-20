@@ -68,12 +68,12 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     private Point symbolPos;
     private float dotSpacingCoeff;
     private DOT_FORM dotForm;
-    private Paint dotPaint;
     private PointF dotCellOrigin;
     private boolean drawing;
-    private Bitmap viewBitmap;
     private Canvas viewCanvas;
+    private Bitmap viewBitmap;
     private Bitmap dotFormOverlayBitmap;
+    private Paint dotPaint;
     private Paint dotFormOverlayPaint;
     private Paint dotFormOverlayTransparentPaint;
     private Paint dotFormOverlayOpaquePaint;
@@ -146,13 +146,15 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         dimensionsSetTemp = null;
         maxDimensions = null;
         gridStateColors = null;
-        dotFormOverlayBitmap.recycle();
-        dotFormOverlayBitmap = null;
-        dotFormOverlayPaint = null;
+        dotPaint = null;
         dotFormOverlayOpaquePaint = null;
         dotFormOverlayTransparentPaint = null;
+        dotFormOverlayPaint = null;
+        dotFormOverlayBitmap.recycle();
+        dotFormOverlayBitmap = null;
+        viewBitmap.recycle();
+        viewBitmap = null;
         viewCanvas = null;
-        dotPaint = null;
     }
 
     @Override
@@ -200,8 +202,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         super.onDraw(canvas);
 
         drawing = true;
-        viewCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
-        viewCanvas.drawBitmap(dotFormOverlayBitmap, displayRect.left, displayRect.top, dotFormOverlayPaint);  //  Overlay posé sur les carrés pour leur donner la forme de point souhaitée
+        viewCanvas.drawBitmap(dotFormOverlayBitmap, displayRect.left, displayRect.top, dotFormOverlayPaint);  //  Overlay (pochoir) posé sur les carrés pour leur donner la forme de point souhaitée
         dotCellOrigin.x = dotMatrixRect.left + dimensionsSet.internalMargins.left;   //  Coordonnée x du 1er carré d'une ligne
         for (int i = 0; i <= (displayRect.width() - 1); i = i + 1) {   //  Parcourir la ligne
             int gridX = displayRect.left + i;
@@ -225,7 +226,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                     }
                 }
                 dotPaint.setColor(((buttonState.equals(BUTTON_STATES.PRESSED)) ^ invertOn) ? gridStateColors[gridY][gridX].pressed : gridStateColors[gridY][gridX].unpressed);
-                viewCanvas.drawRect(dotCellOrigin.x, dotCellOrigin.y, dotCellOrigin.x + dimensionsSet.dotSize, dotCellOrigin.y + dimensionsSet.dotSize, dotPaint);   //  Le carré
+                viewCanvas.drawRect(dotCellOrigin.x, dotCellOrigin.y, dotCellOrigin.x + dimensionsSet.dotSize, dotCellOrigin.y + dimensionsSet.dotSize, dotPaint);   //  Le carré (dans ce qui reste comme espace pour lui dans le pochoir)
                 dotCellOrigin.y = dotCellOrigin.y + dimensionsSet.dotCellSize;   //  Passer au prochain point de la colonne
             }
             dotCellOrigin.x = dotCellOrigin.x + dimensionsSet.dotCellSize;   //  Passer au prochain point de la ligne
@@ -539,11 +540,11 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         if (dotFormOverlayBitmap != null) {
             dotFormOverlayBitmap.recycle();
         }
-        dotFormOverlayBitmap = Bitmap.createBitmap((int) dotMatrixRect.width(), (int) dotMatrixRect.height(), Bitmap.Config.ARGB_8888);
+        dotFormOverlayBitmap = Bitmap.createBitmap(canvasRect.width(), canvasRect.height(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(dotFormOverlayBitmap);
-        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);   //  Maintenant on va faire des trous dedans :)
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
         dotFormOverlayOpaquePaint.setColor(backColor);
-        canvas.drawRoundRect(dotMatrixRect, backCornerRadius, backCornerRadius, dotFormOverlayOpaquePaint);
+        canvas.drawRoundRect(dotMatrixRect, backCornerRadius, backCornerRadius, dotFormOverlayOpaquePaint);   //  Maintenant on va faire des trous dedans :)
 
         dotCellOrigin.x = dotMatrixRect.left + dimensionsSet.internalMargins.left;   //  Coordonnée x du 1er carré d'une ligne
         for (int i = 0; i <= (displayRect.width() - 1); i = i + 1) {   //  Parcourir la ligne
@@ -552,8 +553,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                 if (dotForm.equals(DOT_FORM.SQUARE)) {   //  Point carré
                     canvas.drawRect(dotCellOrigin.x, dotCellOrigin.y, dotCellOrigin.x + dimensionsSet.dotSize, dotCellOrigin.y + dimensionsSet.dotSize, dotFormOverlayTransparentPaint);  //  Carré transparent
                 } else {  //  Point rond
-                    float d = dimensionsSet.dotSize * .5f;
-                    canvas.drawCircle(dotCellOrigin.x + d, dotCellOrigin.y + d, d, dotFormOverlayTransparentPaint);  //  Disque transparent
+                    float radius = dimensionsSet.dotSize * .5f;
+                    canvas.drawCircle(dotCellOrigin.x + radius, dotCellOrigin.y + radius, radius, dotFormOverlayTransparentPaint);  //  Disque transparent
                 }
                 dotCellOrigin.y = dotCellOrigin.y + dimensionsSet.dotCellSize;   //  Passer au prochain point de la colonne
             }
