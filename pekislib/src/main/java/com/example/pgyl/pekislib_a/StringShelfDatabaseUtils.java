@@ -36,6 +36,14 @@ public class StringShelfDatabaseUtils {
         stringShelfDatabase.insertOrReplaceRowById(tableName, TABLE_IDS.CURRENT.toString(), values);
     }
 
+    public static String getCurrent(StringShelfDatabase stringShelfDatabase, String tableName, int index) {
+        return stringShelfDatabase.selectFieldByIdOrCreate(tableName, TABLE_IDS.CURRENT.toString(), index);
+    }
+
+    public static void setCurrent(StringShelfDatabase stringShelfDatabase, String tableName, int index, String value) {
+        stringShelfDatabase.insertOrReplaceFieldById(tableName, TABLE_IDS.CURRENT.toString(), index, value);
+    }
+
     public static String[] getLabels(StringShelfDatabase stringShelfDatabase, String tableName) {
         return stringShelfDatabase.selectRowByIdOrCreate(tableName, TABLE_IDS.LABEL.toString());
     }
