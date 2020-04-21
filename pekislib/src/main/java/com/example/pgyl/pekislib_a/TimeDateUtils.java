@@ -21,7 +21,7 @@ public class TimeDateUtils {
 
         private long durationMs;              //  Durée de l'unité (en millisecondes)
         private String formatDNumberFormat;   //  Format D:  HH:MM:SS.nnn               p.ex. 03:00:02.000,  00:02:00.06
-        private String formatDSeparator;
+        private String formatDSeparator;      //  :
         private String formatDLSeparator;     //  Format DL:   ...h...m...s...t...u...v   p.ex. 3h2s,          2m6u ou 2m0s06
         private TIME_UNITS nextTimeUnit;      //  Prochaine unité à décoder (H->M->S...)
 

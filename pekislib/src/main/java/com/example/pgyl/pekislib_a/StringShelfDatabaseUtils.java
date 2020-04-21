@@ -1,7 +1,5 @@
 package com.example.pgyl.pekislib_a;
 
-import com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITIES;
-
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.ACTIVITY_START_STATUS;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.TABLE_IDS;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.getActivityInfosStartStatusIndex;
@@ -12,6 +10,30 @@ public class StringShelfDatabaseUtils {
 
     public static void createPekislibTableIfNotExists(StringShelfDatabase stringShelfDatabase, String tableName) {
         stringShelfDatabase.createTableIfNotExists(tableName, 1 + getPekislibTableDataFieldsCount(tableName));   //  Champ ID + Données
+    }
+
+    public static String[] getCurrentValuesInActivity(StringShelfDatabase stringShelfDatabase, String activityName, String tableName) {
+        return stringShelfDatabase.selectRowByIdOrCreate(tableName, TABLE_IDS.CURRENT.toString() + activityName);
+    }
+
+    public static void setCurrentValuesInActivity(StringShelfDatabase stringShelfDatabase, String activityName, String tableName, String[] values) {
+        stringShelfDatabase.insertOrReplaceRowById(tableName, TABLE_IDS.CURRENT.toString() + activityName, values);
+    }
+
+    public static String getCurrentValueInActivity(StringShelfDatabase stringShelfDatabase, String activityName, String tableName, int index) {
+        return stringShelfDatabase.selectFieldByIdOrCreate(tableName, TABLE_IDS.CURRENT.toString() + activityName, index);
+    }
+
+    public static void setCurrentValueInActivity(StringShelfDatabase stringShelfDatabase, String activityName, String tableName, int index, String value) {
+        stringShelfDatabase.insertOrReplaceFieldById(tableName, TABLE_IDS.CURRENT.toString() + activityName, index, value);
+    }
+
+    public static String[] getCurrents(StringShelfDatabase stringShelfDatabase, String tableName) {
+        return stringShelfDatabase.selectRowByIdOrCreate(tableName, TABLE_IDS.CURRENT.toString());
+    }
+
+    public static void setCurrents(StringShelfDatabase stringShelfDatabase, String tableName, String[] values) {
+        stringShelfDatabase.insertOrReplaceRowById(tableName, TABLE_IDS.CURRENT.toString(), values);
     }
 
     public static String[] getLabels(StringShelfDatabase stringShelfDatabase, String tableName) {
@@ -54,67 +76,13 @@ public class StringShelfDatabaseUtils {
         stringShelfDatabase.insertOrReplaceRowById(tableName, TABLE_IDS.DEFAULT.toString(), values);
     }
 
-    //region COLORS
-    public static String[] getCurrentColorsInColorPickerActivity(StringShelfDatabase stringShelfDatabase, String tableName) {
-        return stringShelfDatabase.selectRowByIdOrCreate(tableName, TABLE_IDS.CURRENT.toString() + PEKISLIB_ACTIVITIES.COLOR_PICKER.toString());
-    }
-
-    public static void setCurrentColorsInColorPickerActivity(StringShelfDatabase stringShelfDatabase, String tableName, String[] colors) {
-        stringShelfDatabase.insertOrReplaceRowById(tableName, TABLE_IDS.CURRENT.toString() + PEKISLIB_ACTIVITIES.COLOR_PICKER.toString(), colors);
-    }
-    //endregion
-
     //region ACTIVITY_INFOS
-    public static boolean isColdStartStatusInColorPickerActivity(StringShelfDatabase stringShelfDatabase) {
-        return isColdStartStatusInActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.COLOR_PICKER.toString());
-    }
-
-    public static boolean isColdStartStatusInPresetsActivity(StringShelfDatabase stringShelfDatabase) {
-        return isColdStartStatusInActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.PRESETS.toString());
-    }
-
-    public static boolean isColdStartStatusInInputButtonsActivity(StringShelfDatabase stringShelfDatabase) {
-        return isColdStartStatusInActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString());
-    }
-
-    public static void setStartStatusInColorPickerActivity(StringShelfDatabase stringShelfDatabase, ACTIVITY_START_STATUS activityStartStatus) {
-        setStartStatusInActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.COLOR_PICKER.toString(), activityStartStatus);
-    }
-
-    public static void setStartStatusInPresetsActivity(StringShelfDatabase stringShelfDatabase, ACTIVITY_START_STATUS activityStartStatus) {
-        setStartStatusInActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.PRESETS.toString(), activityStartStatus);
-    }
-
-    public static void setStartStatusInInputButtonsActivity(StringShelfDatabase stringShelfDatabase, ACTIVITY_START_STATUS activityStartStatus) {
-        setStartStatusInActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), activityStartStatus);
-    }
-
     public static boolean isColdStartStatusInActivity(StringShelfDatabase stringShelfDatabase, String activityName) {
         return stringShelfDatabase.selectFieldByIdOrCreate(getActivityInfosTableName(), activityName, getActivityInfosStartStatusIndex()).equals(ACTIVITY_START_STATUS.COLD.toString());
     }
 
     public static void setStartStatusInActivity(StringShelfDatabase stringShelfDatabase, String activityName, ACTIVITY_START_STATUS activityStartStatus) {
         stringShelfDatabase.insertOrReplaceFieldById(getActivityInfosTableName(), activityName, getActivityInfosStartStatusIndex(), activityStartStatus.toString());
-    }
-    //endregion
-
-    //region INPUT_BUTTONS
-    public static String getCurrentEntryInInputButtonsActivity(StringShelfDatabase stringShelfDatabase, String tableName, int index) {
-        return stringShelfDatabase.selectFieldByIdOrCreate(tableName, TABLE_IDS.CURRENT.toString() + PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), index);
-    }
-
-    public static void setCurrentEntryInInputButtonsActivity(StringShelfDatabase stringShelfDatabase, String tableName, int index, String value) {
-        stringShelfDatabase.insertOrReplaceFieldById(tableName, TABLE_IDS.CURRENT.toString() + PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), index, value);
-    }
-    //endregion
-
-    //region PRESETS
-    public static String[] getCurrentPresetInPresetsActivity(StringShelfDatabase stringShelfDatabase, String tableName) {
-        return stringShelfDatabase.selectRowByIdOrCreate(tableName, TABLE_IDS.CURRENT.toString() + PEKISLIB_ACTIVITIES.PRESETS.toString());
-    }
-
-    public static void setCurrentPresetInPresetsActivity(StringShelfDatabase stringShelfDatabase, String tableName, String[] values) {
-        stringShelfDatabase.insertOrReplaceRowById(tableName, TABLE_IDS.CURRENT.toString() + PEKISLIB_ACTIVITIES.PRESETS.toString(), values);
     }
     //endregion
 

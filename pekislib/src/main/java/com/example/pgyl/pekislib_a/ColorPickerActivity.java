@@ -22,8 +22,8 @@ import java.util.logging.Logger;
 
 import static com.example.pgyl.pekislib_a.ColorUtils.HSVToRGB;
 import static com.example.pgyl.pekislib_a.Constants.ACTIVITY_EXTRA_KEYS;
-import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_MASK;
+import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
 import static com.example.pgyl.pekislib_a.Constants.HEX_RADIX;
 import static com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITIES;
 import static com.example.pgyl.pekislib_a.Constants.SHP_FILE_NAME_SUFFIX;
@@ -34,17 +34,13 @@ import static com.example.pgyl.pekislib_a.PresetsActivity.PRESETS_ACTIVITY_EXTRA
 import static com.example.pgyl.pekislib_a.StringShelfDatabase.TABLE_DATA_INDEX;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.ACTIVITY_START_STATUS;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.TABLE_EXTRA_KEYS;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentColorsInColorPickerActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentPresetInPresetsActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentEntryInInputButtonsActivity;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentValueInActivity;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentValuesInActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getLabels;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.isColdStartStatusInColorPickerActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentColorsInColorPickerActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentPresetInPresetsActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentEntryInInputButtonsActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatusInColorPickerActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatusInInputButtonsActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatusInPresetsActivity;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.isColdStartStatusInActivity;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentValueInActivity;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentValuesInActivity;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatusInActivity;
 
 public class ColorPickerActivity extends Activity {
     //region Constantes
@@ -127,7 +123,7 @@ public class ColorPickerActivity extends Activity {
         super.onPause();
 
         savePreferences();
-        setCurrentColorsInColorPickerActivity(stringShelfDatabase, tableName, colors);
+        setCurrentValuesInActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.COLOR_PICKER.toString(), tableName, colors);
         stringShelfDatabase.close();
         stringShelfDatabase = null;
         colorWheelViewUpdater.close();
@@ -141,11 +137,11 @@ public class ColorPickerActivity extends Activity {
         shpFileName = getPackageName() + "." + getClass().getSimpleName() + SHP_FILE_NAME_SUFFIX;
         tableName = getIntent().getStringExtra(TABLE_EXTRA_KEYS.TABLE.toString());
         setupStringShelfDatabase();
-        colors = getCurrentColorsInColorPickerActivity(stringShelfDatabase, tableName);
+        colors = getCurrentValuesInActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.COLOR_PICKER.toString(), tableName);
         labelNames = getLabels(stringShelfDatabase, tableName);
 
-        if (isColdStartStatusInColorPickerActivity(stringShelfDatabase)) {
-            setStartStatusInColorPickerActivity(stringShelfDatabase, ACTIVITY_START_STATUS.HOT);
+        if (isColdStartStatusInActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.COLOR_PICKER.toString())) {
+            setStartStatusInActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.COLOR_PICKER.toString(), ACTIVITY_START_STATUS.HOT);
             colorIndex = COLOR_INDEX_DEFAULT_VALUE;
             colorSpace = COLOR_SPACE_DEFAULT_VALUE;
         } else {
@@ -154,11 +150,11 @@ public class ColorPickerActivity extends Activity {
             if (validReturnFromCalledActivity) {
                 validReturnFromCalledActivity = false;
                 if (returnsFromInputButtonsActivity()) {
-                    String colorText = getCurrentEntryInInputButtonsActivity(stringShelfDatabase, tableName, colorIndex);
+                    String colorText = getCurrentValueInActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, colorIndex);
                     colors[colorIndex] = ((colorSpace.equals(COLOR_SPACES.RGB)) ? colorText : HSVToRGB(colorText));  //  HSV dégradé
                 }
                 if (returnsFromPresetsActivity()) {
-                    colors = getCurrentPresetInPresetsActivity(stringShelfDatabase, tableName);
+                    colors = getCurrentValuesInActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.PRESETS.toString(), tableName);
                 }
             }
         }
@@ -243,12 +239,12 @@ public class ColorPickerActivity extends Activity {
     }
 
     private void onButtonClickColorValue() {
-        setCurrentEntryInInputButtonsActivity(stringShelfDatabase, tableName, colorIndex, getSeekBarsProgressHexString());
+        setCurrentValueInActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, colorIndex, getSeekBarsProgressHexString());
         launchInputButtonsActivity();
     }
 
     private void onButtonClickPresets() {
-        setCurrentPresetInPresetsActivity(stringShelfDatabase, tableName, colors);
+        setCurrentValuesInActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.PRESETS.toString(), tableName, colors);
         launchPresetsActivity();
     }
 
@@ -446,7 +442,7 @@ public class ColorPickerActivity extends Activity {
     }
 
     private void launchInputButtonsActivity() {
-        setStartStatusInInputButtonsActivity(stringShelfDatabase, ACTIVITY_START_STATUS.COLD);
+        setStartStatusInActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), ACTIVITY_START_STATUS.COLD);
         Intent callingIntent = new Intent(this, InputButtonsActivity.class);
         callingIntent.putExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString(), labelNames[colorIndex]);
         callingIntent.putExtra(TABLE_EXTRA_KEYS.TABLE.toString(), tableName);
@@ -457,7 +453,7 @@ public class ColorPickerActivity extends Activity {
     private void launchPresetsActivity() {
         final String SEPARATOR = " - ";
 
-        setStartStatusInPresetsActivity(stringShelfDatabase, ACTIVITY_START_STATUS.COLD);
+        setStartStatusInActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.PRESETS.toString(), ACTIVITY_START_STATUS.COLD);
         Intent callingIntent = new Intent(this, PresetsActivity.class);
         callingIntent.putExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString(), "Color Presets");
         callingIntent.putExtra(PRESETS_ACTIVITY_EXTRA_KEYS.SEPARATOR.toString(), SEPARATOR);
