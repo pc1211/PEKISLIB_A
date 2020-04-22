@@ -76,7 +76,6 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
     private Paint dotPaint;
     private Paint dotFormStencilPaint;
     private Paint dotFormStencilTransparentPaint;
-    private Paint dotFormStencilOpaquePaint;
     private Rect canvasRect;
     private RectF dotMatrixRect;
     private float backCornerRadius;
@@ -127,7 +126,6 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
 
         setupDotPaint();
         setupDotFormStencilPaint();
-        setupDotFormStencilOpaquePaint();
         setupDotFormStencilTransparentPaint();
         setBackColor(BACK_COLOR_DEFAULT);
         setOnTouchListener(new OnTouchListener() {
@@ -147,7 +145,6 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         maxDimensions = null;
         gridStateColors = null;
         dotPaint = null;
-        dotFormStencilOpaquePaint = null;
         dotFormStencilTransparentPaint = null;
         dotFormStencilPaint = null;
         dotFormStencilBitmap.recycle();
@@ -483,12 +480,6 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         dotFormStencilPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
     }
 
-    private void setupDotFormStencilOpaquePaint() {
-        dotFormStencilOpaquePaint = new Paint();
-        dotFormStencilOpaquePaint.setAntiAlias(true);
-        dotFormStencilOpaquePaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
-    }
-
     private void setupDotFormStencilTransparentPaint() {
         dotFormStencilTransparentPaint = new Paint();
         dotFormStencilTransparentPaint.setAntiAlias(true);
@@ -543,8 +534,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         dotFormStencilBitmap = Bitmap.createBitmap(canvasRect.width(), canvasRect.height(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(dotFormStencilBitmap);
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
-        dotFormStencilOpaquePaint.setColor(backColor);
-        canvas.drawRoundRect(dotMatrixRect, backCornerRadius, backCornerRadius, dotFormStencilOpaquePaint);   //  Maintenant on va faire des trous dedans :)
+        dotFormStencilPaint.setColor(backColor);
+        canvas.drawRoundRect(dotMatrixRect, backCornerRadius, backCornerRadius, dotFormStencilPaint);   //  Maintenant on va faire des trous dedans :)
 
         dotCellOrigin.x = dotMatrixRect.left + dimensionsSet.internalMargins.left;   //  Coordonn√©e x du 1er point d'une ligne
         for (int i = 0; i <= (displayRect.width() - 1); i = i + 1) {   //  Parcourir la ligne
