@@ -12,19 +12,19 @@ public class StringShelfDatabaseUtils {
         stringShelfDatabase.createTableIfNotExists(tableName, 1 + getPekislibTableDataFieldsCount(tableName));   //  Champ ID + Données
     }
 
-    public static String[] getCurrentValuesInActivity(StringShelfDatabase stringShelfDatabase, String activityName, String tableName) {
+    public static String[] getCurrentValuesFromActivity(StringShelfDatabase stringShelfDatabase, String activityName, String tableName) {
         return stringShelfDatabase.selectRowByIdOrCreate(tableName, TABLE_IDS.CURRENT.toString() + activityName);
     }
 
-    public static void setCurrentValuesInActivity(StringShelfDatabase stringShelfDatabase, String activityName, String tableName, String[] values) {
+    public static void setCurrentValuesForActivity(StringShelfDatabase stringShelfDatabase, String activityName, String tableName, String[] values) {
         stringShelfDatabase.insertOrReplaceRowById(tableName, TABLE_IDS.CURRENT.toString() + activityName, values);
     }
 
-    public static String getCurrentValueInActivity(StringShelfDatabase stringShelfDatabase, String activityName, String tableName, int index) {
+    public static String getCurrentValueFromActivity(StringShelfDatabase stringShelfDatabase, String activityName, String tableName, int index) {
         return stringShelfDatabase.selectFieldByIdOrCreate(tableName, TABLE_IDS.CURRENT.toString() + activityName, index);
     }
 
-    public static void setCurrentValueInActivity(StringShelfDatabase stringShelfDatabase, String activityName, String tableName, int index, String value) {
+    public static void setCurrentValueForActivity(StringShelfDatabase stringShelfDatabase, String activityName, String tableName, int index, String value) {
         stringShelfDatabase.insertOrReplaceFieldById(tableName, TABLE_IDS.CURRENT.toString() + activityName, index, value);
     }
 
@@ -85,11 +85,11 @@ public class StringShelfDatabaseUtils {
     }
 
     //region ACTIVITY_INFOS
-    public static boolean isColdStartStatusInActivity(StringShelfDatabase stringShelfDatabase, String activityName) {
+    public static boolean isColdStartStatusOfActivity(StringShelfDatabase stringShelfDatabase, String activityName) {
         return stringShelfDatabase.selectFieldByIdOrCreate(getActivityInfosTableName(), activityName, getActivityInfosStartStatusIndex()).equals(ACTIVITY_START_STATUS.COLD.toString());
     }
 
-    public static void setStartStatusInActivity(StringShelfDatabase stringShelfDatabase, String activityName, ACTIVITY_START_STATUS activityStartStatus) {
+    public static void setStartStatusOfActivity(StringShelfDatabase stringShelfDatabase, String activityName, ACTIVITY_START_STATUS activityStartStatus) {
         stringShelfDatabase.insertOrReplaceFieldById(getActivityInfosTableName(), activityName, getActivityInfosStartStatusIndex(), activityStartStatus.toString());
     }
     //endregion

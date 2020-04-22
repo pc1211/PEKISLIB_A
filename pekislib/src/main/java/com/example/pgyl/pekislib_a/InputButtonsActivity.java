@@ -34,15 +34,15 @@ import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_TITLE;
 import static com.example.pgyl.pekislib_a.MiscUtils.msgBox;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.ACTIVITY_START_STATUS;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.TABLE_EXTRA_KEYS;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentValueInActivity;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentValueFromActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getKeyboard;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getMax;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getMin;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getRegExp;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getTimeUnit;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.isColdStartStatusInActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentValueInActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatusInActivity;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.isColdStartStatusOfActivity;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentValueForActivity;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatusOfActivity;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.TIME_UNITS;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.ddMMyyyy;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.formattedStringTimeDate;
@@ -359,7 +359,7 @@ public class InputButtonsActivity extends Activity {
         super.onPause();
 
         savePreferences();
-        setCurrentValueInActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, columnIndex, editString);
+        setCurrentValueForActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, columnIndex, editString);
         stringShelfDatabase.close();
         stringShelfDatabase = null;
     }
@@ -376,7 +376,7 @@ public class InputButtonsActivity extends Activity {
         tableName = getIntent().getStringExtra(TABLE_EXTRA_KEYS.TABLE.toString());
         columnIndex = getIntent().getIntExtra(TABLE_EXTRA_KEYS.INDEX.toString(), COLUMN_INDEX_DEFAULT_VALUE);
         setupStringShelfDatabase();
-        editString = getCurrentValueInActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, columnIndex);
+        editString = getCurrentValueFromActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, columnIndex);
         keyboard = KEYBOARDS.valueOf(getKeyboard(stringShelfDatabase, tableName, columnIndex));
         if ((keyboard.equals(KEYBOARDS.TIME_FORMAT_D)) || (keyboard.equals(KEYBOARDS.TIME_FORMAT_DL))) {
             timeUnit = TIME_UNITS.valueOf(getTimeUnit(stringShelfDatabase, tableName, columnIndex));
@@ -385,8 +385,8 @@ public class InputButtonsActivity extends Activity {
         pages = ((buttonTexts.length - 1) / BUTTONS_PER_PAGE) + 1;
         pageButtonTexts = getPageButtonTexts(buttonTexts, BUTTONS_PER_PAGE, pages);
 
-        if (isColdStartStatusInActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString())) {
-            setStartStatusInActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), ACTIVITY_START_STATUS.HOT);
+        if (isColdStartStatusOfActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString())) {
+            setStartStatusOfActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), ACTIVITY_START_STATUS.HOT);
             pageIndex = CURRENT_PAGE_INDEX_DEFAULT_VALUE;
             caze = CASES.NO_CASE;
             append = APPEND_DEFAULT_VALUE;
