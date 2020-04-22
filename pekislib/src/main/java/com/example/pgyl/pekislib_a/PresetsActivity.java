@@ -91,7 +91,7 @@ public class PresetsActivity extends Activity {
     private CustomButton[] buttons;
     private ListView listView;
     private boolean validReturnFromCalledActivity;
-    private String calledActivity;
+    private String calledActivityName;
     private StringShelfDatabase stringShelfDatabase;
     private String shpFileName;
     //endregion
@@ -146,7 +146,7 @@ public class PresetsActivity extends Activity {
             columnIndex = getSHPcolumnIndex();
             if (validReturnFromCalledActivity) {
                 validReturnFromCalledActivity = false;
-                if (returnsFromInputButtonsActivity()) {
+                if (calledActivityName.equals(PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString())) {
                     preset[columnIndex] = getCurrentValueInActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, columnIndex);
                     if (listIndex != LIST_INDEX_DEFAULT_VALUE) {
                         presetsHandler.setPresetColumn(listIndex, columnIndex, preset[columnIndex]);
@@ -162,7 +162,7 @@ public class PresetsActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent returnIntent) {
         validReturnFromCalledActivity = false;
         if (requestCode == PEKISLIB_ACTIVITIES.INPUT_BUTTONS.INDEX()) {
-            calledActivity = PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString();
+            calledActivityName = PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString();
             if (resultCode == RESULT_OK) {
                 validReturnFromCalledActivity = true;
             }
@@ -226,7 +226,6 @@ public class PresetsActivity extends Activity {
     }
 
     private void onButtonClickField() {
-        setCurrentValueInActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, columnIndex, preset[columnIndex]);
         launchInputButtonsActivity();
     }
 
@@ -429,6 +428,7 @@ public class PresetsActivity extends Activity {
     }
 
     private void launchInputButtonsActivity() {
+        setCurrentValueInActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, columnIndex, preset[columnIndex]);
         setStartStatusInActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), ACTIVITY_START_STATUS.COLD);
         Intent callingIntent = new Intent(this, InputButtonsActivity.class);
         callingIntent.putExtra(TABLE_EXTRA_KEYS.TABLE.toString(), tableName);
@@ -442,10 +442,6 @@ public class PresetsActivity extends Activity {
         callingIntent.putExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString(), HELP_ACTIVITY_TITLE);
         callingIntent.putExtra(HELP_ACTIVITY_EXTRA_KEYS.HTML_ID.toString(), R.raw.helppresetsactivity);
         startActivity(callingIntent);
-    }
-
-    private boolean returnsFromInputButtonsActivity() {
-        return (calledActivity.equals(PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString()));
     }
 
 }
