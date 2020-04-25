@@ -554,31 +554,31 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
     }
 
     private BiDimensions getMaxDimensions(int proposedWidth, int proposedHeight) {   //  Trouver les dimensions maximum d'un rectangle pouvant afficher la grille dans un rectangle de dimensions donn√©es
-        int xTop = proposedWidth;
+        int wMax = proposedWidth;
         int hMax = proposedHeight;
-        int xMin = 0;
-        int xBest = 0;
-        int yBest = 0;
-        int oldX = 0;
-        int x = xTop;
+        int wMin = 0;
+        int wBest = 0;
+        int hBest = 0;
+        int oldW = 0;
+        int w = wMax;
         do {
-            setupDimensions(dimensionsSetTemp, x);
-            int y = dimensionsSetTemp.height;
-            if (y <= hMax) {
-                xBest = x;   //  On a un nouveau candidat !
-                yBest = y;
-                if ((x == xTop) || (y == hMax)) {   //  Parfait !
+            setupDimensions(dimensionsSetTemp, w);
+            int h = dimensionsSetTemp.height;
+            if (h <= hMax) {
+                wBest = w;   //  On a un nouveau candidat !
+                hBest = h;
+                if ((w == wMax) || (h == hMax)) {   //  Parfait !
                     break;
                 }
-                xMin = x;   //  Examiner maintenant l'intervalle [x,xTop]
-            } else {   //  y > hMax
-                xTop = x;    // Examiner maintenant l'intervalle [xMin,x]
+                wMin = w;   //  Examiner maintenant l'intervalle [w,wMax]
+            } else {   //  h > hMax
+                wMax = w;    // Examiner maintenant l'intervalle [wMin,w]
             }
-            oldX = x;
-            x = (xMin + xTop) / 2;
-        } while (x != oldX);   //  Si x=oldX, on ne progresse plus => Accepter le dernier candidat
+            oldW = w;
+            w = (wMin + wMax) / 2;
+        } while (w != oldW);   //  Si w=oldW, on ne progresse plus => Accepter le dernier candidat
 
-        maxDimensions.set(xBest, yBest);
+        maxDimensions.set(wBest, hBest);
         return maxDimensions;
     }
 
