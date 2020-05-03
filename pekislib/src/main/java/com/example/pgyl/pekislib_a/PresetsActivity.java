@@ -29,15 +29,15 @@ import static com.example.pgyl.pekislib_a.InputButtonsActivity.KEYBOARDS;
 import static com.example.pgyl.pekislib_a.MiscUtils.toastLong;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.ACTIVITY_START_STATUS;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.TABLE_EXTRA_KEYS;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentValueFromActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentValuesFromActivity;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentFromActivity;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentsFromActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getDefaults;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getKeyboards;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getLabels;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getTimeUnits;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.isColdStartStatusOfActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentValueForActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentValuesForActivity;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentForActivity;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentsForActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatusOfActivity;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.TIME_UNITS;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.msToTimeFormatD;
@@ -113,7 +113,7 @@ public class PresetsActivity extends Activity {
         super.onPause();
 
         savePreferences();
-        setCurrentValuesForActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.PRESETS.toString(), tableName, preset);
+        setCurrentsForActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.PRESETS.toString(), tableName, preset);
         presetsHandler.saveAndClose();
         presetsHandler = null;
         stringShelfDatabase.close();
@@ -131,7 +131,7 @@ public class PresetsActivity extends Activity {
         setupStringShelfDatabase();
         setupPresetsHandler();
         setupButtonSpecialColors();
-        preset = getCurrentValuesFromActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.PRESETS.toString(), tableName);
+        preset = getCurrentsFromActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.PRESETS.toString(), tableName);
         labelNames = getLabels(stringShelfDatabase, tableName);
         keyboards = getKeyboards(stringShelfDatabase, tableName);
         timeUnits = getTimeUnits(stringShelfDatabase, tableName);
@@ -147,7 +147,7 @@ public class PresetsActivity extends Activity {
             if (validReturnFromCalledActivity) {
                 validReturnFromCalledActivity = false;
                 if (calledActivityName.equals(PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString())) {
-                    preset[columnIndex] = getCurrentValueFromActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, columnIndex);
+                    preset[columnIndex] = getCurrentFromActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, columnIndex);
                     if (listIndex != LIST_INDEX_DEFAULT_VALUE) {
                         presetsHandler.setPresetColumn(listIndex, columnIndex, preset[columnIndex]);
                     }
@@ -428,7 +428,7 @@ public class PresetsActivity extends Activity {
     }
 
     private void launchInputButtonsActivity() {
-        setCurrentValueForActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, columnIndex, preset[columnIndex]);
+        setCurrentForActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, columnIndex, preset[columnIndex]);
         setStartStatusOfActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), ACTIVITY_START_STATUS.COLD);
         Intent callingIntent = new Intent(this, InputButtonsActivity.class);
         callingIntent.putExtra(TABLE_EXTRA_KEYS.TABLE.toString(), tableName);

@@ -34,14 +34,14 @@ import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_TITLE;
 import static com.example.pgyl.pekislib_a.MiscUtils.msgBox;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.ACTIVITY_START_STATUS;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.TABLE_EXTRA_KEYS;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentValueFromActivity;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentFromActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getKeyboard;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getMax;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getMin;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getRegExp;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getTimeUnit;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.isColdStartStatusOfActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentValueForActivity;
+import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentForActivity;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatusOfActivity;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.TIME_UNITS;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.ddMMyyyy;
@@ -359,7 +359,7 @@ public class InputButtonsActivity extends Activity {
         super.onPause();
 
         savePreferences();
-        setCurrentValueForActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, columnIndex, editString);
+        setCurrentForActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, columnIndex, editString);
         stringShelfDatabase.close();
         stringShelfDatabase = null;
     }
@@ -376,7 +376,7 @@ public class InputButtonsActivity extends Activity {
         tableName = getIntent().getStringExtra(TABLE_EXTRA_KEYS.TABLE.toString());
         columnIndex = getIntent().getIntExtra(TABLE_EXTRA_KEYS.INDEX.toString(), COLUMN_INDEX_DEFAULT_VALUE);
         setupStringShelfDatabase();
-        editString = getCurrentValueFromActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, columnIndex);
+        editString = getCurrentFromActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, columnIndex);
         keyboard = KEYBOARDS.valueOf(getKeyboard(stringShelfDatabase, tableName, columnIndex));
         if ((keyboard.equals(KEYBOARDS.TIME_FORMAT_D)) || (keyboard.equals(KEYBOARDS.TIME_FORMAT_DL))) {
             timeUnit = TIME_UNITS.valueOf(getTimeUnit(stringShelfDatabase, tableName, columnIndex));

@@ -2,13 +2,22 @@ package com.example.pgyl.pekislib_a;
 
 public class StringShelfDatabaseTables {
     //  TABLES
-    private enum PekisLibTables {
+    private enum PEKISLIB_TABLES {
         ACTIVITY_INFOS(PekislibTableDataFields.activityInfos.class);
 
         private int dataFieldsCount;
+        private String description;
 
-        PekisLibTables(Class<? extends PekislibTableDataFields> pekislibTableFields) {
+        PEKISLIB_TABLES(Class<? extends PekislibTableDataFields> pekislibTableFields) {
             dataFieldsCount = pekislibTableFields.getEnumConstants().length;
+        }
+
+        public String DESCRIPTION() {
+            return description;
+        }
+
+        public int INDEX() {
+            return ordinal();
         }
 
         public int getDataFieldsCount() {
@@ -31,15 +40,23 @@ public class StringShelfDatabaseTables {
 
     public enum ACTIVITY_START_STATUS {COLD, HOT}
 
-    public enum TABLE_EXTRA_KEYS {TABLE, INDEX}
+    public enum TABLE_EXTRA_KEYS {TABLE, INDEX, DESCRIPTION}
 
     public static int getPekislibTableDataFieldsCount(String tableName) {
-        return PekisLibTables.valueOf(tableName).getDataFieldsCount();
+        return PEKISLIB_TABLES.valueOf(tableName).getDataFieldsCount();
+    }
+
+    public static int getPekislibTableIndex(String tableName) {
+        return PEKISLIB_TABLES.valueOf(tableName).INDEX();
+    }
+
+    public static String getPekislibTableDescription(String tableName) {
+        return PEKISLIB_TABLES.valueOf(tableName).DESCRIPTION();
     }
 
     //region ACTIVITY_INFOS
     public static String getActivityInfosTableName() {
-        return PekisLibTables.ACTIVITY_INFOS.toString();
+        return PEKISLIB_TABLES.ACTIVITY_INFOS.toString();
     }
 
     public static int getActivityInfosStartStatusIndex() {

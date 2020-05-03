@@ -1,5 +1,7 @@
 package com.example.pgyl.pekislib_a;
 
+import java.util.Arrays;
+
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.ACTIVITY_START_STATUS;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.TABLE_IDS;
 import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.getActivityInfosStartStatusIndex;
@@ -12,19 +14,45 @@ public class StringShelfDatabaseUtils {
         stringShelfDatabase.createTableIfNotExists(tableName, 1 + getPekislibTableDataFieldsCount(tableName));   //  Champ ID + Données
     }
 
-    public static String[] getCurrentValuesFromActivity(StringShelfDatabase stringShelfDatabase, String activityName, String tableName) {
+    public static int getTableIndex(String[] tableNames, String tableName) {
+        return Arrays.asList(tableNames).indexOf(tableName);
+    }
+
+    public static String[][] getCurrentsFromMultipleTablesFromActivity(StringShelfDatabase stringShelfDatabase, String[] tableNames, String activityName) {
+        String values[][] = new String[tableNames.length][];
+        for (int i = 0; i <= (tableNames.length - 1); i = i + 1) {
+            values[i] = getCurrentsFromActivity(stringShelfDatabase, activityName, tableNames[i]);
+        }
+        return values;
+    }
+
+    public static void setCurrentsForMultipleTablesForActivity(StringShelfDatabase stringShelfDatabase, String[] tableNames, String activityName, String[][] values) {
+        for (int i = 0; i <= (tableNames.length - 1); i = i + 1) {
+            setCurrentsForActivity(stringShelfDatabase, activityName, tableNames[i], values[i]);
+        }
+    }
+
+    public static String[][] getFieldLabelsFromMultipleTables(StringShelfDatabase stringShelfDatabase, String[] tableNames) {
+        String values[][] = new String[tableNames.length][];
+        for (int i = 0; i <= (tableNames.length - 1); i = i + 1) {
+            values[i] = getLabels(stringShelfDatabase, tableNames[i]);
+        }
+        return values;
+    }
+
+    public static String[] getCurrentsFromActivity(StringShelfDatabase stringShelfDatabase, String activityName, String tableName) {
         return stringShelfDatabase.selectRowByIdOrCreate(tableName, TABLE_IDS.CURRENT.toString() + activityName);
     }
 
-    public static void setCurrentValuesForActivity(StringShelfDatabase stringShelfDatabase, String activityName, String tableName, String[] values) {
+    public static void setCurrentsForActivity(StringShelfDatabase stringShelfDatabase, String activityName, String tableName, String[] values) {
         stringShelfDatabase.insertOrReplaceRowById(tableName, TABLE_IDS.CURRENT.toString() + activityName, values);
     }
 
-    public static String getCurrentValueFromActivity(StringShelfDatabase stringShelfDatabase, String activityName, String tableName, int index) {
+    public static String getCurrentFromActivity(StringShelfDatabase stringShelfDatabase, String activityName, String tableName, int index) {
         return stringShelfDatabase.selectFieldByIdOrCreate(tableName, TABLE_IDS.CURRENT.toString() + activityName, index);
     }
 
-    public static void setCurrentValueForActivity(StringShelfDatabase stringShelfDatabase, String activityName, String tableName, int index, String value) {
+    public static void setCurrentForActivity(StringShelfDatabase stringShelfDatabase, String activityName, String tableName, int index, String value) {
         stringShelfDatabase.insertOrReplaceFieldById(tableName, TABLE_IDS.CURRENT.toString() + activityName, index, value);
     }
 
@@ -36,7 +64,7 @@ public class StringShelfDatabaseUtils {
         stringShelfDatabase.insertOrReplaceRowById(tableName, TABLE_IDS.CURRENT.toString(), values);
     }
 
-    public static String getCurrent(StringShelfDatabase stringShelfDatabase, String tableName, int index) {
+    public static String getCurrents(StringShelfDatabase stringShelfDatabase, String tableName, int index) {
         return stringShelfDatabase.selectFieldByIdOrCreate(tableName, TABLE_IDS.CURRENT.toString(), index);
     }
 

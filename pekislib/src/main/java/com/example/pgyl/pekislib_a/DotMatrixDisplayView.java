@@ -32,8 +32,6 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
 
     private onCustomClickListener mOnCustomClickListener;
 
-    public enum DOT_FORM {SQUARE, ROUND}   //  points carrés ou ronds  (Pour obtenir des points de la forme souhaitée, un pochoir sera préparé avant le dessin)
-
     public enum SCROLL_DIRECTIONS {LEFT, RIGHT, TOP, BOTTOM}
 
     private class StateColor {
@@ -67,7 +65,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     private Point scrollOffset;
     private Point symbolPos;
     private float dotSpacingCoeff;
-    private String dotForm;
+    private float dotCornerRadius;
+    private float dotCornerRadiusCoeff;
     private PointF dotCellOrigin;
     private boolean drawing;
     private Canvas viewCanvas;
@@ -78,8 +77,9 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     private Paint dotFormStencilTransparentPaint;
     private Rect canvasRect;
     private RectF dotMatrixRect;
+    private RectF dotRect;
     private float backCornerRadius;
-    private int backCornerRadiusPercent;
+    private float backCornerRadiusCoeff;
     private int backColor;
     private long minClickTimeInterval;
     private long lastClickUpTime;
@@ -98,9 +98,9 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         final RectF INTERNAL_MARGIN_COEFFS_DEFAULT = new RectF(0.02f, 0.02f, 0.02f, 0.02f);   //  Marge autour de l'affichage proprement dit (% de largeur)
         final RectF EXTERNAL_MARGIN_COEFFS_DEFAULT = ALIGN_WIDTH_HEIGHT;   //  Positionnement par défaut de la grille dans le container parent
         final int DOT_SPACING_COEFF_DEFAULT = 20;    //  Taille de l'espace entre carrés (% de largeur d'un carré)
-        final String DOT_FORM_DEFAULT = DOT_FORM.SQUARE.toString();   //  Points carrés par défaut
         final long MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE = 0;   //   Intervalle de temps (ms) minimum imposé entre 2 click
         final int BACK_CORNER_RADIUS_PERCENT_DEFAULT = 35;     //  % appliqué à 1/2 largeur ou hauteur pour déterminer le rayon du coin arrondi
+        final int DOT_CORNER_RADIUS_COEFF_DEFAULT = 0;   //  (Points carrés par défaut)
         final Point SYMBOL_POS_DEFAULT = new Point(0, 0);   //  Position du prochain symbole à afficher (en coordonnées de la grille (x,y), (0,0) étant le carré en haut à gauche)
         final Point SCROLL_OFFSET_DEFAULT = new Point(0, 0);   //  Décalage à partir de scrollRect (la partie de la grille qui est à scroller)
         final String BACK_COLOR_DEFAULT = "000000";   //  Couleur du fond sur lequel repose la grille
@@ -109,13 +109,14 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         setExternalMarginCoeffs(EXTERNAL_MARGIN_COEFFS_DEFAULT);
         setInternalMarginCoeffs(INTERNAL_MARGIN_COEFFS_DEFAULT);
         setDotSpacingCoeff(String.valueOf(DOT_SPACING_COEFF_DEFAULT));
-        setDotForm(DOT_FORM_DEFAULT);
+        setDotCornerRadiusCoeff(String.valueOf(DOT_CORNER_RADIUS_COEFF_DEFAULT));
+        backCornerRadiusCoeff = BACK_CORNER_RADIUS_PERCENT_DEFAULT * .01f;
         setMinClickTimeInterval(MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE);
-        backCornerRadiusPercent = BACK_CORNER_RADIUS_PERCENT_DEFAULT;
         symbolPos = SYMBOL_POS_DEFAULT;
         scrollOffset = SCROLL_OFFSET_DEFAULT;
         buttonState = BUTTON_STATES_DEFAULT;
         scrollRect = null;
+        dotRect = new RectF();
         dimensionsSet = new DimensionsSet();
         dimensionsSetTemp = new DimensionsSet();
         maxDimensions = new BiDimensions(0, 0);
@@ -319,12 +320,12 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         setupDrawParameters();
     }
 
-    public void setDotForm(String dotForm) {
-        this.dotForm = dotForm;     //  SQUARE ou ROUND
+    public void setDotSpacingCoeff(String dotSpacingCoeff) {   //  Taille de l'espace entre chaque carré (en % de largeur d'un carré)
+        this.dotSpacingCoeff = Float.parseFloat(dotSpacingCoeff) * .01f;
     }
 
-    public void setDotSpacingCoeff(String dotSpacingCoeff) {   //  Taille de l'espace entre chaque carré (en % de largeur d'un carré)
-        this.dotSpacingCoeff = Float.parseFloat(dotSpacingCoeff) / 100;
+    public void setDotCornerRadiusCoeff(String dotCornerRadiusCoeff) {
+        this.dotCornerRadiusCoeff = Float.parseFloat(dotCornerRadiusCoeff) * .01f;
     }
 
     public void setInternalMarginCoeffs(RectF internalMarginCoeffs) {   //  Marges autour de l'affichage proprement dit (en % de largeur totale)
@@ -491,7 +492,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     private void setupDrawParameters() {
         if (canvasRect != null) {
             dotMatrixRect = getSubRect(canvasRect, dimensionsSet.width - dimensionsSet.slackWidth, dimensionsSet.height, externalMarginCoeffs);  //  internalMargins incluses
-            backCornerRadius = (Math.min(dotMatrixRect.width(), dotMatrixRect.height()) * backCornerRadiusPercent) / 200;
+            backCornerRadius = Math.min(dotMatrixRect.width(), dotMatrixRect.height()) * backCornerRadiusCoeff * .5f;
+            dotCornerRadius = dimensionsSet.dotSize * dotCornerRadiusCoeff * .5f;
             createDotFormStencilBitmap();
         }
     }
@@ -541,12 +543,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         for (int i = 0; i <= (displayRect.width() - 1); i = i + 1) {   //  Parcourir la ligne
             dotCellOrigin.y = dotMatrixRect.top + dimensionsSet.internalMargins.top;   //  Coordonnée y du 1er point d'une colonne
             for (int j = 0; j <= (displayRect.height() - 1); j = j + 1) {   //  Parcourir la colonne
-                if (dotForm.equals(DOT_FORM.SQUARE.toString())) {   //  Point carré
-                    canvas.drawRect(dotCellOrigin.x, dotCellOrigin.y, dotCellOrigin.x + dimensionsSet.dotSize, dotCellOrigin.y + dimensionsSet.dotSize, dotFormStencilTransparentPaint);  //  Carré transparent
-                } else {  //  Point rond
-                    float radius = dimensionsSet.dotSize * .5f;
-                    canvas.drawCircle(dotCellOrigin.x + radius, dotCellOrigin.y + radius, radius, dotFormStencilTransparentPaint);  //  Disque transparent
-                }
+                dotRect.set(dotCellOrigin.x, dotCellOrigin.y, dotCellOrigin.x + dimensionsSet.dotSize, dotCellOrigin.y + dimensionsSet.dotSize);
+                canvas.drawRoundRect(dotRect, dotCornerRadius, dotCornerRadius, dotFormStencilTransparentPaint);
                 dotCellOrigin.y = dotCellOrigin.y + dimensionsSet.dotCellSize;   //  Passer au prochain point de la colonne
             }
             dotCellOrigin.x = dotCellOrigin.x + dimensionsSet.dotCellSize;   //  Passer au prochain point de la ligne
