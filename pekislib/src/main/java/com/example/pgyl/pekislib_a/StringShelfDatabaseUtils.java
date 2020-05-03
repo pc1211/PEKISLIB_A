@@ -100,6 +100,10 @@ public class StringShelfDatabaseUtils {
         return stringShelfDatabase.selectFieldByIdOrCreate(tableName, TABLE_IDS.MAX.toString(), index);
     }
 
+    public static String[] getMaxs(StringShelfDatabase stringShelfDatabase, String tableName) {
+        return stringShelfDatabase.selectRowByIdOrCreate(tableName, TABLE_IDS.MAX.toString());
+    }
+
     public static String getRegExp(StringShelfDatabase stringShelfDatabase, String tableName, int index) {
         return stringShelfDatabase.selectFieldByIdOrCreate(tableName, TABLE_IDS.REGEXP.toString(), index);
     }
