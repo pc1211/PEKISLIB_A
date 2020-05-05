@@ -68,7 +68,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
     private float dotCornerRadius;
     private float dotCornerRadiusCoeff;
     private PointF dotCellOrigin;
-    private boolean drawing;
+    private boolean inDrawing;
     private Canvas viewCanvas;
     private Bitmap viewBitmap;
     private Bitmap dotFormStencilBitmap;
@@ -121,7 +121,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         dimensionsSetTemp = new DimensionsSet();
         maxDimensions = new BiDimensions(0, 0);
         dotCellOrigin = new PointF();
-        drawing = false;
+        inDrawing = false;
         invertOn = false;
         lastClickUpTime = 0;
 
@@ -199,7 +199,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        drawing = true;
+        inDrawing = true;
         viewCanvas.drawBitmap(dotFormStencilBitmap, displayRect.left, displayRect.top, dotFormStencilPaint);  //  Pochoir pour obtenir la forme de point souhait√©e
         dotCellOrigin.x = dotMatrixRect.left + dimensionsSet.internalMargins.left;   //  Coordonn√©e x du 1er point d'une ligne
         for (int i = 0; i <= (displayRect.width() - 1); i = i + 1) {   //  Parcourir la ligne
@@ -230,7 +230,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
             dotCellOrigin.x = dotCellOrigin.x + dimensionsSet.dotCellSize;   //  Passer au prochain point de la ligne
         }
         canvas.drawBitmap(viewBitmap, 0, 0, null);
-        drawing = false;
+        inDrawing = false;
     }
 
     private boolean onButtonTouch(View v, MotionEvent event) {
@@ -349,51 +349,53 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
     }
 
     public boolean isDrawing() {
-        return drawing;
+        return inDrawing;
     }
 
-    public void scroll(SCROLL_DIRECTIONS scrollDirection) {
-        switch (scrollDirection) {
-            case LEFT:
-                scrollLeft();
-                break;
-            case TOP:
-                scrollTop();
-                break;
-            case RIGHT:
-                scrollRight();
-                break;
-            case BOTTOM:
-                scrollBottom();
-                break;
+    public void scroll(SCROLL_DIRECTIONS scrollDirection, int dotNumber) {
+        if (dotNumber > 0) {
+            switch (scrollDirection) {
+                case LEFT:
+                    scrollLeft(dotNumber);
+                    break;
+                case TOP:
+                    scrollTop(dotNumber);
+                    break;
+                case RIGHT:
+                    scrollRight(dotNumber);
+                    break;
+                case BOTTOM:
+                    scrollBottom(dotNumber);
+                    break;
+            }
         }
     }
 
-    public void scrollLeft() {
-        scrollOffset.x = scrollOffset.x + 1;
+    public void scrollLeft(int dotNumber) {
+        scrollOffset.x = scrollOffset.x + dotNumber % scrollRect.width();
         if (scrollOffset.x >= scrollRect.width()) {
-            scrollOffset.x = 0;
+            scrollOffset.x = scrollOffset.x - scrollRect.width();
         }
     }
 
-    public void scrollRight() {
-        scrollOffset.x = scrollOffset.x - 1;
+    public void scrollRight(int dotNumber) {
+        scrollOffset.x = scrollOffset.x - dotNumber % scrollRect.width();
         if (scrollOffset.x < 0) {
-            scrollOffset.x = scrollRect.width() - 1;
+            scrollOffset.x = scrollOffset.x + scrollRect.width();
         }
     }
 
-    public void scrollTop() {
-        scrollOffset.y = scrollOffset.y + 1;
+    public void scrollTop(int dotNumber) {
+        scrollOffset.y = scrollOffset.y + dotNumber % scrollRect.height();
         if (scrollOffset.y >= scrollRect.height()) {
-            scrollOffset.y = 0;
+            scrollOffset.y = scrollOffset.y - scrollRect.height();
         }
     }
 
-    public void scrollBottom() {
-        scrollOffset.y = scrollOffset.y - 1;
+    public void scrollBottom(int dotNumber) {
+        scrollOffset.y = scrollOffset.y - dotNumber % scrollRect.height();
         if (scrollOffset.y < 0) {
-            scrollOffset.y = scrollRect.height() - 1;
+            scrollOffset.y = scrollOffset.y + scrollRect.height();
         }
     }
 
