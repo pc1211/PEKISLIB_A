@@ -16,7 +16,7 @@ public class StringDB extends SQLiteOpenHelper {
     public static final int TABLE_ID_INDEX = FIELDS.ID.USER_INDEX();
     public static final int TABLE_DATA_INDEX = FIELDS.DATA.USER_INDEX();
     private static final int DATABASE_VERSION = 1;
-    private static final String DATABASE_NAME = "ssDB";
+    private static final String DATABASE_NAME = "SSDB";
 
     private enum FIELDS {
         _id, ID, DATA;
@@ -30,7 +30,7 @@ public class StringDB extends SQLiteOpenHelper {
         }    //  Index apparent pour l'utilisateur
     }
 
-    private final String NULL_STRING = "NULL@SSDB";   //  Chaîne stockée en cas de champ null
+    private final String NULL_STRING = "NULL@" + DATABASE_NAME;   //  Chaîne stockée en cas de champ null
     //endregion
 
     //region Variables
