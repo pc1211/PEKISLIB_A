@@ -18,7 +18,7 @@ public class StringDBUtils {
         return Arrays.asList(tableNames).indexOf(tableName);
     }
 
-    public static String[][] getCurrentsFromMultipleTablesFromActivity(StringDB stringDB, String[] tableNames, String activityName) {
+    public static String[][] getCurrentsFromMultipleTablesFromActivity(StringDB stringDB, String activityName, String[] tableNames) {
         String values[][] = new String[tableNames.length][];
         for (int i = 0; i <= (tableNames.length - 1); i = i + 1) {
             values[i] = getCurrentsFromActivity(stringDB, activityName, tableNames[i]);
@@ -26,7 +26,7 @@ public class StringDBUtils {
         return values;
     }
 
-    public static void setCurrentsForMultipleTablesForActivity(StringDB stringDB, String[] tableNames, String activityName, String[][] values) {
+    public static void setCurrentsForMultipleTablesForActivity(StringDB stringDB, String activityName, String[] tableNames, String[][] values) {
         for (int i = 0; i <= (tableNames.length - 1); i = i + 1) {
             setCurrentsForActivity(stringDB, activityName, tableNames[i], values[i]);
         }
