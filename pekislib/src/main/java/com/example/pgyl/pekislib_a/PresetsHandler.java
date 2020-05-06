@@ -7,17 +7,17 @@ import java.util.Comparator;
 
 import static com.example.pgyl.pekislib_a.Constants.NOT_FOUND;
 import static com.example.pgyl.pekislib_a.InputButtonsActivity.KEYBOARDS;
-import static com.example.pgyl.pekislib_a.StringShelfDatabase.TABLE_DATA_INDEX;
-import static com.example.pgyl.pekislib_a.StringShelfDatabase.TABLE_ID_INDEX;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.TABLE_IDS;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getKeyboards;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getTimeUnits;
+import static com.example.pgyl.pekislib_a.StringDB.TABLE_DATA_INDEX;
+import static com.example.pgyl.pekislib_a.StringDB.TABLE_ID_INDEX;
+import static com.example.pgyl.pekislib_a.StringDBTables.TABLE_IDS;
+import static com.example.pgyl.pekislib_a.StringDBUtils.getKeyboards;
+import static com.example.pgyl.pekislib_a.StringDBUtils.getTimeUnits;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.TIME_UNITS;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.msToTimeFormatD;
 
 public class PresetsHandler {
     //region Variables
-    private StringShelfDatabase stringShelfDatabase;
+    private StringDB stringDB;
     private String tableName;
     private ArrayList<String[]> presets;
     private String[] keyboards;
@@ -25,8 +25,8 @@ public class PresetsHandler {
     private String separator;
     //endregion
 
-    public PresetsHandler(StringShelfDatabase stringShelfDatabase) {
-        this.stringShelfDatabase = stringShelfDatabase;
+    public PresetsHandler(StringDB stringDB) {
+        this.stringDB = stringDB;
         init();
     }
 
@@ -36,7 +36,7 @@ public class PresetsHandler {
 
     public void saveAndClose() {
         savePresets();
-        stringShelfDatabase = null;
+        stringDB = null;
         presets.clear();
         presets = null;
     }
@@ -54,8 +54,8 @@ public class PresetsHandler {
     public void setTableName(String tableName) {
         this.tableName = tableName;
         presets = presetRowsToPresets(getPresetRows());
-        keyboards = getKeyboards(stringShelfDatabase, tableName);
-        timeUnits = getTimeUnits(stringShelfDatabase, tableName);
+        keyboards = getKeyboards(stringDB, tableName);
+        timeUnits = getTimeUnits(stringDB, tableName);
     }
 
     public void setSeparator(String separator) {
@@ -173,16 +173,16 @@ public class PresetsHandler {
     }
 
     private String whereConditionForPresets() {
-        return stringShelfDatabase.getFieldName(TABLE_ID_INDEX) + " LIKE '" + TABLE_IDS.PRESET.toString() + "%'";
+        return stringDB.getFieldName(TABLE_ID_INDEX) + " LIKE '" + TABLE_IDS.PRESET.toString() + "%'";
     }
 
     private void savePresets() {
-        stringShelfDatabase.deleteRows(tableName, whereConditionForPresets());
-        stringShelfDatabase.insertOrReplaceRows(tableName, presetsToPresetRows(presets));
+        stringDB.deleteRows(tableName, whereConditionForPresets());
+        stringDB.insertOrReplaceRows(tableName, presetsToPresetRows(presets));
     }
 
     private String[][] getPresetRows() {
-        return stringShelfDatabase.selectRows(tableName, whereConditionForPresets());
+        return stringDB.selectRows(tableName, whereConditionForPresets());
     }
 
 }

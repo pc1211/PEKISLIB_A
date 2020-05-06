@@ -42,10 +42,10 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     private class DimensionsSet {
         int width;               //  Largeur donnée pour l'affichage
         Rect internalMargins;    //  Marge autour de l'affichage proprement dit
-        int dotCellSize;         //  Taille d'un carré + Espace entre 2 carrés, à calculer selon le nombre de carrés en largeur (cf displayRect)
-        int dotSize;             //  Taille d'un carré (dotCellSize / (1 + Coefficient de taille de l'espace entre carrés))
-        int slackWidth;          //  Compense les arrondis (dûs au calcul de dotCellSize et dotSize), de telle sorte que internalMargins.left + (displayRect.width -1) * dotCellSize + dotSize + internalMargins.right +slackWidth = width
-        int height;              //  internalMargins.top + (displayRect.width -1) * dotCellSize + dotSize + internalMargins.bottom
+        int dotCellSide;         //  Taille d'un carré + Espace entre 2 carrés, à calculer selon le nombre de carrés en largeur (cf displayRect)
+        int dotSide;             //  Taille d'un carré (dotCellSide / (1 + Coefficient de taille de l'espace entre carrés))
+        int slackWidth;          //  Compense les arrondis (dûs au calcul de dotCellSide et dotSide), de telle sorte que internalMargins.left + (displayRect.width -1) * dotCellSide + dotSide + internalMargins.right +slackWidth = width
+        int height;              //  internalMargins.top + (displayRect.width -1) * dotCellSide + dotSide + internalMargins.bottom
 
         DimensionsSet() {
             internalMargins = new Rect();
@@ -224,10 +224,10 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                     }
                 }
                 dotPaint.setColor(((buttonState.equals(BUTTON_STATES.PRESSED)) ^ invertOn) ? gridStateColors[gridY][gridX].pressed : gridStateColors[gridY][gridX].unpressed);
-                viewCanvas.drawRect(dotCellOrigin.x, dotCellOrigin.y, dotCellOrigin.x + dimensionsSet.dotSize, dotCellOrigin.y + dimensionsSet.dotSize, dotPaint);   //  Dessiner un carré (dans ce qui reste comme espace pour lui dans le pochoir)
-                dotCellOrigin.y = dotCellOrigin.y + dimensionsSet.dotCellSize;   //  Passer au prochain point de la colonne
+                viewCanvas.drawRect(dotCellOrigin.x, dotCellOrigin.y, dotCellOrigin.x + dimensionsSet.dotSide, dotCellOrigin.y + dimensionsSet.dotSide, dotPaint);   //  Dessiner un carré (dans ce qui reste comme espace pour lui dans le pochoir)
+                dotCellOrigin.y = dotCellOrigin.y + dimensionsSet.dotCellSide;   //  Passer au prochain point de la colonne
             }
-            dotCellOrigin.x = dotCellOrigin.x + dimensionsSet.dotCellSize;   //  Passer au prochain point de la ligne
+            dotCellOrigin.x = dotCellOrigin.x + dimensionsSet.dotCellSide;   //  Passer au prochain point de la ligne
         }
         canvas.drawBitmap(viewBitmap, 0, 0, null);
         inDrawing = false;
@@ -495,7 +495,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         if (canvasRect != null) {
             dotMatrixRect = getSubRect(canvasRect, dimensionsSet.width - dimensionsSet.slackWidth, dimensionsSet.height, externalMarginCoeffs);  //  internalMargins incluses
             backCornerRadius = Math.min(dotMatrixRect.width(), dotMatrixRect.height()) * backCornerRadiusCoeff * .5f;
-            dotCornerRadius = dimensionsSet.dotSize * dotCornerRadiusCoeff * .5f;
+            dotCornerRadius = dimensionsSet.dotSide * dotCornerRadiusCoeff * .5f;
             createDotFormStencilBitmap();
         }
     }
@@ -505,30 +505,30 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
 
         dimensionsSet.width = viewWidth;
         dimensionsSet.internalMargins.set(getMarginSize(dimensionsSet.width, internalMarginCoeffs.left), getMarginSize(dimensionsSet.width, internalMarginCoeffs.top), getMarginSize(dimensionsSet.width, internalMarginCoeffs.right), getMarginSize(dimensionsSet.width, internalMarginCoeffs.bottom));
-        dimensionsSet.dotCellSize = getDotCellSize(dimensionsSet);
-        dimensionsSet.dotSize = getDotSize(dimensionsSet);
-        if (getSlackWidth(dimensionsSet) < -(SLACKWIDTH_TOL_COEFF * (dimensionsSet.internalMargins.left + dimensionsSet.internalMargins.right) / 100)) {   //  Les calculs de dotCellSize et dotSize ont été trop optimistes
-            dimensionsSet.dotCellSize = dimensionsSet.dotCellSize - 1;
-            dimensionsSet.dotSize = getDotSize(dimensionsSet);
+        dimensionsSet.dotCellSide = getDotCellSide(dimensionsSet);
+        dimensionsSet.dotSide = getDotSide(dimensionsSet);
+        if (getSlackWidth(dimensionsSet) < -(SLACKWIDTH_TOL_COEFF * (dimensionsSet.internalMargins.left + dimensionsSet.internalMargins.right) / 100)) {   //  Les calculs de dotCellSide et dotSide ont été trop optimistes
+            dimensionsSet.dotCellSide = dimensionsSet.dotCellSide - 1;
+            dimensionsSet.dotSide = getDotSide(dimensionsSet);
         }
         dimensionsSet.slackWidth = getSlackWidth(dimensionsSet);
-        dimensionsSet.height = dimensionsSet.internalMargins.top + (displayRect.height() - 1) * dimensionsSet.dotCellSize + dimensionsSet.dotSize + dimensionsSet.internalMargins.bottom;
+        dimensionsSet.height = dimensionsSet.internalMargins.top + (displayRect.height() - 1) * dimensionsSet.dotCellSide + dimensionsSet.dotSide + dimensionsSet.internalMargins.bottom;
     }
 
     private int getMarginSize(int length, float marginCoeff) {
         return (int) (length * marginCoeff + 0.5f);
     }
 
-    private int getDotCellSize(DimensionsSet dimensionsSet) {  //  Solution de l'équation telle que internalMargins.left + (displayRect.width -1) * dotCellSize + dotSize + internalMargins.right = width (si pas d'arrondis)
+    private int getDotCellSide(DimensionsSet dimensionsSet) {  //  Solution de l'équation telle que internalMargins.left + (displayRect.width -1) * dotCellSide + dotSide + internalMargins.right = width (si pas d'arrondis)
         return (int) ((dimensionsSet.width - dimensionsSet.internalMargins.left - dimensionsSet.internalMargins.right) * (1 + dotSpacingCoeff) / (displayRect.width() * (1 + dotSpacingCoeff) - dotSpacingCoeff) + .5f);
     }
 
-    private int getDotSize(DimensionsSet dimensionsSet) {
-        return (int) (dimensionsSet.dotCellSize / (1 + dotSpacingCoeff) + .5f);
+    private int getDotSide(DimensionsSet dimensionsSet) {
+        return (int) (dimensionsSet.dotCellSide / (1 + dotSpacingCoeff) + .5f);
     }
 
     private int getSlackWidth(DimensionsSet dimensionsSet) {
-        return dimensionsSet.width - (dimensionsSet.internalMargins.left + (displayRect.width() - 1) * dimensionsSet.dotCellSize + dimensionsSet.dotSize + dimensionsSet.internalMargins.right);
+        return dimensionsSet.width - (dimensionsSet.internalMargins.left + (displayRect.width() - 1) * dimensionsSet.dotCellSide + dimensionsSet.dotSide + dimensionsSet.internalMargins.right);
     }
 
     private void createDotFormStencilBitmap() {   //  Préparer un pochoir avec des formes transparentes sur fond de backColor, pour donner aux futurs points la forme désirée
@@ -545,11 +545,11 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         for (int i = 0; i <= (displayRect.width() - 1); i = i + 1) {   //  Parcourir la ligne
             dotCellOrigin.y = dotMatrixRect.top + dimensionsSet.internalMargins.top;   //  Coordonnée y du 1er point d'une colonne
             for (int j = 0; j <= (displayRect.height() - 1); j = j + 1) {   //  Parcourir la colonne
-                dotRect.set(dotCellOrigin.x, dotCellOrigin.y, dotCellOrigin.x + dimensionsSet.dotSize, dotCellOrigin.y + dimensionsSet.dotSize);
+                dotRect.set(dotCellOrigin.x, dotCellOrigin.y, dotCellOrigin.x + dimensionsSet.dotSide, dotCellOrigin.y + dimensionsSet.dotSide);
                 canvas.drawRoundRect(dotRect, dotCornerRadius, dotCornerRadius, dotFormStencilTransparentPaint);
-                dotCellOrigin.y = dotCellOrigin.y + dimensionsSet.dotCellSize;   //  Passer au prochain point de la colonne
+                dotCellOrigin.y = dotCellOrigin.y + dimensionsSet.dotCellSide;   //  Passer au prochain point de la colonne
             }
-            dotCellOrigin.x = dotCellOrigin.x + dimensionsSet.dotCellSize;   //  Passer au prochain point de la ligne
+            dotCellOrigin.x = dotCellOrigin.x + dimensionsSet.dotCellSide;   //  Passer au prochain point de la ligne
         }
     }
 

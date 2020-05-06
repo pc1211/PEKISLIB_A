@@ -27,18 +27,18 @@ import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_TITLE;
 import static com.example.pgyl.pekislib_a.InputButtonsActivity.KEYBOARDS;
 import static com.example.pgyl.pekislib_a.MiscUtils.toastLong;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.ACTIVITY_START_STATUS;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.TABLE_EXTRA_KEYS;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentFromActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentsFromActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getDefaults;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getKeyboards;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getLabels;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getTimeUnits;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.isColdStartStatusOfActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentForActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentsForActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatusOfActivity;
+import static com.example.pgyl.pekislib_a.StringDBTables.ACTIVITY_START_STATUS;
+import static com.example.pgyl.pekislib_a.StringDBTables.TABLE_EXTRA_KEYS;
+import static com.example.pgyl.pekislib_a.StringDBUtils.getCurrentFromActivity;
+import static com.example.pgyl.pekislib_a.StringDBUtils.getCurrentsFromActivity;
+import static com.example.pgyl.pekislib_a.StringDBUtils.getDefaults;
+import static com.example.pgyl.pekislib_a.StringDBUtils.getKeyboards;
+import static com.example.pgyl.pekislib_a.StringDBUtils.getLabels;
+import static com.example.pgyl.pekislib_a.StringDBUtils.getTimeUnits;
+import static com.example.pgyl.pekislib_a.StringDBUtils.isColdStartStatusOfActivity;
+import static com.example.pgyl.pekislib_a.StringDBUtils.setCurrentForActivity;
+import static com.example.pgyl.pekislib_a.StringDBUtils.setCurrentsForActivity;
+import static com.example.pgyl.pekislib_a.StringDBUtils.setStartStatusOfActivity;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.TIME_UNITS;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.msToTimeFormatD;
 
@@ -92,7 +92,7 @@ public class PresetsActivity extends Activity {
     private ListView listView;
     private boolean validReturnFromCalledActivity;
     private String calledActivityName;
-    private StringShelfDatabase stringShelfDatabase;
+    private StringDB stringDB;
     private String shpFileName;
     //endregion
 
@@ -113,11 +113,11 @@ public class PresetsActivity extends Activity {
         super.onPause();
 
         savePreferences();
-        setCurrentsForActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.PRESETS.toString(), tableName, preset);
+        setCurrentsForActivity(stringDB, PEKISLIB_ACTIVITIES.PRESETS.toString(), tableName, preset);
         presetsHandler.saveAndClose();
         presetsHandler = null;
-        stringShelfDatabase.close();
-        stringShelfDatabase = null;
+        stringDB.close();
+        stringDB = null;
     }
 
     @Override
@@ -128,17 +128,17 @@ public class PresetsActivity extends Activity {
         tableName = getIntent().getStringExtra(TABLE_EXTRA_KEYS.TABLE.toString());
         isTypeColors = ((getIntent().getStringExtra(PRESETS_ACTIVITY_EXTRA_KEYS.DISPLAY_TYPE.toString()).equals(PRESETS_ACTIVITY_DISPLAY_TYPE.COLORS.toString())) ? true : false);
 
-        setupStringShelfDatabase();
+        setupStringDB();
         setupPresetsHandler();
         setupButtonSpecialColors();
-        preset = getCurrentsFromActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.PRESETS.toString(), tableName);
-        labelNames = getLabels(stringShelfDatabase, tableName);
-        keyboards = getKeyboards(stringShelfDatabase, tableName);
-        timeUnits = getTimeUnits(stringShelfDatabase, tableName);
-        defaults = getDefaults(stringShelfDatabase, tableName);
+        preset = getCurrentsFromActivity(stringDB, PEKISLIB_ACTIVITIES.PRESETS.toString(), tableName);
+        labelNames = getLabels(stringDB, tableName);
+        keyboards = getKeyboards(stringDB, tableName);
+        timeUnits = getTimeUnits(stringDB, tableName);
+        defaults = getDefaults(stringDB, tableName);
 
-        if (isColdStartStatusOfActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.PRESETS.toString())) {
-            setStartStatusOfActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.PRESETS.toString(), ACTIVITY_START_STATUS.HOT);
+        if (isColdStartStatusOfActivity(stringDB, PEKISLIB_ACTIVITIES.PRESETS.toString())) {
+            setStartStatusOfActivity(stringDB, PEKISLIB_ACTIVITIES.PRESETS.toString(), ACTIVITY_START_STATUS.HOT);
             listIndex = LIST_INDEX_DEFAULT_VALUE;
             columnIndex = COLUMN_INDEX_DEFAULT_VALUE;
         } else {
@@ -147,7 +147,7 @@ public class PresetsActivity extends Activity {
             if (validReturnFromCalledActivity) {
                 validReturnFromCalledActivity = false;
                 if (calledActivityName.equals(PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString())) {
-                    preset[columnIndex] = getCurrentFromActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, columnIndex);
+                    preset[columnIndex] = getCurrentFromActivity(stringDB, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, columnIndex);
                     if (listIndex != LIST_INDEX_DEFAULT_VALUE) {
                         presetsHandler.setPresetColumn(listIndex, columnIndex, preset[columnIndex]);
                     }
@@ -405,13 +405,13 @@ public class PresetsActivity extends Activity {
         });
     }
 
-    private void setupStringShelfDatabase() {
-        stringShelfDatabase = new StringShelfDatabase(this);
-        stringShelfDatabase.open();
+    private void setupStringDB() {
+        stringDB = new StringDB(this);
+        stringDB.open();
     }
 
     private void setupPresetsHandler() {
-        presetsHandler = new PresetsHandler(stringShelfDatabase);
+        presetsHandler = new PresetsHandler(stringDB);
         presetsHandler.setSeparator(getIntent().getStringExtra(PRESETS_ACTIVITY_EXTRA_KEYS.SEPARATOR.toString()));
         presetsHandler.setTableName(tableName);
     }
@@ -428,8 +428,8 @@ public class PresetsActivity extends Activity {
     }
 
     private void launchInputButtonsActivity() {
-        setCurrentForActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, columnIndex, preset[columnIndex]);
-        setStartStatusOfActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), ACTIVITY_START_STATUS.COLD);
+        setCurrentForActivity(stringDB, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, columnIndex, preset[columnIndex]);
+        setStartStatusOfActivity(stringDB, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), ACTIVITY_START_STATUS.COLD);
         Intent callingIntent = new Intent(this, InputButtonsActivity.class);
         callingIntent.putExtra(TABLE_EXTRA_KEYS.TABLE.toString(), tableName);
         callingIntent.putExtra(TABLE_EXTRA_KEYS.INDEX.toString(), columnIndex);

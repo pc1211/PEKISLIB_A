@@ -1,6 +1,6 @@
 package com.example.pgyl.pekislib_a;
 
-public class StringShelfDatabaseTables {
+public class StringDBTables {
     //  TABLES
     private enum PEKISLIB_TABLES {
         ACTIVITY_INFOS(PekislibTableDataFields.activityInfos.class);

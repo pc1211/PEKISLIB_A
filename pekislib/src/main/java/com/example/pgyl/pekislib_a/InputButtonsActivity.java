@@ -32,17 +32,17 @@ import static com.example.pgyl.pekislib_a.Constants.SHP_FILE_NAME_SUFFIX;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_TITLE;
 import static com.example.pgyl.pekislib_a.MiscUtils.msgBox;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.ACTIVITY_START_STATUS;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseTables.TABLE_EXTRA_KEYS;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getCurrentFromActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getKeyboard;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getMax;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getMin;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getRegExp;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.getTimeUnit;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.isColdStartStatusOfActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setCurrentForActivity;
-import static com.example.pgyl.pekislib_a.StringShelfDatabaseUtils.setStartStatusOfActivity;
+import static com.example.pgyl.pekislib_a.StringDBTables.ACTIVITY_START_STATUS;
+import static com.example.pgyl.pekislib_a.StringDBTables.TABLE_EXTRA_KEYS;
+import static com.example.pgyl.pekislib_a.StringDBUtils.getCurrentFromActivity;
+import static com.example.pgyl.pekislib_a.StringDBUtils.getKeyboard;
+import static com.example.pgyl.pekislib_a.StringDBUtils.getMax;
+import static com.example.pgyl.pekislib_a.StringDBUtils.getMin;
+import static com.example.pgyl.pekislib_a.StringDBUtils.getRegExp;
+import static com.example.pgyl.pekislib_a.StringDBUtils.getTimeUnit;
+import static com.example.pgyl.pekislib_a.StringDBUtils.isColdStartStatusOfActivity;
+import static com.example.pgyl.pekislib_a.StringDBUtils.setCurrentForActivity;
+import static com.example.pgyl.pekislib_a.StringDBUtils.setStartStatusOfActivity;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.TIME_UNITS;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.ddMMyyyy;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.formattedStringTimeDate;
@@ -339,7 +339,7 @@ public class InputButtonsActivity extends Activity {
     private Button[] keyboardButtons;
     private Button[] buttons;
     private TextView lbldisplay;
-    private StringShelfDatabase stringShelfDatabase;
+    private StringDB stringDB;
     private String shpFileName;
     //endregion
 
@@ -359,9 +359,9 @@ public class InputButtonsActivity extends Activity {
         super.onPause();
 
         savePreferences();
-        setCurrentForActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, columnIndex, editString);
-        stringShelfDatabase.close();
-        stringShelfDatabase = null;
+        setCurrentForActivity(stringDB, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, columnIndex, editString);
+        stringDB.close();
+        stringDB = null;
     }
 
     @Override
@@ -375,18 +375,18 @@ public class InputButtonsActivity extends Activity {
         shpFileName = getPackageName() + "." + getClass().getSimpleName() + SHP_FILE_NAME_SUFFIX;
         tableName = getIntent().getStringExtra(TABLE_EXTRA_KEYS.TABLE.toString());
         columnIndex = getIntent().getIntExtra(TABLE_EXTRA_KEYS.INDEX.toString(), COLUMN_INDEX_DEFAULT_VALUE);
-        setupStringShelfDatabase();
-        editString = getCurrentFromActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, columnIndex);
-        keyboard = KEYBOARDS.valueOf(getKeyboard(stringShelfDatabase, tableName, columnIndex));
+        setupStringDB();
+        editString = getCurrentFromActivity(stringDB, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, columnIndex);
+        keyboard = KEYBOARDS.valueOf(getKeyboard(stringDB, tableName, columnIndex));
         if ((keyboard.equals(KEYBOARDS.TIME_FORMAT_D)) || (keyboard.equals(KEYBOARDS.TIME_FORMAT_DL))) {
-            timeUnit = TIME_UNITS.valueOf(getTimeUnit(stringShelfDatabase, tableName, columnIndex));
+            timeUnit = TIME_UNITS.valueOf(getTimeUnit(stringDB, tableName, columnIndex));
         }
         buttonTexts = getButtonTexts(keyboard);
         pages = ((buttonTexts.length - 1) / BUTTONS_PER_PAGE) + 1;
         pageButtonTexts = getPageButtonTexts(buttonTexts, BUTTONS_PER_PAGE, pages);
 
-        if (isColdStartStatusOfActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString())) {
-            setStartStatusOfActivity(stringShelfDatabase, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), ACTIVITY_START_STATUS.HOT);
+        if (isColdStartStatusOfActivity(stringDB, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString())) {
+            setStartStatusOfActivity(stringDB, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), ACTIVITY_START_STATUS.HOT);
             pageIndex = CURRENT_PAGE_INDEX_DEFAULT_VALUE;
             caze = CASES.NO_CASE;
             append = APPEND_DEFAULT_VALUE;
@@ -432,9 +432,9 @@ public class InputButtonsActivity extends Activity {
 
     private void onButtonClickOK() {
         String candidate = editString;
-        String smin = getMin(stringShelfDatabase, tableName, columnIndex);
-        String smax = getMax(stringShelfDatabase, tableName, columnIndex);
-        String regexp = getRegExp(stringShelfDatabase, tableName, columnIndex);
+        String smin = getMin(stringDB, tableName, columnIndex);
+        String smax = getMax(stringDB, tableName, columnIndex);
+        String regexp = getRegExp(stringDB, tableName, columnIndex);
         String error = noErrorMessage();
         if (regexp != null) {
             if (!candidate.matches(regexp)) {
@@ -856,9 +856,9 @@ public class InputButtonsActivity extends Activity {
         }
     }
 
-    private void setupStringShelfDatabase() {
-        stringShelfDatabase = new StringShelfDatabase(this);
-        stringShelfDatabase.open();
+    private void setupStringDB() {
+        stringDB = new StringDB(this);
+        stringDB.open();
     }
 
     private void setupTextSizes() {

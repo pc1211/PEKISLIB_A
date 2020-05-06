@@ -10,7 +10,7 @@ import java.util.Arrays;
 //  Les champs de toutes les tables sont toujours _id, ID, DATA1, DATA2, DATA3, ... selon le nombre de champs spécifié lors du createTableIfNotExists
 //  Le champ _id est la véritable clé primaire, mais invisible pour l'utilisateur
 //  Le champ ID est la clé primaire apparente pour l'utilisateur (cf contrainte UNIQUE sur le champ ID au createTableIfNotExists)
-public class StringShelfDatabase extends SQLiteOpenHelper {
+public class StringDB extends SQLiteOpenHelper {
 
     //region Constantes
     public static final int TABLE_ID_INDEX = FIELDS.ID.USER_INDEX();
@@ -37,7 +37,7 @@ public class StringShelfDatabase extends SQLiteOpenHelper {
     SQLiteDatabase ssdb;
     //endregion
 
-    public StringShelfDatabase(Context context) {
+    public StringDB(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
