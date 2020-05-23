@@ -67,8 +67,8 @@ public class TimeDateUtils {
     public static final int MILLISECONDS_PER_SECOND = 1000;
 
     public static TIME_UNITS getFirstTimeUnit() {  //  1e unité à décoder et initialisation (lazy) de nextTimeUnit de chaque unité
-        TIME_UNITS ret = TIME_UNITS.HOUR;
-        if (ret.getNextTimeUnit() == null) {  //  nextDecodeUnit pas encore initialisés
+        TIME_UNITS firstTimeUnit = TIME_UNITS.HOUR;
+        if (firstTimeUnit.getNextTimeUnit() == null) {  //  nextDecodeUnit pas encore initialisés
             TIME_UNITS.HOUR.setNextTimeUnit(TIME_UNITS.MIN);   //  On décode les minutes après les heures
             TIME_UNITS.MIN.setNextTimeUnit(TIME_UNITS.SEC);
             TIME_UNITS.SEC.setNextTimeUnit(TIME_UNITS.TS);
@@ -76,75 +76,75 @@ public class TimeDateUtils {
             TIME_UNITS.HS.setNextTimeUnit(TIME_UNITS.MS);
             TIME_UNITS.MS.setNextTimeUnit(null);   //  MS est la dernière unité à décoder
         }
-        return ret;
+        return firstTimeUnit;
     }
 
-    public static long midnightTimeMillis() {
+    public static long getMidnightTimeMillis() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-        long ret = calendar.getTimeInMillis();
+        long midnightTimeMillis = calendar.getTimeInMillis();
         calendar.clear();
         calendar = null;
-        return ret;
+        return midnightTimeMillis;
     }
 
-    public static String formattedStringTimeDate(String string, SimpleDateFormat sdf) {
-        String ret = "";
+    public static String getFormattedStringTimeDate(String string, SimpleDateFormat sdf) {
+        String formattedStringTimeDate = "";
         try {
             Date fdate = sdf.parse(string);
-            ret = sdf.format(fdate);
+            formattedStringTimeDate = sdf.format(fdate);
         } catch (ParseException ex) {
             //   NOP
         }
-        return ret;
+        return formattedStringTimeDate;
     }
 
-    public static String formattedCalendarTimeDate(Calendar calendar, SimpleDateFormat sdf) {
+    public static String getFormattedCalendarTimeDate(Calendar calendar, SimpleDateFormat sdf) {
         return sdf.format(calendar.getTime());
     }
 
-    public static String formattedTimeZoneLongTimeDate(long timeDateMillis, SimpleDateFormat sdf) {  //  OK TimeZone
-        String ret = null;
+    public static String getFormattedTimeZoneLongTimeDate(long timeDateMillis, SimpleDateFormat sdf) {  //  OK TimeZone
+        String formattedTimeZoneLongTimeDate = null;
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(timeDateMillis);
-        ret = sdf.format(calendar.getTime());
+        formattedTimeZoneLongTimeDate = sdf.format(calendar.getTime());
         calendar.clear();
         calendar = null;
-        return ret;
+        return formattedTimeZoneLongTimeDate;
     }
 
     public static String msToTimeFormatD(long ms, TIME_UNITS timeUnit) {
-        String ret = "";
+        String timeFormatD = "";
         long p = timeUnit.DURATION_MS();
         long n = p * ((ms + (p / 2)) / p);  //  Arrondir à l'unité nécessaire
         TIME_UNITS tu = getFirstTimeUnit();
         do {
             long q = n / tu.DURATION_MS();
-            ret = ret + String.format(tu.FORMAT_D_NUMBER_FORMAT(), q);
+            timeFormatD = timeFormatD + String.format(tu.FORMAT_D_NUMBER_FORMAT(), q);
             if (!tu.equals(timeUnit)) {
                 n = n - q * tu.DURATION_MS();
             } else {
                 break;  //  Pas de séparateur pour terminer
             }
-            ret = ret + tu.FORMAT_D_SEPARATOR();
+            timeFormatD = timeFormatD + tu.FORMAT_D_SEPARATOR();
             tu = tu.getNextTimeUnit();
         } while (tu != null);
-        return ret;
+        return timeFormatD;
     }
 
     public static String msToTimeFormatDL(long ms, TIME_UNITS timeUnit) {
-        String ret = "";
+        String timeFormatDL = "";
         long p = timeUnit.DURATION_MS();
         long n = p * ((ms + (p / 2)) / p);  //  Arrondir à l'unité nécessaire
         TIME_UNITS tu = getFirstTimeUnit();
         do {
             long q = n / tu.DURATION_MS();
-            ret = ret + q;
+            timeFormatDL = timeFormatDL + q;
             if (tu.FORMAT_D_SEPARATOR().length() != 0)   //  Si HOUR, MIN, SEC => ajouter le séparateur DL prévu
-                ret = ret + tu.FORMAT_DL_SEPARATOR();   //  Pas de format de nombre en format DL;
+                timeFormatDL = timeFormatDL + tu.FORMAT_DL_SEPARATOR();   //  Pas de format de nombre en format DL;
             if (!tu.equals(timeUnit)) {
                 n = n - q * tu.DURATION_MS();
             } else {
@@ -152,7 +152,7 @@ public class TimeDateUtils {
             }
             tu = tu.getNextTimeUnit();
         } while (tu != null);
-        return ret;
+        return timeFormatDL;
     }
 
     public static long timeFormatDToMs(String timeFormatD) {

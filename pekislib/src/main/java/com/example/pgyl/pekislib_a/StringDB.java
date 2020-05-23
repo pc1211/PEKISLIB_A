@@ -67,14 +67,14 @@ public class StringDB extends SQLiteOpenHelper {
     public boolean tableExists(String tableName) {
         final int COUNT_INDEX = 0;
         Cursor cursor;
-        boolean ret;
+        boolean tableExists;
 
         cursor = ssdb.rawQuery(sqlForTableExists(tableName), null);
         cursor.moveToFirst();    //  cursor jamais null après rawQuery de sqlForTableExists
-        ret = (cursor.getInt(COUNT_INDEX) > 0);
+        tableExists = (cursor.getInt(COUNT_INDEX) > 0);
         cursor.close();
         cursor = null;
-        return ret;
+        return tableExists;
     }
 
     public void createTableIfNotExists(String tableName, int tableFieldsCount) {
@@ -82,18 +82,18 @@ public class StringDB extends SQLiteOpenHelper {
     }
 
     public String[][] selectRows(String tableName, String whereCondition) {
-        String[][] ret = null;
+        String[][] rows = null;
         Cursor cursor = ssdb.rawQuery(sqlForSelectUserRows(tableName, whereCondition), null);
         if (cursor != null) {
             int rowCount = cursor.getCount();
             if (rowCount > 0) {
                 cursor.moveToFirst();
                 int columnCount = cursor.getColumnCount();
-                ret = new String[rowCount][columnCount];
+                rows = new String[rowCount][columnCount];
                 for (int i = 0; i <= (rowCount - 1); i = i + 1) {
                     for (int j = 0; j <= (columnCount - 1); j = j + 1) {
                         String fieldValue = cursor.getString(j);
-                        ret[i][j] = ((fieldValue.equals(NULL_STRING)) ? null : fieldValue);
+                        rows[i][j] = ((fieldValue.equals(NULL_STRING)) ? null : fieldValue);
                     }
                     cursor.moveToNext();
                 }
@@ -101,45 +101,45 @@ public class StringDB extends SQLiteOpenHelper {
             cursor.close();
             cursor = null;
         }
-        return ret;
+        return rows;
     }
 
     public String[] selectRowById(String tableName, String idValue) {
-        String[] ret;
+        String[] row;
 
         String[][] stsa = selectRows(tableName, FIELDS.ID.toString() + " = '" + idValue + "'");
         if (stsa != null) {
-            ret = stsa[0];       //  Prendre le 1er (et unique) record (cf contrainte UNIQUE sur le champ ID)
+            row = stsa[0];       //  Prendre le 1er (et unique) record (cf contrainte UNIQUE sur le champ ID)
         } else {      //  IdValue inconnu dans la table
-            ret = null;
+            row = null;
         }
-        return ret;
+        return row;
     }
 
     public String[] selectRowByIdOrCreate(String tableName, String idValue) {
-        String[] ret;
+        String[] row;
 
         String[] sts = selectRowById(tableName, idValue);
         if (sts != null) {
-            ret = sts;
+            row = sts;
         } else {      //  IdValue inconnu dans la table => Enregistrer un record vide dans la table, avec ce IdValue
-            ret = new String[getTableFieldsCount(tableName) - 1];   //  Champ _id non compté
-            ret[FIELDS.ID.USER_INDEX()] = idValue;
-            insertOrReplaceRow(tableName, ret);
+            row = new String[getTableFieldsCount(tableName) - 1];   //  Champ _id non compté
+            row[FIELDS.ID.USER_INDEX()] = idValue;
+            insertOrReplaceRow(tableName, row);
         }
-        return ret;
+        return row;
     }
 
     public String selectFieldById(String tableName, String idValue, int fieldIndex) {
-        String ret;
+        String field;
 
         String[] sts = selectRowById(tableName, idValue);
         if (sts != null) {
-            ret = sts[fieldIndex];
+            field = sts[fieldIndex];
         } else {   //  IdValue inconnu dans la table
-            ret = null;
+            field = null;
         }
-        return ret;
+        return field;
     }
 
     public String selectFieldByIdOrCreate(String tableName, String idValue, int fieldIndex) {
@@ -176,10 +176,10 @@ public class StringDB extends SQLiteOpenHelper {
 
     private int getTableFieldsCount(String tableName) {
         Cursor cursor = ssdb.rawQuery(sqlForGetTableFieldsCount(tableName), null);
-        int ret = cursor.getColumnNames().length;    //  cursor jamais null après rawQuery de sqlForGetTableFieldsCount
+        int tableFieldsCount = cursor.getColumnNames().length;    //  cursor jamais null après rawQuery de sqlForGetTableFieldsCount
         cursor.close();
         cursor = null;
-        return ret;
+        return tableFieldsCount;
     }
 
     private String sqlForCreateTableIfNotExists(String tableName, int tableUserFieldsCount) {
@@ -203,11 +203,11 @@ public class StringDB extends SQLiteOpenHelper {
                 fieldNames = fieldNames + ", ";
             }
         }
-        String ret = "SELECT " + fieldNames + " FROM " + tableName;
+        String sql = "SELECT " + fieldNames + " FROM " + tableName;
         if (whereCondition != null) {
-            ret = ret + " WHERE " + whereCondition;
+            sql = sql + " WHERE " + whereCondition;
         }
-        return ret;
+        return sql;
     }
 
     private String sqlForInsertOrReplaceUserRow(String tableName, String[] userRow) {   //  Fonctionne grâce à la contrainte UNIQUE sur le champ ID
@@ -226,11 +226,11 @@ public class StringDB extends SQLiteOpenHelper {
     }
 
     private String sqlForDeleteRows(String tableName, String whereCondition) {
-        String ret = "DELETE FROM " + tableName;
+        String sql = "DELETE FROM " + tableName;
         if (whereCondition != null) {
-            ret = ret + " WHERE " + whereCondition;
+            sql = sql + " WHERE " + whereCondition;
         }
-        return ret;
+        return sql;
     }
 
     private String sqlForTableExists(String tableName) {

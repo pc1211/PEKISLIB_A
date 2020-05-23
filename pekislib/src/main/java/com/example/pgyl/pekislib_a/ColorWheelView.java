@@ -253,7 +253,7 @@ public final class ColorWheelView extends View {
     public void rotate(float angle) {
         int k;
 
-        float newAngle = rotationAngle + normalizedAngle(angle);
+        float newAngle = rotationAngle + getNormalizedAngle(angle);
         if (Math.abs(newAngle) > (angleSpread / 2)) {
             if (newAngle > 0) {
                 rotationAngle = newAngle - angleSpread;
@@ -282,27 +282,27 @@ public final class ColorWheelView extends View {
         return (float) Math.atan2(v.getHeight() / 2 - y, x - v.getWidth() / 2);
     }
 
-    private float normalizedAngle(float angle) {
-        float ret;
+    private float getNormalizedAngle(float angle) {
+        float normalizedAngle;
 
         if (angle >= Math.PI) {
-            ret = angle - 2 * (float) Math.PI;
+            normalizedAngle = angle - 2 * (float) Math.PI;
         } else {
             if (angle <= -(float) Math.PI) {
-                ret = angle + 2 * (float) Math.PI;
+                normalizedAngle = angle + 2 * (float) Math.PI;
             } else {
-                ret = angle;
+                normalizedAngle = angle;
             }
         }
-        return ret;
+        return normalizedAngle;
     }
 
     private Bitmap createMarkerBitmap(Picture picture) {
-        Bitmap ret = Bitmap.createBitmap((int) markerCellCanvasRect.width(), (int) markerCellCanvasRect.height(), Bitmap.Config.ARGB_8888);
-        Canvas markerCanvas = new Canvas(ret);
+        Bitmap markerBitmap = Bitmap.createBitmap((int) markerCellCanvasRect.width(), (int) markerCellCanvasRect.height(), Bitmap.Config.ARGB_8888);
+        Canvas markerCanvas = new Canvas(markerBitmap);
         float markerAspectRatio = (float) picture.getHeight() / (float) picture.getWidth();
         markerCanvas.drawPicture(picture, PointRectUtils.getMaxSubRect(markerCellCanvasRect, ALIGN_RIGHT_BOTTOM, markerAspectRatio, FULL_SIZE_COEFF));
-        return ret;
+        return markerBitmap;
     }
 
     private void setMarkerState(MARKER_STATES markerType) {

@@ -67,11 +67,11 @@ public class PresetsHandler {
     }
 
     public int getCount() {
-        int ret = 0;
+        int count = 0;
         if (!presets.isEmpty()) {
-            ret = presets.size();
+            count = presets.size();
         }
-        return ret;
+        return count;
     }
 
     public String getPresetId(int index) {
@@ -79,16 +79,16 @@ public class PresetsHandler {
     }
 
     public int getIndex(String PresetId) {
-        int ret = NOT_FOUND;
+        int index = NOT_FOUND;
         if (!presets.isEmpty()) {
             for (int i = 0; i <= (presets.size() - 1); i = i + 1) {
                 if (PresetId.equals(getPresetId(i))) {     //  Found !!
-                    ret = i;
+                    index = i;
                     break;
                 }
             }
         }
-        return ret;
+        return index;
     }
 
     public void setPresetColumn(int index, int columnIndex, String value) {
@@ -99,77 +99,77 @@ public class PresetsHandler {
         if (presets.size() >= 2) {
             Collections.sort(presets, new Comparator<String[]>() {
                 public int compare(String[] sa1, String[] sa2) {
-                    return concatenatedDisplayPresetData(sa1).compareTo(concatenatedDisplayPresetData(sa2));
+                    return getConcatenatedDisplayPresetData(sa1).compareTo(getConcatenatedDisplayPresetData(sa2));
                 }
             });
         }
     }
 
-    public ArrayList<String[]> presetDataList() {
-        ArrayList<String[]> ret = new ArrayList<String[]>();
+    public ArrayList<String[]> getPresetDataList() {
+        ArrayList<String[]> presetDataList = new ArrayList<String[]>();
         if (!presets.isEmpty()) {
             for (int i = 0; i <= (presets.size() - 1); i = i + 1) {
-                ret.add(Arrays.copyOfRange(presets.get(i), TABLE_DATA_INDEX, presets.get(i).length));   //  Exclure le champ ID);
+                presetDataList.add(Arrays.copyOfRange(presets.get(i), TABLE_DATA_INDEX, presets.get(i).length));   //  Exclure le champ ID);
             }
         }
-        return ret;
+        return presetDataList;
     }
 
-    public String[] concatenatedDisplayPresetDataList() {
-        String[] ret = new String[0];
+    public String[] getConcatenatedDisplayPresetDataList() {
+        String[] concatenatedDisplayPresetDataList = new String[0];
         if (!presets.isEmpty()) {
-            ret = new String[presets.size()];
+            concatenatedDisplayPresetDataList = new String[presets.size()];
             for (int i = 0; i <= (presets.size() - 1); i = i + 1) {
-                ret[i] = concatenatedDisplayPresetData(presets.get(i));
+                concatenatedDisplayPresetDataList[i] = getConcatenatedDisplayPresetData(presets.get(i));
             }
         }
-        return ret;
+        return concatenatedDisplayPresetDataList;
     }
 
-    private String concatenatedDisplayPresetData(String[] preset) {
-        String ret = "";
+    private String getConcatenatedDisplayPresetData(String[] preset) {
+        String concatenatedDisplayPresetData = "";
         for (int j = TABLE_DATA_INDEX; j <= (preset.length - 1); j = j + 1) {   //  Exclure le champ ID
             String s = preset[j];
             if ((keyboards[j].equals(KEYBOARDS.TIME_FORMAT_D.toString())) || (keyboards[j].equals(KEYBOARDS.TIME_FORMAT_DL.toString()))) {
                 s = msToTimeFormatD(Long.parseLong(s), TIME_UNITS.valueOf(timeUnits[j]));
             }
-            ret = ret + s;
+            concatenatedDisplayPresetData = concatenatedDisplayPresetData + s;
             if (j < (preset.length - 1)) {
-                ret = ret + separator;
+                concatenatedDisplayPresetData = concatenatedDisplayPresetData + separator;
             }
         }
-        return ret;
+        return concatenatedDisplayPresetData;
     }
 
     private int getMaxId() {
-        int ret = 0;
+        int maxId = 0;
         if (!presets.isEmpty()) {
             for (int i = 0; i <= (presets.size() - 1); i = i + 1) {
                 int k = Integer.valueOf(presets.get(i)[TABLE_ID_INDEX].substring(TABLE_IDS.PRESET.toString().length()));  // N° de PRESET
-                if (k > ret) {
-                    ret = k;
+                if (k > maxId) {
+                    maxId = k;
                 }
             }
         }
-        return ret;
+        return maxId;
     }
 
     private ArrayList<String[]> presetRowsToPresets(String[][] presetRows) {
-        ArrayList<String[]> ret = new ArrayList<String[]>();
+        ArrayList<String[]> presets = new ArrayList<String[]>();
         if (presetRows != null) {
             for (int i = 0; i <= (presetRows.length - 1); i = i + 1) {
-                ret.add(presetRows[i]);
+                presets.add(presetRows[i]);
             }
         }
-        return ret;
+        return presets;
     }
 
     private String[][] presetsToPresetRows(ArrayList<String[]> presets) {
-        String[][] ret = null;
+        String[][] presetRows = null;
         if (!presets.isEmpty()) {
-            ret = presets.toArray(new String[presets.size()][presets.get(0).length]);
+            presetRows = presets.toArray(new String[presets.size()][presets.get(0).length]);
         }
-        return ret;
+        return presetRows;
     }
 
     private String whereConditionForPresets() {

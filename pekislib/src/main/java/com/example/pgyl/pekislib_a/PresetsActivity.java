@@ -334,12 +334,12 @@ public class PresetsActivity extends Activity {
         }
         if (isTypeColors) {   //  Afficher aussi la roue de couleurs
             ListItemColorAdapter lvAdapter = new ListItemColorAdapter(this);
-            lvAdapter.setColorItems(presetsHandler.presetDataList());
-            lvAdapter.setTextItems(presetsHandler.concatenatedDisplayPresetDataList());
+            lvAdapter.setColorItems(presetsHandler.getPresetDataList());
+            lvAdapter.setTextItems(presetsHandler.getConcatenatedDisplayPresetDataList());
             listView.setAdapter(lvAdapter);
             lvAdapter = null;
         } else {
-            ListItemNoColorAdapter lvAdapter = new ListItemNoColorAdapter(this, presetsHandler.concatenatedDisplayPresetDataList());
+            ListItemNoColorAdapter lvAdapter = new ListItemNoColorAdapter(this, presetsHandler.getConcatenatedDisplayPresetDataList());
             listView.setAdapter(lvAdapter);
             lvAdapter = null;
         }

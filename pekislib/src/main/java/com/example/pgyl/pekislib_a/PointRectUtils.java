@@ -43,80 +43,80 @@ public class PointRectUtils {  //  Routines adaptées à des coordonnées (0,0) 
         }
         subWidth = subWidth * sizeCoeff;
         subHeight = subHeight * sizeCoeff;
-        RectF ret = new RectF(UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED);
+        RectF maxSubRect = new RectF(UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED);
         if (relativePositionCoeffs.left != UNDEFINED) {
-            ret.left = boundingRect.left + boundingRect.width() * relativePositionCoeffs.left;
+            maxSubRect.left = boundingRect.left + boundingRect.width() * relativePositionCoeffs.left;
         }
         if (relativePositionCoeffs.top != UNDEFINED) {
-            ret.top = boundingRect.top + boundingRect.height() * relativePositionCoeffs.top;
+            maxSubRect.top = boundingRect.top + boundingRect.height() * relativePositionCoeffs.top;
         }
         if (relativePositionCoeffs.right != UNDEFINED) {
-            ret.right = boundingRect.left + boundingRect.width() * relativePositionCoeffs.right;
+            maxSubRect.right = boundingRect.left + boundingRect.width() * relativePositionCoeffs.right;
         }
         if (relativePositionCoeffs.bottom != UNDEFINED) {
-            ret.bottom = boundingRect.top + boundingRect.height() * relativePositionCoeffs.bottom;
+            maxSubRect.bottom = boundingRect.top + boundingRect.height() * relativePositionCoeffs.bottom;
         }
-        if ((ret.left == UNDEFINED) && (ret.right == UNDEFINED)) {
-            ret.left = boundingRect.left + (boundingRect.width() - subWidth) / 2;   //  Rien de spécifié => Centrer horizontalement
-            ret.right = ret.left + subWidth;
+        if ((maxSubRect.left == UNDEFINED) && (maxSubRect.right == UNDEFINED)) {
+            maxSubRect.left = boundingRect.left + (boundingRect.width() - subWidth) / 2;   //  Rien de spécifié => Centrer horizontalement
+            maxSubRect.right = maxSubRect.left + subWidth;
         } else {
-            if (ret.left == UNDEFINED) {
-                ret.left = ret.right - subWidth;
+            if (maxSubRect.left == UNDEFINED) {
+                maxSubRect.left = maxSubRect.right - subWidth;
             }
-            if (ret.right == UNDEFINED) {
-                ret.right = ret.left + subWidth;
+            if (maxSubRect.right == UNDEFINED) {
+                maxSubRect.right = maxSubRect.left + subWidth;
             }
         }
-        if ((ret.top == UNDEFINED) && (ret.bottom == UNDEFINED)) {
-            ret.top = boundingRect.top + (boundingRect.height() - subHeight) / 2;    //  Rien de spécifié => Centrer verticalement
-            ret.bottom = ret.top + subHeight;
+        if ((maxSubRect.top == UNDEFINED) && (maxSubRect.bottom == UNDEFINED)) {
+            maxSubRect.top = boundingRect.top + (boundingRect.height() - subHeight) / 2;    //  Rien de spécifié => Centrer verticalement
+            maxSubRect.bottom = maxSubRect.top + subHeight;
         } else {
-            if (ret.top == UNDEFINED) {
-                ret.top = ret.bottom - subHeight;
+            if (maxSubRect.top == UNDEFINED) {
+                maxSubRect.top = maxSubRect.bottom - subHeight;
             }
-            if (ret.bottom == UNDEFINED) {
-                ret.bottom = ret.top + subHeight;
+            if (maxSubRect.bottom == UNDEFINED) {
+                maxSubRect.bottom = maxSubRect.top + subHeight;
             }
         }
-        return ret;
+        return maxSubRect;
     }
 
     public static RectF getSubRect(Rect boundingRect, int subWidth, int subHeight, RectF relativePositionCoeffs) {
-        RectF ret = new RectF(UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED);
+        RectF subRect = new RectF(UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED);
         if (relativePositionCoeffs.left != UNDEFINED) {
-            ret.left = boundingRect.left + (int) (boundingRect.width() * relativePositionCoeffs.left);
+            subRect.left = boundingRect.left + (int) (boundingRect.width() * relativePositionCoeffs.left);
         }
         if (relativePositionCoeffs.top != UNDEFINED) {
-            ret.top = boundingRect.top + (int) (boundingRect.height() * relativePositionCoeffs.top);
+            subRect.top = boundingRect.top + (int) (boundingRect.height() * relativePositionCoeffs.top);
         }
         if (relativePositionCoeffs.right != UNDEFINED) {
-            ret.right = boundingRect.left + (int) (boundingRect.width() * relativePositionCoeffs.right);
+            subRect.right = boundingRect.left + (int) (boundingRect.width() * relativePositionCoeffs.right);
         }
         if (relativePositionCoeffs.bottom != UNDEFINED) {
-            ret.bottom = boundingRect.top + (int) (boundingRect.height() * relativePositionCoeffs.bottom);
+            subRect.bottom = boundingRect.top + (int) (boundingRect.height() * relativePositionCoeffs.bottom);
         }
-        if ((ret.left == UNDEFINED) && (ret.right == UNDEFINED)) {
-            ret.left = boundingRect.left + (boundingRect.width() - subWidth) / 2;   //  Rien de spécifié => Centrer horizontalement
-            ret.right = ret.left + subWidth;
+        if ((subRect.left == UNDEFINED) && (subRect.right == UNDEFINED)) {
+            subRect.left = boundingRect.left + (boundingRect.width() - subWidth) / 2;   //  Rien de spécifié => Centrer horizontalement
+            subRect.right = subRect.left + subWidth;
         } else {
-            if (ret.left == UNDEFINED) {
-                ret.left = ret.right - subWidth;
+            if (subRect.left == UNDEFINED) {
+                subRect.left = subRect.right - subWidth;
             }
-            if (ret.right == UNDEFINED) {
-                ret.right = ret.left + subWidth;
+            if (subRect.right == UNDEFINED) {
+                subRect.right = subRect.left + subWidth;
             }
         }
-        if ((ret.top == UNDEFINED) && (ret.bottom == UNDEFINED)) {
-            ret.top = boundingRect.top + (boundingRect.height() - subHeight) / 2;    //  Rien de spécifié => Centrer verticalement
-            ret.bottom = ret.top + subHeight;
+        if ((subRect.top == UNDEFINED) && (subRect.bottom == UNDEFINED)) {
+            subRect.top = boundingRect.top + (boundingRect.height() - subHeight) / 2;    //  Rien de spécifié => Centrer verticalement
+            subRect.bottom = subRect.top + subHeight;
         } else {
-            if (ret.top == UNDEFINED) {
-                ret.top = ret.bottom - subHeight;
+            if (subRect.top == UNDEFINED) {
+                subRect.top = subRect.bottom - subHeight;
             }
-            if (ret.bottom == UNDEFINED) {
-                ret.bottom = ret.top + subHeight;
+            if (subRect.bottom == UNDEFINED) {
+                subRect.bottom = subRect.top + subHeight;
             }
         }
-        return ret;
+        return subRect;
     }
 }

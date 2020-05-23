@@ -184,10 +184,10 @@ public final class SymbolButtonView extends View {
     }
 
     private Bitmap createSymbolBitmap(Picture picture) {
-        Bitmap ret = Bitmap.createBitmap((int) viewCanvasRect.width(), (int) viewCanvasRect.height(), Bitmap.Config.ARGB_8888);
-        Canvas viewCanvas = new Canvas(ret);
+        Bitmap symbolBitmap = Bitmap.createBitmap((int) viewCanvasRect.width(), (int) viewCanvasRect.height(), Bitmap.Config.ARGB_8888);
+        Canvas viewCanvas = new Canvas(symbolBitmap);
         viewCanvas.drawPicture(picture, PointRectUtils.getMaxSubRect(symbolCellCanvasRect, symbolRelativePositionCoeffs, symbolAspectRatio, symbolSizeCoeff));
-        return ret;
+        return symbolBitmap;
     }
 
 }

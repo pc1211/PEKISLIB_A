@@ -46,7 +46,7 @@ public class HelpActivity extends Activity {
         super.onResume();
 
         int resourceId = getIntent().getIntExtra(HELP_ACTIVITY_EXTRA_KEYS.HTML_ID.toString(), 0);
-        String html = loadHtmlFromFile(resourceId);
+        String html = getHtmlFromFile(resourceId);
         webView.loadDataWithBaseURL(IMAGE_ASSET_FOLDER, html, MIME_TYPE, ENCODING, null);
     }
 
@@ -66,10 +66,10 @@ public class HelpActivity extends Activity {
     }
 
 
-    private String loadHtmlFromFile(int resourceId) {
+    private String getHtmlFromFile(int resourceId) {
         final int BUF_SIZE = 4096;  // Taille d'un paquet pour le buffer
 
-        String ret = "";
+        String htmlFromFile = "";
         try {
             InputStream inputStream = getResources().openRawResource(resourceId);
             byte[] bytesBuffer = new byte[BUF_SIZE];
@@ -81,14 +81,14 @@ public class HelpActivity extends Activity {
             }
             inputStream.close();
             inputStream = null;
-            ret = outputStream.toString();
+            htmlFromFile = outputStream.toString();
             outputStream.close();
             outputStream = null;
 
         } catch (IOException e) {
             msgBox("Can't read Help file", this);
         }
-        return ret;
+        return htmlFromFile;
     }
 
 }        
