@@ -25,6 +25,10 @@ public class Constants {
         }
     }
 
+    public enum SWITCHES {
+        ON, OFF
+    }
+
     public static final int DUMMY_VALUE = -1;
     public static final int NOT_FOUND = -1;
     public static final int UNDEFINED = -1;
