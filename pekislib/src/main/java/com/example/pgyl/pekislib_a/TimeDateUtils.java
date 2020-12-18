@@ -126,10 +126,10 @@ public class TimeDateUtils {
             timeFormatD = timeFormatD + String.format(tu.FORMAT_D_NUMBER_FORMAT(), q);
             if (!tu.equals(timeUnit)) {
                 n = n - q * tu.DURATION_MS();
-            } else {
-                break;  //  Pas de séparateur pour terminer
+                timeFormatD = timeFormatD + tu.FORMAT_D_SEPARATOR();
+            } else {   //  C'est terminé
+                break;
             }
-            timeFormatD = timeFormatD + tu.FORMAT_D_SEPARATOR();
             tu = tu.getNextTimeUnit();
         } while (tu != null);
         return timeFormatD;
@@ -142,12 +142,18 @@ public class TimeDateUtils {
         TIME_UNITS tu = getFirstTimeUnit();
         do {
             long q = n / tu.DURATION_MS();
-            timeFormatDL = timeFormatDL + q;
-            if (tu.FORMAT_D_SEPARATOR().length() != 0)   //  Si HOUR, MIN, SEC => ajouter le séparateur DL prévu
-                timeFormatDL = timeFormatDL + tu.FORMAT_DL_SEPARATOR();   //  Pas de format de nombre en format DL;
+            if (q != 0) {   //  Afficher l'unité de temps si différente de 0
+                timeFormatDL = timeFormatDL + q;
+                if (tu.FORMAT_D_SEPARATOR().length() != 0) {  //  Si HOUR, MIN, SEC => ajouter le séparateur DL prévu
+                    timeFormatDL = timeFormatDL + tu.FORMAT_DL_SEPARATOR();  //  Pas de format de nombre en format DL;
+                }
+            }
             if (!tu.equals(timeUnit)) {
                 n = n - q * tu.DURATION_MS();
-            } else {
+            } else {  //  C'est terminé
+                if ((q != 0) && (tu.FORMAT_D_SEPARATOR().length() == 0)) {   // Si dixièmes, centièmes ou millièmes, Ajouter le séparateur DL prévu
+                    timeFormatDL = timeFormatDL + tu.FORMAT_DL_SEPARATOR();  //  Pas de format de nombre en format DL;
+                }
                 break;
             }
             tu = tu.getNextTimeUnit();
