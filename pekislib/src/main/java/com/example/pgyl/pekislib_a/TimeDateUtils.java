@@ -137,6 +137,7 @@ public class TimeDateUtils {
 
     public static String msToTimeFormatDL(long ms, TIME_UNITS timeUnit) {
         String timeFormatDL = "";
+        String collectZeros = "";
         long p = timeUnit.DURATION_MS();
         long n = p * ((ms + (p / 2)) / p);  //  Arrondir à l'unité nécessaire
         TIME_UNITS tu = getFirstTimeUnit();
@@ -147,12 +148,17 @@ public class TimeDateUtils {
                 if (tu.FORMAT_D_SEPARATOR().length() != 0) {  //  Si HOUR, MIN, SEC => ajouter le séparateur DL prévu
                     timeFormatDL = timeFormatDL + tu.FORMAT_DL_SEPARATOR();  //  Pas de format de nombre en format DL;
                 }
+            } else {   //  0
+                collectZeros = collectZeros + "0" + tu.FORMAT_DL_SEPARATOR();
             }
-            if (!tu.equals(timeUnit)) {
+            if (!tu.equals(timeUnit)) {   //  Précision demandée non encore atteinte
                 n = n - q * tu.DURATION_MS();
             } else {  //  C'est terminé
                 if ((q != 0) && (tu.FORMAT_D_SEPARATOR().length() == 0)) {   // Si dixièmes, centièmes ou millièmes, Ajouter le séparateur DL prévu
                     timeFormatDL = timeFormatDL + tu.FORMAT_DL_SEPARATOR();  //  Pas de format de nombre en format DL;
+                }
+                if (timeFormatDL.isEmpty()) {
+                    timeFormatDL = collectZeros;   //  0h0m0s0t si TS
                 }
                 break;
             }

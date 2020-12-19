@@ -322,7 +322,12 @@ public class InputButtonsActivity extends Activity {
     }
 
     private final int BUTTONS_PER_PAGE = 32;      //  Nombre maximum de boutons d'input par page (8x4 ou 4x8)
+    private final String NO_ERROR = "OK";
+    private final String ERROR_MIN = "Error: Minimum ";
+    private final String ERROR_MAX = "Error: Maximum ";
+    private final String ERROR_PARSE = "Error: Must parse ";
     private static final String NA = "NA";        //  Emplacement occupé mais invisible
+
     //endregion
     //region Variables
     private String[] buttonTexts;
@@ -435,7 +440,7 @@ public class InputButtonsActivity extends Activity {
         String smin = getMin(stringDB, tableName, columnIndex);
         String smax = getMax(stringDB, tableName, columnIndex);
         String regexp = getRegExp(stringDB, tableName, columnIndex);
-        String error = noErrorMessage();
+        String error = NO_ERROR;
         if (regexp != null) {   //  Regexp non vide
             if (!candidate.matches(regexp)) {
                 error = "Error: Must match " + regexp;
@@ -443,7 +448,7 @@ public class InputButtonsActivity extends Activity {
                 error = parseCandidate(candidate, smin, smax);
             }
         }
-        if (error.equals(noErrorMessage())) {  //  Good guy
+        if (error.equals(NO_ERROR)) {  //  Good guy
             editString = normalizedCandidate(candidate);
             Intent returnIntent = new Intent();
             setResult(RESULT_OK, returnIntent);
@@ -558,7 +563,7 @@ public class InputButtonsActivity extends Activity {
     }
 
     private String parseCandidate(String candidate, String smin, String smax) {
-        String errorParseCandidate = noErrorMessage();
+        String errorParseCandidate = NO_ERROR;
         if (candidate.length() >= 1) {
             if ((keyboard.equals(KEYBOARDS.ALPHANUM)) || (keyboard.equals(KEYBOARDS.ASCII))) {
                 errorParseCandidate = parseAlphanum(candidate, smin, smax);
@@ -604,177 +609,161 @@ public class InputButtonsActivity extends Activity {
         return normalizedCandidate;
     }
 
-    private String noErrorMessage() {
-        return "OK";
-    }
-
-    private String errorMessageParse(KEYBOARDS keyboard) {
-        return "Error: Must parse " + keyboard.toString();
-    }
-
-    private String errorMessageMin(String smin) {
-        return "Error: Minimum " + smin;
-    }
-
-    private String errorMessageMax(String smax) {
-        return "Error: Maximum " + smax;
-    }
-
     private String parseAlphanum(String sed, String smin, String smax) {
-        String errorParseAlphanum = noErrorMessage();
+        String errorParseAlphanum = NO_ERROR;
         if (smin != null) {
             if (sed.compareTo(smin) < 0) {
-                errorParseAlphanum = errorMessageMin(smin);
+                errorParseAlphanum = ERROR_MIN + smin;
             }
         }
         if (smax != null) {
             if (sed.compareTo(smax) > 0) {
-                errorParseAlphanum = errorMessageMax(smax);
+                errorParseAlphanum = ERROR_MAX + smax;
             }
         }
         return errorParseAlphanum;
     }
 
     private String parseTimeFormatD(String sed, String smin, String smax) {
-        String errorParseTimeFormatD = noErrorMessage();
+        String errorParseTimeFormatD = NO_ERROR;
         long ms = timeFormatDToMs(sed);
         if (ms != ERROR_VALUE) {
             if (smin != null) {
-                long min = timeFormatDLToMs(smin);
+                long min = Long.parseLong(smin);
                 if (ms < min) {
-                    errorParseTimeFormatD = errorMessageMin(msToTimeFormatD(min, timeUnit));
+                    errorParseTimeFormatD = ERROR_MIN + msToTimeFormatD(min, timeUnit);
                 }
             }
             if (smax != null) {
-                long max = timeFormatDLToMs(smax);
+                long max = Long.parseLong(smax);
                 if (ms > max) {
-                    errorParseTimeFormatD = errorMessageMax(msToTimeFormatD(max, timeUnit));
+                    errorParseTimeFormatD = ERROR_MAX + msToTimeFormatD(max, timeUnit);
                 }
             }
         } else {
-            errorParseTimeFormatD = errorMessageParse(KEYBOARDS.TIME_FORMAT_D);
+            errorParseTimeFormatD = ERROR_PARSE + KEYBOARDS.TIME_FORMAT_D;
         }
         return errorParseTimeFormatD;
     }
 
     private String parseTimeFormatDL(String sed, String smin, String smax) {
-        String errorParseTimeFormatDL = noErrorMessage();
+        String errorParseTimeFormatDL = NO_ERROR;
         long ms = timeFormatDLToMs(sed);
         if (ms != ERROR_VALUE) {
             if (smin != null) {
-                long min = timeFormatDLToMs(smin);
+                long min = Long.parseLong(smin);
                 if (ms < min) {
-                    errorParseTimeFormatDL = errorMessageMin(msToTimeFormatDL(min, timeUnit));
+                    errorParseTimeFormatDL = ERROR_MIN + msToTimeFormatDL(min, timeUnit);
                 }
             }
             if (smax != null) {
-                long max = timeFormatDLToMs(smax);
+                long max = Long.parseLong(smax);
                 if (ms > max) {
-                    errorParseTimeFormatDL = errorMessageMax(msToTimeFormatDL(max, timeUnit));
+                    errorParseTimeFormatDL = ERROR_MAX + msToTimeFormatDL(max, timeUnit);
                 }
             }
         } else {
-            errorParseTimeFormatDL = errorMessageParse(KEYBOARDS.TIME_FORMAT_DL);
+            errorParseTimeFormatDL = ERROR_PARSE + KEYBOARDS.TIME_FORMAT_DL;
         }
         return errorParseTimeFormatDL;
     }
 
     private String parseDATEJJMMAAAA(String sed, String smin, String smax) {
-        String errorParseDATEJJMMAAAA = noErrorMessage();
+        String errorParseDATEJJMMAAAA = NO_ERROR;
         try {
             Date d = ddMMyyyy.parse(sed);
             if (smin != null) {
                 if (d.compareTo(ddMMyyyy.parse(smin)) < 0) {   //  Date inférieure au minimum
-                    errorParseDATEJJMMAAAA = errorMessageMin(smin);
+                    errorParseDATEJJMMAAAA = ERROR_MIN + smin;
                 }
             }
             if (smax != null) {
                 if (d.compareTo(ddMMyyyy.parse(smax)) > 0) {   //  Date supérieure au maximum
-                    errorParseDATEJJMMAAAA = errorMessageMax(smax);
+                    errorParseDATEJJMMAAAA = ERROR_MAX + smax;
                 }
             }
         } catch (ParseException ex) {
-            errorParseDATEJJMMAAAA = errorMessageParse(KEYBOARDS.DATE_JJMMAAAA);
+            errorParseDATEJJMMAAAA = ERROR_PARSE + KEYBOARDS.DATE_JJMMAAAA;
         }
         return errorParseDATEJJMMAAAA;
     }
 
     private String parsePosInteger(String sed, String smin, String smax) {
-        String errorParsePosInteger = noErrorMessage();
+        String errorParsePosInteger = NO_ERROR;
         try {
             int l = Integer.parseInt(sed);
             if (smin != null) {
                 if (l < Integer.parseInt(smin)) {
-                    errorParsePosInteger = errorMessageMin(smin);
+                    errorParsePosInteger = ERROR_MIN + smin;
                 }
             }
             if (smax != null) {
                 if (l > Integer.parseInt(smax)) {
-                    errorParsePosInteger = errorMessageMax(smax);
+                    errorParsePosInteger = ERROR_MAX + smax;
                 }
             }
         } catch (NumberFormatException ex) {
-            errorParsePosInteger = errorMessageParse(KEYBOARDS.POSINT);
+            errorParsePosInteger = ERROR_PARSE + KEYBOARDS.POSINT;
         }
         return errorParsePosInteger;
     }
 
     private String parseLong(String sed, String smin, String smax) {
-        String errorParseLong = noErrorMessage();
+        String errorParseLong = NO_ERROR;
         try {
             long l = Long.parseLong(sed);
             if (smin != null) {
                 if (l < Long.parseLong(smin)) {
-                    errorParseLong = errorMessageMin(smin);
+                    errorParseLong = ERROR_MIN + smin;
                 }
             }
             if (smax != null) {
                 if (l > Long.parseLong(smax)) {
-                    errorParseLong = errorMessageMax(smax);
+                    errorParseLong = ERROR_MAX + smax;
                 }
             }
         } catch (NumberFormatException ex) {
-            errorParseLong = errorMessageParse(KEYBOARDS.LONG);
+            errorParseLong = ERROR_PARSE + KEYBOARDS.LONG;
         }
         return errorParseLong;
     }
 
     private String parseFloat(String sed, String smin, String smax) {
-        String errorParseFloat = noErrorMessage();
+        String errorParseFloat = NO_ERROR;
         try {
             float f = Float.parseFloat(sed);
             if (smin != null) {
                 if (f < Float.parseFloat(smin)) {
-                    errorParseFloat = errorMessageMin(smin);
+                    errorParseFloat = ERROR_MIN + smin;
                 }
             }
             if (smax != null) {
                 if (f > Float.parseFloat(smax)) {
-                    errorParseFloat = errorMessageMax(smax);
+                    errorParseFloat = ERROR_MAX + smax;
                 }
             }
         } catch (NumberFormatException ex) {
-            errorParseFloat = errorMessageParse(KEYBOARDS.FLOAT);
+            errorParseFloat = ERROR_PARSE + KEYBOARDS.FLOAT;
         }
         return errorParseFloat;
     }
 
     private String parseHex(String sed, String smin, String smax) {
-        String errorParseHex = noErrorMessage();
+        String errorParseHex = NO_ERROR;
         try {
             long l = Long.parseLong(sed, HEX_RADIX);
             if (smin != null) {
                 if (l < Long.parseLong(smin, HEX_RADIX)) {
-                    errorParseHex = errorMessageMin(smin);
+                    errorParseHex = ERROR_MIN + smin;
                 }
             }
             if (smax != null) {
                 if (l > Long.parseLong(smax, HEX_RADIX)) {
-                    errorParseHex = errorMessageMax(smax);
+                    errorParseHex = ERROR_MAX + smax;
                 }
             }
         } catch (NumberFormatException ex) {
-            errorParseHex = errorMessageParse(KEYBOARDS.HEX);
+            errorParseHex = ERROR_PARSE + KEYBOARDS.HEX;
         }
         return errorParseHex;
     }
