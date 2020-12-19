@@ -112,6 +112,10 @@ public class StringDBUtils {
         return stringDB.selectRowByIdOrCreate(tableName, TABLE_IDS.DEFAULT.toString());
     }
 
+    public static String[] getDefaultsBase(StringDB stringDB, String tableName) {
+        return stringDB.selectRowByIdOrCreate(tableName, TABLE_IDS.DEFAULT_BASE.toString());
+    }
+
     public static void setDefaults(StringDB stringDB, String tableName, String[] values) {
         stringDB.insertOrReplaceRowById(tableName, TABLE_IDS.DEFAULT.toString(), values);
     }
