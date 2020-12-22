@@ -135,6 +135,12 @@ public class TimeDateUtils {
         return timeFormatD;
     }
 
+    public static long msToTimeUnit(long ms, TIME_UNITS timeUnit) {
+        long p = timeUnit.DURATION_MS();
+        long n = p * ((ms + (p / 2)) / p);  //  Arrondir à l'unité nécessaire
+        return (n / timeUnit.DURATION_MS());
+    }
+
     public static String msToTimeFormatDL(long ms, TIME_UNITS timeUnit) {
         String timeFormatDL = "";
         String collectZeros = "";
