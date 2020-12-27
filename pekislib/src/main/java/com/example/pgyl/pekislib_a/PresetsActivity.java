@@ -34,7 +34,7 @@ import static com.example.pgyl.pekislib_a.StringDBUtils.getCurrentsFromActivity;
 import static com.example.pgyl.pekislib_a.StringDBUtils.getDefaults;
 import static com.example.pgyl.pekislib_a.StringDBUtils.getKeyboards;
 import static com.example.pgyl.pekislib_a.StringDBUtils.getLabels;
-import static com.example.pgyl.pekislib_a.StringDBUtils.getTimeUnits;
+import static com.example.pgyl.pekislib_a.StringDBUtils.getTimeUnitPrecisions;
 import static com.example.pgyl.pekislib_a.StringDBUtils.isColdStartStatusOfActivity;
 import static com.example.pgyl.pekislib_a.StringDBUtils.setCurrentForActivity;
 import static com.example.pgyl.pekislib_a.StringDBUtils.setCurrentsForActivity;
@@ -82,7 +82,7 @@ public class PresetsActivity extends Activity {
     private String[] preset;
     private String[] labelNames;
     private String[] keyboards;
-    private String[] timeUnits;
+    private String[] timeUnitPrecisions;
     private String[] defaults;
     private String tableName;
     private boolean isTypeColors;
@@ -134,7 +134,7 @@ public class PresetsActivity extends Activity {
         preset = getCurrentsFromActivity(stringDB, PEKISLIB_ACTIVITIES.PRESETS.toString(), tableName);
         labelNames = getLabels(stringDB, tableName);
         keyboards = getKeyboards(stringDB, tableName);
-        timeUnits = getTimeUnits(stringDB, tableName);
+        timeUnitPrecisions = getTimeUnitPrecisions(stringDB, tableName);
         defaults = getDefaults(stringDB, tableName);
 
         if (isColdStartStatusOfActivity(stringDB, PEKISLIB_ACTIVITIES.PRESETS.toString())) {
@@ -301,7 +301,7 @@ public class PresetsActivity extends Activity {
 
         String fieldText = preset[columnIndex];
         if ((keyboards[columnIndex].equals(KEYBOARDS.TIME_FORMAT_D.toString())) || (keyboards[columnIndex].equals(KEYBOARDS.TIME_FORMAT_DL.toString()))) {
-            fieldText = msToTimeFormatD(Long.parseLong(fieldText), TIME_UNITS.valueOf(timeUnits[columnIndex]));
+            fieldText = msToTimeFormatD(Long.parseLong(fieldText), TIME_UNITS.valueOf(timeUnitPrecisions[columnIndex]));
         }
         buttons[COMMANDS.FIELD.INDEX()].setText(fieldText);
         buttons[COMMANDS.NEXT_FIELD.INDEX()].setText(labelNames[columnIndex] + SYMBOL_NEXT);

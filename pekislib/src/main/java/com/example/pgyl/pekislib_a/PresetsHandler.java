@@ -11,7 +11,7 @@ import static com.example.pgyl.pekislib_a.StringDB.TABLE_DATA_INDEX;
 import static com.example.pgyl.pekislib_a.StringDB.TABLE_ID_INDEX;
 import static com.example.pgyl.pekislib_a.StringDBTables.TABLE_IDS;
 import static com.example.pgyl.pekislib_a.StringDBUtils.getKeyboards;
-import static com.example.pgyl.pekislib_a.StringDBUtils.getTimeUnits;
+import static com.example.pgyl.pekislib_a.StringDBUtils.getTimeUnitPrecisions;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.TIME_UNITS;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.msToTimeFormatD;
 
@@ -21,7 +21,7 @@ public class PresetsHandler {
     private String tableName;
     private ArrayList<String[]> presets;
     private String[] keyboards;
-    private String[] timeUnits;
+    private String[] timeUnitPrecisions;
     private String separator;
     //endregion
 
@@ -55,7 +55,7 @@ public class PresetsHandler {
         this.tableName = tableName;
         presets = presetRowsToPresets(getPresetRows());
         keyboards = getKeyboards(stringDB, tableName);
-        timeUnits = getTimeUnits(stringDB, tableName);
+        timeUnitPrecisions = getTimeUnitPrecisions(stringDB, tableName);
     }
 
     public void setSeparator(String separator) {
@@ -131,7 +131,7 @@ public class PresetsHandler {
         for (int j = TABLE_DATA_INDEX; j <= (preset.length - 1); j = j + 1) {   //  Exclure le champ ID
             String s = preset[j];
             if ((keyboards[j].equals(KEYBOARDS.TIME_FORMAT_D.toString())) || (keyboards[j].equals(KEYBOARDS.TIME_FORMAT_DL.toString()))) {
-                s = msToTimeFormatD(Long.parseLong(s), TIME_UNITS.valueOf(timeUnits[j]));
+                s = msToTimeFormatD(Long.parseLong(s), TIME_UNITS.valueOf(timeUnitPrecisions[j]));
             }
             concatenatedDisplayPresetData = concatenatedDisplayPresetData + s;
             if (j < (preset.length - 1)) {

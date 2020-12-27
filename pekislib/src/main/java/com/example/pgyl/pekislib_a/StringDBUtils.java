@@ -84,12 +84,12 @@ public class StringDBUtils {
         return stringDB.selectRowByIdOrCreate(tableName, TABLE_IDS.KEYBOARD.toString());
     }
 
-    public static String getTimeUnit(StringDB stringDB, String tableName, int index) {
-        return stringDB.selectFieldByIdOrCreate(tableName, TABLE_IDS.TIMEUNIT.toString(), index);
+    public static String getTimeUnitPrecision(StringDB stringDB, String tableName, int index) {
+        return stringDB.selectFieldByIdOrCreate(tableName, TABLE_IDS.TIMEUNIT_PRECISION.toString(), index);
     }
 
-    public static String[] getTimeUnits(StringDB stringDB, String tableName) {
-        return stringDB.selectRowByIdOrCreate(tableName, TABLE_IDS.TIMEUNIT.toString());
+    public static String[] getTimeUnitPrecisions(StringDB stringDB, String tableName) {
+        return stringDB.selectRowByIdOrCreate(tableName, TABLE_IDS.TIMEUNIT_PRECISION.toString());
     }
 
     public static String getMin(StringDB stringDB, String tableName, int index) {

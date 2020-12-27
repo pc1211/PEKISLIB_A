@@ -39,7 +39,7 @@ import static com.example.pgyl.pekislib_a.StringDBUtils.getKeyboard;
 import static com.example.pgyl.pekislib_a.StringDBUtils.getMax;
 import static com.example.pgyl.pekislib_a.StringDBUtils.getMin;
 import static com.example.pgyl.pekislib_a.StringDBUtils.getRegExp;
-import static com.example.pgyl.pekislib_a.StringDBUtils.getTimeUnit;
+import static com.example.pgyl.pekislib_a.StringDBUtils.getTimeUnitPrecision;
 import static com.example.pgyl.pekislib_a.StringDBUtils.isColdStartStatusOfActivity;
 import static com.example.pgyl.pekislib_a.StringDBUtils.setCurrentForActivity;
 import static com.example.pgyl.pekislib_a.StringDBUtils.setStartStatusOfActivity;
@@ -336,7 +336,7 @@ public class InputButtonsActivity extends Activity {
     private int pages;
     private int pageIndex;
     private CASES caze;
-    private TIME_UNITS timeUnit;
+    private TIME_UNITS timeUnitPrecision;
     private boolean append;             //  True si les caractères entrés s'ajoutent à la chaîne d'entrée
     private String tableName;
     private int columnIndex;
@@ -384,7 +384,7 @@ public class InputButtonsActivity extends Activity {
         editString = getCurrentFromActivity(stringDB, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), tableName, columnIndex);
         keyboard = KEYBOARDS.valueOf(getKeyboard(stringDB, tableName, columnIndex));
         if ((keyboard.equals(KEYBOARDS.TIME_FORMAT_D)) || (keyboard.equals(KEYBOARDS.TIME_FORMAT_DL))) {
-            timeUnit = TIME_UNITS.valueOf(getTimeUnit(stringDB, tableName, columnIndex));
+            timeUnitPrecision = TIME_UNITS.valueOf(getTimeUnitPrecision(stringDB, tableName, columnIndex));
         }
         buttonTexts = getButtonTexts(keyboard);
         pages = ((buttonTexts.length - 1) / BUTTONS_PER_PAGE) + 1;
@@ -396,10 +396,10 @@ public class InputButtonsActivity extends Activity {
             caze = CASES.NO_CASE;
             append = APPEND_DEFAULT_VALUE;
             if (keyboard.equals(KEYBOARDS.TIME_FORMAT_D)) {
-                editString = msToTimeFormatD(Long.parseLong(editString), timeUnit);
+                editString = msToTimeFormatD(Long.parseLong(editString), timeUnitPrecision);
             }
             if (keyboard.equals(KEYBOARDS.TIME_FORMAT_DL)) {
-                editString = msToTimeFormatDL(Long.parseLong(editString), timeUnit);
+                editString = msToTimeFormatDL(Long.parseLong(editString), timeUnitPrecision);
             }
         } else {
             pageIndex = getSHPcurrentPageIndex();
@@ -631,13 +631,13 @@ public class InputButtonsActivity extends Activity {
             if (smin != null) {
                 long min = Long.parseLong(smin);
                 if (ms < min) {
-                    errorParseTimeFormatD = ERROR_MIN + msToTimeFormatD(min, timeUnit);
+                    errorParseTimeFormatD = ERROR_MIN + msToTimeFormatD(min, timeUnitPrecision);
                 }
             }
             if (smax != null) {
                 long max = Long.parseLong(smax);
                 if (ms > max) {
-                    errorParseTimeFormatD = ERROR_MAX + msToTimeFormatD(max, timeUnit);
+                    errorParseTimeFormatD = ERROR_MAX + msToTimeFormatD(max, timeUnitPrecision);
                 }
             }
         } else {
@@ -653,13 +653,13 @@ public class InputButtonsActivity extends Activity {
             if (smin != null) {
                 long min = Long.parseLong(smin);
                 if (ms < min) {
-                    errorParseTimeFormatDL = ERROR_MIN + msToTimeFormatDL(min, timeUnit);
+                    errorParseTimeFormatDL = ERROR_MIN + msToTimeFormatDL(min, timeUnitPrecision);
                 }
             }
             if (smax != null) {
                 long max = Long.parseLong(smax);
                 if (ms > max) {
-                    errorParseTimeFormatDL = ERROR_MAX + msToTimeFormatDL(max, timeUnit);
+                    errorParseTimeFormatDL = ERROR_MAX + msToTimeFormatDL(max, timeUnitPrecision);
                 }
             }
         } else {
