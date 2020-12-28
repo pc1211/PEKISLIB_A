@@ -85,11 +85,11 @@ public class StringDBUtils {
     }
 
     public static String getTimeUnitPrecision(StringDB stringDB, String tableName, int index) {
-        return stringDB.selectFieldByIdOrCreate(tableName, TABLE_IDS.TIMEUNIT_PRECISION.toString(), index);
+        return stringDB.selectFieldByIdOrCreate(tableName, TABLE_IDS.TIME_UNIT_PRECISION.toString(), index);
     }
 
     public static String[] getTimeUnitPrecisions(StringDB stringDB, String tableName) {
-        return stringDB.selectRowByIdOrCreate(tableName, TABLE_IDS.TIMEUNIT_PRECISION.toString());
+        return stringDB.selectRowByIdOrCreate(tableName, TABLE_IDS.TIME_UNIT_PRECISION.toString());
     }
 
     public static String getMin(StringDB stringDB, String tableName, int index) {
