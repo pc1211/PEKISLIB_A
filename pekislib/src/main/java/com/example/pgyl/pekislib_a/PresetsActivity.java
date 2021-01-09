@@ -39,6 +39,7 @@ import static com.example.pgyl.pekislib_a.StringDBUtils.isColdStartStatusOfActiv
 import static com.example.pgyl.pekislib_a.StringDBUtils.setCurrentForActivity;
 import static com.example.pgyl.pekislib_a.StringDBUtils.setCurrentsForActivity;
 import static com.example.pgyl.pekislib_a.StringDBUtils.setStartStatusOfActivity;
+import static com.example.pgyl.pekislib_a.TimeDateUtils.ROUND_TO_TIME_UNIT_PRECISION;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.TIME_UNITS;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.msToTimeFormatD;
 
@@ -301,7 +302,7 @@ public class PresetsActivity extends Activity {
 
         String fieldText = preset[columnIndex];
         if ((keyboards[columnIndex].equals(KEYBOARDS.TIME_FORMAT_D.toString())) || (keyboards[columnIndex].equals(KEYBOARDS.TIME_FORMAT_DL.toString()))) {
-            fieldText = msToTimeFormatD(Long.parseLong(fieldText), TIME_UNITS.valueOf(timeUnitPrecisions[columnIndex]));
+            fieldText = msToTimeFormatD(Long.parseLong(fieldText), TIME_UNITS.valueOf(timeUnitPrecisions[columnIndex]), ROUND_TO_TIME_UNIT_PRECISION);
         }
         buttons[COMMANDS.FIELD.INDEX()].setText(fieldText);
         buttons[COMMANDS.NEXT_FIELD.INDEX()].setText(labelNames[columnIndex] + SYMBOL_NEXT);

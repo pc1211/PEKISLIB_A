@@ -65,6 +65,7 @@ public class TimeDateUtils {
     public static final int MINUTES_PER_HOUR = 60;
     public static final int SECONDS_PER_MINUTE = 60;
     public static final int MILLISECONDS_PER_SECOND = 1000;
+    public static final boolean ROUND_TO_TIME_UNIT_PRECISION = false;
 
     public static TIME_UNITS getFirstTimeUnit() {  //  1e unité à décoder et initialisation (lazy) de nextTimeUnit de chaque unité
         TIME_UNITS firstTimeUnit = TIME_UNITS.HOUR;
@@ -116,10 +117,10 @@ public class TimeDateUtils {
         return formattedTimeZoneLongTimeDate;
     }
 
-    public static String msToTimeFormatD(long ms, TIME_UNITS timeUnitPrecision) {
+    public static String msToTimeFormatD(long ms, TIME_UNITS timeUnitPrecision, boolean roundToTimeUnitPrecision) {
         String timeFormatD = "";
         long p = timeUnitPrecision.DURATION_MS();
-        long n = p * ((ms + (p / 2)) / p);  //  Arrondir à l'unité nécessaire
+        long n = ((roundToTimeUnitPrecision) ? p * ((ms + (p / 2)) / p) : ms);   //  Arrondir à l'unité si demandé
         TIME_UNITS tu = getFirstTimeUnit();
         do {
             long q = n / tu.DURATION_MS();
@@ -135,17 +136,17 @@ public class TimeDateUtils {
         return timeFormatD;
     }
 
-    public static long msToTimeUnit(long ms, TIME_UNITS timeUnitPrecision) {
+    public static long msToTimeUnit(long ms, TIME_UNITS timeUnitPrecision, boolean roundToTimeUnitPrecision) {
         long p = timeUnitPrecision.DURATION_MS();
-        long n = p * ((ms + (p / 2)) / p);  //  Arrondir à l'unité nécessaire
+        long n = ((roundToTimeUnitPrecision) ? p * ((ms + (p / 2)) / p) : ms);   //  Arrondir à l'unité si demandé
         return (n / timeUnitPrecision.DURATION_MS());
     }
 
-    public static String msToTimeFormatDL(long ms, TIME_UNITS timeUnitPrecision) {
+    public static String msToTimeFormatDL(long ms, TIME_UNITS timeUnitPrecision, boolean roundToTimeUnitPrecision) {
         String timeFormatDL = "";
         String collectZeros = "";
         long p = timeUnitPrecision.DURATION_MS();
-        long n = p * ((ms + (p / 2)) / p);  //  Arrondir à l'unité nécessaire
+        long n = ((roundToTimeUnitPrecision) ? p * ((ms + (p / 2)) / p) : ms);   //  Arrondir à l'unité si demandé
         TIME_UNITS tu = getFirstTimeUnit();
         do {
             long q = n / tu.DURATION_MS();

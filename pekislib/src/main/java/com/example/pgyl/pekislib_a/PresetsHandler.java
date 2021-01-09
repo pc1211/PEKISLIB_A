@@ -12,6 +12,7 @@ import static com.example.pgyl.pekislib_a.StringDB.TABLE_ID_INDEX;
 import static com.example.pgyl.pekislib_a.StringDBTables.TABLE_IDS;
 import static com.example.pgyl.pekislib_a.StringDBUtils.getKeyboards;
 import static com.example.pgyl.pekislib_a.StringDBUtils.getTimeUnitPrecisions;
+import static com.example.pgyl.pekislib_a.TimeDateUtils.ROUND_TO_TIME_UNIT_PRECISION;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.TIME_UNITS;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.msToTimeFormatD;
 
@@ -131,7 +132,7 @@ public class PresetsHandler {
         for (int j = TABLE_DATA_INDEX; j <= (preset.length - 1); j = j + 1) {   //  Exclure le champ ID
             String s = preset[j];
             if ((keyboards[j].equals(KEYBOARDS.TIME_FORMAT_D.toString())) || (keyboards[j].equals(KEYBOARDS.TIME_FORMAT_DL.toString()))) {
-                s = msToTimeFormatD(Long.parseLong(s), TIME_UNITS.valueOf(timeUnitPrecisions[j]));
+                s = msToTimeFormatD(Long.parseLong(s), TIME_UNITS.valueOf(timeUnitPrecisions[j]), ROUND_TO_TIME_UNIT_PRECISION);
             }
             concatenatedDisplayPresetData = concatenatedDisplayPresetData + s;
             if (j < (preset.length - 1)) {
