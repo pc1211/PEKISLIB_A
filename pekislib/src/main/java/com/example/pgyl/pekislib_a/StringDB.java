@@ -105,15 +105,8 @@ public class StringDB extends SQLiteOpenHelper {
     }
 
     public String[] selectRowById(String tableName, String idValue) {
-        String[] row;
-
         String[][] stsa = selectRows(tableName, FIELDS.ID.toString() + " = '" + idValue + "'");
-        if (stsa != null) {
-            row = stsa[0];       //  Prendre le 1er (et unique) record (cf contrainte UNIQUE sur le champ ID)
-        } else {      //  IdValue inconnu dans la table
-            row = null;
-        }
-        return row;
+        return ((stsa != null) ? stsa[0] : null);    //  Prendre le 1er (et unique) record (cf contrainte UNIQUE sur le champ ID);
     }
 
     public String[] selectRowByIdOrCreate(String tableName, String idValue) {
@@ -131,15 +124,8 @@ public class StringDB extends SQLiteOpenHelper {
     }
 
     public String selectFieldById(String tableName, String idValue, int fieldIndex) {
-        String field;
-
         String[] sts = selectRowById(tableName, idValue);
-        if (sts != null) {
-            field = sts[fieldIndex];
-        } else {   //  IdValue inconnu dans la table
-            field = null;
-        }
-        return field;
+        return ((sts != null) ? sts[fieldIndex] : null);
     }
 
     public String selectFieldByIdOrCreate(String tableName, String idValue, int fieldIndex) {
