@@ -105,17 +105,13 @@ public class StringDB extends SQLiteOpenHelper {
     }
 
     public String[] selectRowById(String tableName, String idValue) {
-        String[][] stsa = selectRows(tableName, FIELDS.ID.toString() + " = '" + idValue + "'");
-        return ((stsa != null) ? stsa[0] : null);    //  Prendre le 1er (et unique) record (cf contrainte UNIQUE sur le champ ID);
+        String[][] rows = selectRows(tableName, FIELDS.ID.toString() + " = '" + idValue + "'");
+        return ((rows != null) ? rows[0] : null);    //  Prendre le 1er (et unique) record (cf contrainte UNIQUE sur le champ ID);
     }
 
     public String[] selectRowByIdOrCreate(String tableName, String idValue) {
-        String[] row;
-
-        String[] sts = selectRowById(tableName, idValue);
-        if (sts != null) {
-            row = sts;
-        } else {      //  IdValue inconnu dans la table => Enregistrer un record vide dans la table, avec ce IdValue
+        String[] row = selectRowById(tableName, idValue);
+        if (row == null) {   //  IdValue inconnu dans la table => Enregistrer un record vide dans la table, avec ce IdValue
             row = new String[getTableFieldsCount(tableName) - 1];   //  Champ _id non compté
             row[FIELDS.ID.USER_INDEX()] = idValue;
             insertOrReplaceRow(tableName, row);
@@ -124,8 +120,8 @@ public class StringDB extends SQLiteOpenHelper {
     }
 
     public String selectFieldById(String tableName, String idValue, int fieldIndex) {
-        String[] sts = selectRowById(tableName, idValue);
-        return ((sts != null) ? sts[fieldIndex] : null);
+        String[] row = selectRowById(tableName, idValue);
+        return ((row != null) ? row[fieldIndex] : null);
     }
 
     public String selectFieldByIdOrCreate(String tableName, String idValue, int fieldIndex) {
@@ -145,15 +141,15 @@ public class StringDB extends SQLiteOpenHelper {
     }
 
     public void insertOrReplaceRowById(String tableName, String idValue, String[] row) {
-        String[] sts = Arrays.copyOf(row, row.length);
-        sts[FIELDS.ID.USER_INDEX()] = idValue;
-        insertOrReplaceRow(tableName, sts);
+        String[] rowCopy = Arrays.copyOf(row, row.length);
+        rowCopy[FIELDS.ID.USER_INDEX()] = idValue;
+        insertOrReplaceRow(tableName, rowCopy);
     }
 
     public void insertOrReplaceFieldById(String tableName, String idValue, int fieldIndex, String value) {
-        String[] sts = selectRowByIdOrCreate(tableName, idValue);
-        sts[fieldIndex] = value;
-        insertOrReplaceRow(tableName, sts);
+        String[] row = selectRowByIdOrCreate(tableName, idValue);
+        row[fieldIndex] = value;
+        insertOrReplaceRow(tableName, row);
     }
 
     public void deleteRows(String tableName, String whereCondition) {
