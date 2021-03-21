@@ -65,7 +65,7 @@ public class TimeDateUtils {
     public static final int MINUTES_PER_HOUR = 60;
     public static final int SECONDS_PER_MINUTE = 60;
     public static final int MILLISECONDS_PER_SECOND = 1000;
-    public static final boolean ROUND_TO_TIME_UNIT_PRECISION = false;
+    public static final boolean ROUND_TO_TIME_UNIT_PRECISION = true;
 
     public static TIME_UNITS getFirstTimeUnit() {  //  1e unité à décoder et initialisation (lazy) de nextTimeUnit de chaque unité
         TIME_UNITS firstTimeUnit = TIME_UNITS.HOUR;
