@@ -65,7 +65,6 @@ public class TimeDateUtils {
     public static final int MINUTES_PER_HOUR = 60;
     public static final int SECONDS_PER_MINUTE = 60;
     public static final int MILLISECONDS_PER_SECOND = 1000;
-    public static final boolean ROUND_TO_TIME_UNIT_PRECISION = true;
 
     public static TIME_UNITS getFirstTimeUnit() {  //  1e unité à décoder et initialisation (lazy) de nextTimeUnit de chaque unité
         TIME_UNITS firstTimeUnit = TIME_UNITS.HOUR;
@@ -117,15 +116,18 @@ public class TimeDateUtils {
         return formattedTimeZoneLongTimeDate;
     }
 
-    public static String msToTimeFormatD(long ms, TIME_UNITS timeUnitPrecision, boolean roundToTimeUnitPrecision) {
+    public static String msToTimeFormatD(long ms, TIME_UNITS timeUnitDisplayPrecision, TIME_UNITS timeUnitRoundingPrecision) {
         String timeFormatD = "";
-        long p = timeUnitPrecision.DURATION_MS();
-        long n = ((roundToTimeUnitPrecision) ? p * ((ms + (p / 2)) / p) : ms);   //  Arrondir à l'unité si demandé
+        long n = ms;
+        if (timeUnitRoundingPrecision != null) {
+            long p = timeUnitRoundingPrecision.DURATION_MS();
+            n = p * ((ms + (p / 2)) / p);   //  Arrondir à l'unité si demandé
+        }
         TIME_UNITS tu = getFirstTimeUnit();
         do {
             long q = n / tu.DURATION_MS();
             timeFormatD = timeFormatD + String.format(tu.FORMAT_D_NUMBER_FORMAT(), q);
-            if (!tu.equals(timeUnitPrecision)) {
+            if (!tu.equals(timeUnitDisplayPrecision)) {
                 n = n - q * tu.DURATION_MS();
                 timeFormatD = timeFormatD + tu.FORMAT_D_SEPARATOR();
             } else {   //  C'est terminé
@@ -136,17 +138,23 @@ public class TimeDateUtils {
         return timeFormatD;
     }
 
-    public static long msToTimeUnit(long ms, TIME_UNITS timeUnitPrecision, boolean roundToTimeUnitPrecision) {
-        long p = timeUnitPrecision.DURATION_MS();
-        long n = ((roundToTimeUnitPrecision) ? p * ((ms + (p / 2)) / p) : ms);   //  Arrondir à l'unité si demandé
-        return (n / timeUnitPrecision.DURATION_MS());
+    public static long msToTimeUnit(long ms, TIME_UNITS timeUnitDisplayPrecision, TIME_UNITS timeUnitRoundingPrecision) {
+        long n = ms;
+        if (timeUnitRoundingPrecision != null) {
+            long p = timeUnitRoundingPrecision.DURATION_MS();
+            n = p * ((ms + (p / 2)) / p);   //  Arrondir à l'unité si demandé
+        }
+        return (n / timeUnitDisplayPrecision.DURATION_MS());
     }
 
-    public static String msToTimeFormatDL(long ms, TIME_UNITS timeUnitPrecision, boolean roundToTimeUnitPrecision) {
+    public static String msToTimeFormatDL(long ms, TIME_UNITS timeUnitDisplayPrecision, TIME_UNITS timeUnitRoundingPrecision) {
         String timeFormatDL = "";
         String collectZeros = "";
-        long p = timeUnitPrecision.DURATION_MS();
-        long n = ((roundToTimeUnitPrecision) ? p * ((ms + (p / 2)) / p) : ms);   //  Arrondir à l'unité si demandé
+        long n = ms;
+        if (timeUnitRoundingPrecision != null) {
+            long p = timeUnitRoundingPrecision.DURATION_MS();
+            n = p * ((ms + (p / 2)) / p);   //  Arrondir à l'unité si demandé
+        }
         TIME_UNITS tu = getFirstTimeUnit();
         do {
             long q = n / tu.DURATION_MS();
@@ -158,7 +166,7 @@ public class TimeDateUtils {
             } else {   //  0
                 collectZeros = collectZeros + "0" + tu.FORMAT_DL_SEPARATOR();
             }
-            if (!tu.equals(timeUnitPrecision)) {   //  Précision demandée non encore atteinte
+            if (!tu.equals(timeUnitDisplayPrecision)) {   //  Précision demandée non encore atteinte
                 n = n - q * tu.DURATION_MS();
             } else {  //  C'est terminé
                 if ((q != 0) && (tu.FORMAT_D_SEPARATOR().isEmpty())) {   // Si dixièmes, centièmes ou millièmes, Ajouter le séparateur DL prévu

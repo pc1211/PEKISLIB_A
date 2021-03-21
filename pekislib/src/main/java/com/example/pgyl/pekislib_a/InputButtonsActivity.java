@@ -43,7 +43,6 @@ import static com.example.pgyl.pekislib_a.StringDBUtils.getTimeUnitPrecision;
 import static com.example.pgyl.pekislib_a.StringDBUtils.isColdStartStatusOfActivity;
 import static com.example.pgyl.pekislib_a.StringDBUtils.setCurrentForActivity;
 import static com.example.pgyl.pekislib_a.StringDBUtils.setStartStatusOfActivity;
-import static com.example.pgyl.pekislib_a.TimeDateUtils.ROUND_TO_TIME_UNIT_PRECISION;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.TIME_UNITS;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.ddMMyyyy;
 import static com.example.pgyl.pekislib_a.TimeDateUtils.getFormattedStringTimeDate;
@@ -397,10 +396,10 @@ public class InputButtonsActivity extends Activity {
             caze = CASES.NO_CASE;
             append = APPEND_DEFAULT_VALUE;
             if (keyboard.equals(KEYBOARDS.TIME_FORMAT_D)) {
-                editString = msToTimeFormatD(Long.parseLong(editString), timeUnitPrecision, ROUND_TO_TIME_UNIT_PRECISION);
+                editString = msToTimeFormatD(Long.parseLong(editString), timeUnitPrecision, timeUnitPrecision);
             }
             if (keyboard.equals(KEYBOARDS.TIME_FORMAT_DL)) {
-                editString = msToTimeFormatDL(Long.parseLong(editString), timeUnitPrecision, ROUND_TO_TIME_UNIT_PRECISION);
+                editString = msToTimeFormatDL(Long.parseLong(editString), timeUnitPrecision, timeUnitPrecision);
             }
         } else {
             pageIndex = getSHPcurrentPageIndex();
@@ -632,13 +631,13 @@ public class InputButtonsActivity extends Activity {
             if (smin != null) {
                 long min = Long.parseLong(smin);
                 if (ms < min) {
-                    errorParseTimeFormatD = ERROR_MIN + msToTimeFormatD(min, timeUnitPrecision, ROUND_TO_TIME_UNIT_PRECISION);
+                    errorParseTimeFormatD = ERROR_MIN + msToTimeFormatD(min, timeUnitPrecision, timeUnitPrecision);
                 }
             }
             if (smax != null) {
                 long max = Long.parseLong(smax);
                 if (ms > max) {
-                    errorParseTimeFormatD = ERROR_MAX + msToTimeFormatD(max, timeUnitPrecision, ROUND_TO_TIME_UNIT_PRECISION);
+                    errorParseTimeFormatD = ERROR_MAX + msToTimeFormatD(max, timeUnitPrecision, timeUnitPrecision);
                 }
             }
         } else {
@@ -654,13 +653,13 @@ public class InputButtonsActivity extends Activity {
             if (smin != null) {
                 long min = Long.parseLong(smin);
                 if (ms < min) {
-                    errorParseTimeFormatDL = ERROR_MIN + msToTimeFormatDL(min, timeUnitPrecision, ROUND_TO_TIME_UNIT_PRECISION);
+                    errorParseTimeFormatDL = ERROR_MIN + msToTimeFormatDL(min, timeUnitPrecision, timeUnitPrecision);
                 }
             }
             if (smax != null) {
                 long max = Long.parseLong(smax);
                 if (ms > max) {
-                    errorParseTimeFormatDL = ERROR_MAX + msToTimeFormatDL(max, timeUnitPrecision, ROUND_TO_TIME_UNIT_PRECISION);
+                    errorParseTimeFormatDL = ERROR_MAX + msToTimeFormatDL(max, timeUnitPrecision, timeUnitPrecision);
                 }
             }
         } else {
