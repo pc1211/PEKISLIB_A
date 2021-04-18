@@ -36,7 +36,7 @@ public class StringDBTables {
         }
     }
 
-    public enum TABLE_IDS {CURRENT, DEFAULT, DEFAULT_BASE, PRESET, LABEL, KEYBOARD, REGEXP, MIN, MAX, TIME_UNIT_PRECISION}   //  Identifiants utilisateur génériques
+    public enum TABLE_IDS {CURRENT, DEFAULT, DEFAULT_BASE, PRESET, LABEL, KEYBOARD, REGEXP, REGEXP_ERROR_MESSAGE, MIN, MAX, TIME_UNIT_PRECISION}   //  Identifiants utilisateur génériques
 
     public enum ACTIVITY_START_STATUS {COLD, HOT}
 

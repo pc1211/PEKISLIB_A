@@ -108,6 +108,10 @@ public class StringDBUtils {
         return stringDB.selectFieldByIdOrCreate(tableName, TABLE_IDS.REGEXP.toString(), index);
     }
 
+    public static String getRegExpErrorMessage(StringDB stringDB, String tableName, int index) {
+        return stringDB.selectFieldByIdOrCreate(tableName, TABLE_IDS.REGEXP_ERROR_MESSAGE.toString(), index);
+    }
+
     public static String[] getDefaults(StringDB stringDB, String tableName) {
         return stringDB.selectRowByIdOrCreate(tableName, TABLE_IDS.DEFAULT.toString());
     }

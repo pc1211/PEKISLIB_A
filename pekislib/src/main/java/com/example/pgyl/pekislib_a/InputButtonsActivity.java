@@ -39,6 +39,7 @@ import static com.example.pgyl.pekislib_a.StringDBUtils.getKeyboard;
 import static com.example.pgyl.pekislib_a.StringDBUtils.getMax;
 import static com.example.pgyl.pekislib_a.StringDBUtils.getMin;
 import static com.example.pgyl.pekislib_a.StringDBUtils.getRegExp;
+import static com.example.pgyl.pekislib_a.StringDBUtils.getRegExpErrorMessage;
 import static com.example.pgyl.pekislib_a.StringDBUtils.getTimeUnitPrecision;
 import static com.example.pgyl.pekislib_a.StringDBUtils.isColdStartStatusOfActivity;
 import static com.example.pgyl.pekislib_a.StringDBUtils.setCurrentForActivity;
@@ -346,6 +347,7 @@ public class InputButtonsActivity extends Activity {
     private TextView lbldisplay;
     private StringDB stringDB;
     private String shpFileName;
+    private String title;
     //endregion
 
     @Override
@@ -353,7 +355,8 @@ public class InputButtonsActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
-        getActionBar().setTitle(getIntent().getStringExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString()));
+        title = getIntent().getStringExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString());
+        getActionBar().setTitle(title);
         setupOrientationLayout();
         setupButtons();
         setupKeyboardButtons();
@@ -439,11 +442,12 @@ public class InputButtonsActivity extends Activity {
         String candidate = editString;   //  Peut-être "" (Empty); c'est à la regexp de gérer ce cas
         String smin = getMin(stringDB, tableName, columnIndex);
         String smax = getMax(stringDB, tableName, columnIndex);
-        String regexp = getRegExp(stringDB, tableName, columnIndex);
+        String regExp = getRegExp(stringDB, tableName, columnIndex);
         String error = NO_ERROR;
-        if (regexp != null) {   //  Regexp non vide
-            if (!candidate.matches(regexp)) {
-                error = "Error: Must match " + regexp;
+        if (regExp != null) {   //  Regexp non vide
+            if (!candidate.matches(regExp)) {
+                String regexpErrorMessage = getRegExpErrorMessage(stringDB, tableName, columnIndex);
+                error = (regexpErrorMessage != null) ? regexpErrorMessage : "Error: Must match " + regExp;
             } else {   //  OK avec la regexp
                 error = parseCandidate(candidate, smin, smax);
             }
@@ -451,6 +455,7 @@ public class InputButtonsActivity extends Activity {
         if (error.equals(NO_ERROR)) {  //  Good guy
             editString = normalizedCandidate(candidate);
             Intent returnIntent = new Intent();
+            returnIntent.putExtra(Constants.ACTIVITY_EXTRA_KEYS.TITLE.toString(), title);
             setResult(RESULT_OK, returnIntent);
             finish();
         } else {  //  Bad guy
