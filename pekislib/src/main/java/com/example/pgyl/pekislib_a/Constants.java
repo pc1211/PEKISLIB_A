@@ -31,8 +31,10 @@ public class Constants {
 
     public static final String REGEXP_SIX_CHARS = ".{6}";  //  6 caractères
     public static final String REGEXP_SIX_CHARS_ERROR_MESSAGE = "Required: 6 chars";
-    public static final String REGEXP_PERCENT = "^(100|[1-9]?[0-9])$";  //  Nombre entier de 0 à 100, sans décimales
-    public static final String REGEXP_PERCENT_ERROR_MESSAGE = "Required: Integer number from 0 to 100, without decimals";
+    public static final String REGEXP_PERCENT = "^[0]*(100|[1-9]?[0-9])$";  //  Entier de 0 à 100 (avec 1 ou plusieurs 0 au début)
+    public static final String REGEXP_PERCENT_ERROR_MESSAGE = "Required: Integer from 0 to 100";
+    public static final String REG_EXP_POSITIVE_INTEGER = "^[0]*[1-9][0-9]*$";   //  Entier positif (>0) (avec 1 ou plusieurs 0 au début)
+    public static final String REG_EXP_POSITIVE_INTEGER_ERROR_MESSAGE = "Required: Positive integer";
     public static final String REGEXP_MIN_ONE_CHAR = ".+";  //  Minimum 1 char
     public static final String REGEXP_MIN_ONE_CHAR_ERROR_MESSAGE = "Required: At least 1 char";  //  Minimum 1 char
     public static final int DUMMY_VALUE = -1;
