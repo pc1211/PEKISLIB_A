@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 
+import java.util.Arrays;
 import java.util.Locale;
 
 public class MiscUtils {
@@ -50,4 +51,7 @@ public class MiscUtils {
         return string.substring(0, 1).toUpperCase(Locale.ENGLISH) + string.substring(1).toLowerCase(Locale.ENGLISH);
     }
 
+    public static int getStringIndexOf(String string, String[] stringArray) {
+        return Arrays.asList(stringArray).indexOf(string);
+    }
 }
