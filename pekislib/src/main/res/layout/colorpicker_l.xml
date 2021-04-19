@@ -1,95 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/black">
+    android:orientation="vertical">
+
     <LinearLayout
-    	android:orientation="horizontal"
-        android:gravity="center"        
-        android:layout_marginTop="8dp"  
-    	android:layout_width="match_parent"
-    	android:layout_height="wrap_content">    
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
         <SeekBar
             android:id="@+id/SEEKB_RED_HUE"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:max="65535"
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
-            android:layout_width="0dp"
-            android:layout_weight="3"                              
-            android:layout_height="wrap_content"
-            android:max="65535"
-            android:progress="0"/>
+            android:progress="0" />
+
         <Button
             android:id="@+id/BTN_NEXT_COLOR_ITEM"
             android:layout_width="0dp"
-            android:layout_weight="2"
-            android:layout_height="wrap_content" />
-    </LinearLayout>         
+            android:layout_height="wrap_content"
+            android:layout_weight="2" />
+    </LinearLayout>
+
     <LinearLayout
-    	android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="center"
-    	android:layout_width="match_parent"
-    	android:layout_height="wrap_content">    
+        android:orientation="horizontal">
+
         <SeekBar
             android:id="@+id/SEEKB_GREEN_SAT"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="9"
+            android:max="65535"
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
-            android:layout_width="0dp"
-            android:layout_weight="9"
-            android:layout_height="wrap_content"
-            android:max="65535"
-            android:progress="0"/>
+            android:progress="0" />
+
         <Button
             android:id="@+id/BTN_NEXT_COLOR_SPACE"
             android:layout_width="0dp"
-            android:layout_weight="2"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_weight="2" />
+
         <Button
             android:id="@+id/BTN_COLOR_VALUE"
-            android:textStyle="bold"
             android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:layout_height="wrap_content" />
+            android:textStyle="bold" />
+
         <Button
             android:id="@+id/BTN_PRESETS"
             android:layout_width="0dp"
-            android:layout_weight="2"
-            android:layout_height="wrap_content" />
-    </LinearLayout>         
+            android:layout_height="wrap_content"
+            android:layout_weight="2" />
+    </LinearLayout>
+
     <LinearLayout
-    	android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="center"
-    	android:layout_width="match_parent"
-    	android:layout_height="wrap_content">   
+        android:orientation="horizontal">
+
         <SeekBar
             android:id="@+id/SEEKB_BLUE_VAL"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:max="65535"
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
-            android:layout_width="0dp"
-            android:layout_weight="3"                              
-            android:layout_height="wrap_content"
-            android:max="65535"
-            android:progress="0"/>
+            android:progress="0" />
+
         <Button
             android:id="@+id/BTN_CANCEL"
             android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
         <Button
             android:id="@+id/BTN_OK"
-            android:textStyle="bold"
             android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_height="wrap_content" />
-    </LinearLayout>    
+            android:textStyle="bold" />
+    </LinearLayout>
+
     <LinearLayout
-        android:orientation="horizontal"
-    	android:layout_width="match_parent"
-    	android:layout_height="match_parent">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
         <com.example.pgyl.pekislib_a.ColorWheelView
             android:id="@+id/COLORS_VIEW"
-            android:layout_marginTop="8dp"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </LinearLayout>   
+            android:layout_height="match_parent"
+            android:layout_marginTop="8dp" />
+    </LinearLayout>
 </LinearLayout>

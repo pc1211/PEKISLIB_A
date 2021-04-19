@@ -223,8 +223,8 @@ public final class ColorWheelView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        final int RECT_FILL_COLOR = Color.BLACK;
-        final int WHEEL_OUTLINE_COLOR = Color.WHITE;
+        final int RECT_FILL_COLOR = Color.parseColor("#FFC0C0C0");
+        final int WHEEL_OUTLINE_COLOR = Color.BLACK;
         final boolean DRAW_ARC_USE_CENTER = true;
 
         super.onDraw(canvas);

@@ -3,19 +3,22 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal">
+
     <LinearLayout
-        android:paddingTop="3dp"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_gravity="center_vertical"
         android:layout_weight="1"
-        android:background="@android:color/black"
-        android:orientation="horizontal">
+        android:background="#FFC0C0C0"
+        android:orientation="horizontal"
+        android:paddingTop="3dp">
+
         <com.example.pgyl.pekislib_a.ColorWheelView
             android:id="@+id/COLORS_VIEW"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </LinearLayout>
+
     <TextView
         android:id="@+id/TV_TXT"
         android:layout_width="0dp"

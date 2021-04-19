@@ -1,258 +1,298 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/black">
+    android:orientation="vertical">
+
     <LinearLayout
-    	android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_marginTop="8dp"
-    	android:layout_width="match_parent"
-    	android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
         <Button
             android:id="@+id/BTN_P1"
-            android:text="P1"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P1" />
+
         <Button
             android:id="@+id/BTN_P2"
-            android:text="P2"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P2" />
+
         <Button
             android:id="@+id/BTN_P3"
-            android:text="P3"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P3" />
+
         <Button
             android:id="@+id/BTN_P4"
-            android:text="P4"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />    
+            android:text="P4" />
+
         <Button
             android:id="@+id/BTN_P5"
-            android:text="P5"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P5" />
+
         <Button
             android:id="@+id/BTN_P6"
-            android:text="P6"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P6" />
+
         <Button
             android:id="@+id/BTN_P7"
-            android:text="P7"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P7" />
+
         <Button
             android:id="@+id/BTN_P8"
-            android:text="P8"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
-    </LinearLayout> 
+            android:text="P8" />
+    </LinearLayout>
+
     <LinearLayout
-    	android:orientation="horizontal"
-    	android:layout_width="match_parent"
-    	android:layout_height="0dp"
-        android:layout_weight="1">    
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
         <Button
             android:id="@+id/BTN_P9"
-            android:text="P9"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P9" />
+
         <Button
             android:id="@+id/BTN_P10"
-            android:text="P10"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P10" />
+
         <Button
             android:id="@+id/BTN_P11"
-            android:text="P11"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P11" />
+
         <Button
             android:id="@+id/BTN_P12"
-            android:text="P12"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P12" />
+
         <Button
             android:id="@+id/BTN_P13"
-            android:text="P13"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P13" />
+
         <Button
             android:id="@+id/BTN_P14"
-            android:text="P14"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P14" />
+
         <Button
             android:id="@+id/BTN_P15"
-            android:text="P15"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P15" />
+
         <Button
             android:id="@+id/BTN_P16"
-            android:text="P16"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
-    </LinearLayout> 
+            android:text="P16" />
+    </LinearLayout>
+
     <LinearLayout
-    	android:orientation="horizontal"
-    	android:layout_width="match_parent"
-    	android:layout_height="0dp"
-        android:layout_weight="1">    
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
         <Button
             android:id="@+id/BTN_P17"
-            android:text="P17"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P17" />
+
         <Button
             android:id="@+id/BTN_P18"
-            android:text="P18"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P18" />
+
         <Button
             android:id="@+id/BTN_P19"
-            android:text="P19"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P19" />
+
         <Button
             android:id="@+id/BTN_P20"
-            android:text="P20"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P20" />
+
         <Button
             android:id="@+id/BTN_P21"
-            android:text="P21"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P21" />
+
         <Button
             android:id="@+id/BTN_P22"
-            android:text="P22"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P22" />
+
         <Button
             android:id="@+id/BTN_P23"
-            android:text="P23"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P23" />
+
         <Button
             android:id="@+id/BTN_P24"
-            android:text="P24"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />    
-    </LinearLayout>         
+            android:text="P24" />
+    </LinearLayout>
+
     <LinearLayout
-    	android:orientation="horizontal"
-    	android:layout_width="match_parent"
-    	android:layout_height="0dp"
-        android:layout_weight="1">    
-       <Button
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <Button
             android:id="@+id/BTN_P25"
-            android:text="P25"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P25" />
+
         <Button
             android:id="@+id/BTN_P26"
-            android:text="P26"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P26" />
+
         <Button
             android:id="@+id/BTN_P27"
-            android:text="P27"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P27" />
+
         <Button
             android:id="@+id/BTN_P28"
-            android:text="P28"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />   
+            android:text="P28" />
+
         <Button
             android:id="@+id/BTN_P29"
-            android:text="P29"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P29" />
+
         <Button
             android:id="@+id/BTN_P30"
-            android:text="P30"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P30" />
+
         <Button
             android:id="@+id/BTN_P31"
-            android:text="P31"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
+            android:text="P31" />
+
         <Button
             android:id="@+id/BTN_P32"
-            android:text="P32"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
-    </LinearLayout>             
+            android:text="P32" />
+    </LinearLayout>
+
     <LinearLayout
-    	android:orientation="horizontal"
-    	android:layout_width="match_parent"
-    	android:layout_height="0dp"
-        android:layout_weight="1">    
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
         <TextView
-            android:id="@+id/LBL_DISPLAY"                
-            android:text="DISPLAY"
-            android:textSize="22sp"
-            android:textColor="#00FF00"
+            android:id="@+id/LBL_DISPLAY"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
             android:gravity="center"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent" />     
-    </LinearLayout>     
+            android:text="DISPLAY"
+            android:textColor="#0000FF"
+            android:textSize="22sp" />
+    </LinearLayout>
+
     <LinearLayout
-    	android:orientation="horizontal"
-    	android:layout_width="match_parent"
-    	android:layout_height="0dp"
-        android:layout_weight="1">    
-       <Button
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <Button
             android:id="@+id/BTN_CANCEL"
-            android:text="Cancel"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
-       <Button
+            android:text="Cancel" />
+
+        <Button
             android:id="@+id/BTN_OK"
-            android:text="OK"
-            android:textStyle="bold"            
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent" />     
-    </LinearLayout>     
+            android:text="OK"
+            android:textStyle="bold" />
+    </LinearLayout>
 </LinearLayout>
