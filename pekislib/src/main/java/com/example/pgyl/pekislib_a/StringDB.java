@@ -60,8 +60,12 @@ public class StringDB extends SQLiteOpenHelper {
         ssdb = null;
     }
 
-    public String getFieldName(int fieldIndex) {
+    public static String getFieldName(int fieldIndex) {
         return ((fieldIndex == FIELDS.ID.USER_INDEX()) ? FIELDS.ID.toString() : FIELDS.DATA.toString() + fieldIndex);
+    }
+
+    public static String getIDPatternWhereCondition(String pattern) {   //    "<String>%" ou "%<String>" ou ...
+        return FIELDS.ID.toString() + " LIKE '" + pattern + "'";
     }
 
     public boolean tableExists(String tableName) {

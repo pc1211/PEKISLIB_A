@@ -1,7 +1,5 @@
 package com.example.pgyl.pekislib_a;
 
-import java.util.Arrays;
-
 import static com.example.pgyl.pekislib_a.StringDBTables.ACTIVITY_START_STATUS;
 import static com.example.pgyl.pekislib_a.StringDBTables.TABLE_IDS;
 import static com.example.pgyl.pekislib_a.StringDBTables.getActivityInfosStartStatusIndex;
@@ -12,10 +10,6 @@ public class StringDBUtils {
 
     public static void createPekislibTableIfNotExists(StringDB stringDB, String tableName) {
         stringDB.createTableIfNotExists(tableName, 1 + getPekislibTableDataFieldsCount(tableName));   //  Champ ID + Données
-    }
-
-    public static int getTableIndex(String[] tableNames, String tableName) {
-        return Arrays.asList(tableNames).indexOf(tableName);
     }
 
     public static String[][] getCurrentsFromMultipleTablesFromActivity(StringDB stringDB, String activityName, String[] tableNames) {

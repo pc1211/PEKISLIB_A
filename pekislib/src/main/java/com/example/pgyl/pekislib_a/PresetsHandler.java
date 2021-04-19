@@ -9,6 +9,7 @@ import static com.example.pgyl.pekislib_a.Constants.NOT_FOUND;
 import static com.example.pgyl.pekislib_a.InputButtonsActivity.KEYBOARDS;
 import static com.example.pgyl.pekislib_a.StringDB.TABLE_DATA_INDEX;
 import static com.example.pgyl.pekislib_a.StringDB.TABLE_ID_INDEX;
+import static com.example.pgyl.pekislib_a.StringDB.getIDPatternWhereCondition;
 import static com.example.pgyl.pekislib_a.StringDBTables.TABLE_IDS;
 import static com.example.pgyl.pekislib_a.StringDBUtils.getKeyboards;
 import static com.example.pgyl.pekislib_a.StringDBUtils.getTimeUnitPrecisions;
@@ -172,17 +173,13 @@ public class PresetsHandler {
         return presetRows;
     }
 
-    private String whereConditionForPresets() {
-        return stringDB.getFieldName(TABLE_ID_INDEX) + " LIKE '" + TABLE_IDS.PRESET.toString() + "%'";
-    }
-
     private void savePresets() {
-        stringDB.deleteRows(tableName, whereConditionForPresets());
+        stringDB.deleteRows(tableName, getIDPatternWhereCondition(TABLE_IDS.PRESET.toString() + "%"));
         stringDB.insertOrReplaceRows(tableName, presetsToPresetRows(presets));
     }
 
     private String[][] getPresetRows() {
-        return stringDB.selectRows(tableName, whereConditionForPresets());
+        return stringDB.selectRows(tableName, getIDPatternWhereCondition(TABLE_IDS.PRESET.toString() + "%"));
     }
 
 }
