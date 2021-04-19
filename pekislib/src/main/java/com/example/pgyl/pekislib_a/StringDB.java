@@ -61,7 +61,7 @@ public class StringDB extends SQLiteOpenHelper {
     }
 
     public String getFieldName(int fieldIndex) {
-        return ((fieldIndex == FIELDS.ID.USER_INDEX()) ? FIELDS.ID.toString() : FIELDS.DATA.toString() + String.valueOf(fieldIndex));
+        return ((fieldIndex == FIELDS.ID.USER_INDEX()) ? FIELDS.ID.toString() : FIELDS.DATA.toString() + fieldIndex);
     }
 
     public boolean tableExists(String tableName) {
