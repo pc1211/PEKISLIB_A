@@ -45,7 +45,7 @@ import static com.example.pgyl.pekislib_a.TimeDateUtils.msToTimeFormatD;
 public class PresetsActivity extends Activity {
     //region Constantes
     private enum COMMANDS {
-        NEXT_FIELD(""), CANCEL("Cancel"), FIELD(""), OK("OK"), ADD("Add"), REMOVE("Remove"), DESELECT("Deselect"), DEFAULT("Default");
+        NEXT_FIELD(""), CANCEL("Cancel"), FIELD(""), OK("OK"), ADD("Add"), REMOVE("Remove"), DEFAULT("Default");
 
         private String valueText;
 
@@ -203,9 +203,6 @@ public class PresetsActivity extends Activity {
         if (command.equals(COMMANDS.REMOVE)) {
             onButtonClickRemove();
         }
-        if (command.equals(COMMANDS.DESELECT)) {
-            onButtonClickDeselect();
-        }
         if (command.equals(COMMANDS.DEFAULT)) {
             onButtonClickDefault();
         }
@@ -268,15 +265,6 @@ public class PresetsActivity extends Activity {
         }
     }
 
-    private void onButtonClickDeselect() {
-        if (listIndex != LIST_INDEX_DEFAULT_VALUE) {
-            listIndex = LIST_INDEX_DEFAULT_VALUE;
-            updateDisplayButtonFieldColor();
-        } else {
-            toastLong("A preset must be selected in the list", this);
-        }
-    }
-
     private void onButtonClickDefault() {
         preset[columnIndex] = defaults[columnIndex];
         if (listIndex != LIST_INDEX_DEFAULT_VALUE) {
@@ -286,14 +274,20 @@ public class PresetsActivity extends Activity {
         updateDisplayButtonTexts();
     }
 
-    private void onPresetClick(int pos) {
-        if (presetsHandler.getCount() > 0) {
-            preset = presetsHandler.getPreset(pos);
-            listIndex = pos;
-            columnIndex = COLUMN_INDEX_DEFAULT_VALUE;
-            updateDisplayButtonTexts();
-            updateDisplayButtonFieldColor();
+    private void onPresetClick(int pos, View view) {
+        view.setSelected(!view.isSelected());  //  L'item est sélectionné
+        if (pos != listIndex) {
+            if (presetsHandler.getCount() > 0) {
+                preset = presetsHandler.getPreset(pos);
+                listIndex = pos;
+                columnIndex = COLUMN_INDEX_DEFAULT_VALUE;
+                updateDisplayButtonTexts();
+            }
+        } else {
+            listView.clearFocus();   //   Plus aucun item n'est sélectionné
+            listIndex = LIST_INDEX_DEFAULT_VALUE;
         }
+        updateDisplayButtonFieldColor();
     }
 
     private void updateDisplayButtonTexts() {
@@ -379,7 +373,7 @@ public class PresetsActivity extends Activity {
         Class rid = R.id.class;
         for (COMMANDS command : COMMANDS.values()) {
             try {
-                buttons[command.INDEX()] = findViewById(rid.getField(BUTTON_XML_PREFIX + command.toString()).getInt(rid));   //  1, 2, 3 ... dans le XML
+                buttons[command.INDEX()] = findViewById(rid.getField(BUTTON_XML_PREFIX + command.toString()).getInt(rid));   //  BTN_... dans le XML
                 buttons[command.INDEX()].setText(command.TEXT());
                 buttons[command.INDEX()].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
                 final COMMANDS fcommand = command;
@@ -400,7 +394,7 @@ public class PresetsActivity extends Activity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                onPresetClick(position);
+                onPresetClick(position, view);
             }
         });
     }

@@ -31,5 +31,5 @@
         android:paddingRight="4dp"
         android:singleLine="true"
         android:textColor="@color/listitemtextsel"
-        android:textSize="22sp" />
+        android:textSize="20sp" />
 </LinearLayout>

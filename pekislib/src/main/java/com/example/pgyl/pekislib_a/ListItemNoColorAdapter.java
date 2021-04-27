@@ -1,6 +1,7 @@
 package com.example.pgyl.pekislib_a;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ public class ListItemNoColorAdapter extends ArrayAdapter<String> {
         View rowView = inflater.inflate(R.layout.listitemnormal, parent, false);
         TextView textView = rowView.findViewById(R.id.text1);
         textView.setText(values[position]);
+
         return rowView;
     }
 }
