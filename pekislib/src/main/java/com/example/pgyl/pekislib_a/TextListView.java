@@ -14,10 +14,9 @@ public class TextListView extends ListView {
         super(context, attrs);
 
         this.context = context;
-        init();
     }
 
-    private void init() {
+    public void init() {
         textListViewAdapter = new TextListViewAdapter(context);
         setAdapter(textListViewAdapter);
         setFastScrollEnabled(true);
