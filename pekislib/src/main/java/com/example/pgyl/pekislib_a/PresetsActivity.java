@@ -79,7 +79,7 @@ public class PresetsActivity extends Activity {
     //endregion
     //region Variables
     private PresetsHandler presetsHandler;
-    private String[] preset;
+    private String[] preset;   //  Valeurs des champs du preset actuel
     private String[] labelNames;
     private String[] keyboards;
     private String[] timeUnitPrecisions;
@@ -126,7 +126,7 @@ public class PresetsActivity extends Activity {
 
         shpFileName = getPackageName() + "." + getClass().getSimpleName() + SHP_FILE_NAME_SUFFIX;
         tableName = getIntent().getStringExtra(TABLE_EXTRA_KEYS.TABLE.toString());
-        isTypeColors = ((getIntent().getStringExtra(PRESETS_ACTIVITY_EXTRA_KEYS.DISPLAY_TYPE.toString()).equals(PRESETS_ACTIVITY_DISPLAY_TYPE.COLORS.toString())) ? true : false);
+        isTypeColors = getIntent().getStringExtra(PRESETS_ACTIVITY_EXTRA_KEYS.DISPLAY_TYPE.toString()).equals(PRESETS_ACTIVITY_DISPLAY_TYPE.COLORS.toString());
 
         setupStringDB();
         setupPresetsHandler();
@@ -155,6 +155,7 @@ public class PresetsActivity extends Activity {
             }
         }
         updateDisplayButtonTexts();
+        updateDisplayButtonFieldColor();
         rebuildPresets();
     }
 
@@ -336,6 +337,9 @@ public class PresetsActivity extends Activity {
             ListItemNoColorAdapter lvAdapter = new ListItemNoColorAdapter(this, presetsHandler.getConcatenatedDisplayPresetDataList());
             listView.setAdapter(lvAdapter);
             lvAdapter = null;
+        }
+        if (listIndex != LIST_INDEX_DEFAULT_VALUE) {
+            listView.setSelected(true);  //  L'item est sélectionné et apparaît en fond orange
         }
     }
 
