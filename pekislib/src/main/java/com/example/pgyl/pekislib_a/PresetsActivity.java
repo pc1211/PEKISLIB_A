@@ -154,9 +154,9 @@ public class PresetsActivity extends Activity {
                 }
             }
         }
+        rebuildPresets();
         updateDisplayButtonTexts();
         updateDisplayButtonFieldColor();
-        rebuildPresets();
     }
 
     @Override
@@ -235,8 +235,7 @@ public class PresetsActivity extends Activity {
 
     private void onButtonClickAdd() {
         presetsHandler.createNewPreset(preset);
-        rebuildDisplay();
-        updateDisplayButtonFieldColor();
+        rebuildPresets();
     }
 
     private void onButtonClickRemove() {
@@ -249,7 +248,9 @@ public class PresetsActivity extends Activity {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int id) {
                     presetsHandler.removePreset(listIndex);
-                    rebuildDisplay();
+                    listIndex = LIST_INDEX_DEFAULT_VALUE;
+                    columnIndex = COLUMN_INDEX_DEFAULT_VALUE;
+                    rebuildPresets();
                 }
             });
             builder.setNegativeButton("No", null);
@@ -312,13 +313,6 @@ public class PresetsActivity extends Activity {
         buttons[COMMANDS.FIELD.INDEX()].setColors(pressedColor, unpressedColor);
     }
 
-    private void rebuildDisplay() {
-        listIndex = LIST_INDEX_DEFAULT_VALUE;
-        columnIndex = COLUMN_INDEX_DEFAULT_VALUE;
-        rebuildPresets();
-        updateDisplayButtonTexts();
-    }
-
     private void rebuildPresets() {
         if (listIndex != LIST_INDEX_DEFAULT_VALUE) {
             String presetId = presetsHandler.getPresetId(listIndex);
@@ -340,9 +334,14 @@ public class PresetsActivity extends Activity {
             lvAdapter = null;
         }
         if (listIndex != LIST_INDEX_DEFAULT_VALUE) {   //  Faire comme si on venait de cliquer pour sélectionner l'item à la position listIndex
-            listView.setSelection(listIndex);
-            listView.getAdapter().getView(listIndex, null, null).setSelected(true);
-            listView.requestFocusFromTouch();
+            listView.post(new Runnable() {   //  post car listView doit être bien prêt
+                @Override
+                public void run() {
+                    int oldListIndex = listIndex;
+                    listIndex = LIST_INDEX_DEFAULT_VALUE;
+                    listView.performItemClick(listView.getChildAt(oldListIndex), oldListIndex, listView.getChildAt(oldListIndex).getId());
+                }
+            });
         }
     }
 
