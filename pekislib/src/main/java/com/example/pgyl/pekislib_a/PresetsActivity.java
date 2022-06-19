@@ -276,8 +276,8 @@ public class PresetsActivity extends Activity {
     }
 
     private void onPresetClick(int pos, View view) {
-        view.setSelected(!view.isSelected());  //  L'item est sélectionné
-        if (pos != listIndex) {
+        view.setSelected(!view.isSelected());  //  L'item est sélectionné (ou désélectionné si on le presse à nouveau)
+        if ((pos != listIndex)) {
             if (presetsHandler.getCount() > 0) {
                 preset = presetsHandler.getPreset(pos);
                 listIndex = pos;
@@ -333,13 +333,16 @@ public class PresetsActivity extends Activity {
             lvAdapter.setTextItems(presetsHandler.getConcatenatedDisplayPresetDataList());
             listView.setAdapter(lvAdapter);
             lvAdapter = null;
-        } else {
-            ListItemNoColorAdapter lvAdapter = new ListItemNoColorAdapter(this, presetsHandler.getConcatenatedDisplayPresetDataList());
+        } else {   //  Sans roue de couleur
+            ListItemNoColorAdapter lvAdapter = new ListItemNoColorAdapter(this);
+            lvAdapter.setTextItems(presetsHandler.getConcatenatedDisplayPresetDataList());
             listView.setAdapter(lvAdapter);
             lvAdapter = null;
         }
-        if (listIndex != LIST_INDEX_DEFAULT_VALUE) {
-            listView.setSelected(true);  //  L'item est sélectionné et apparaît en fond orange
+        if (listIndex != LIST_INDEX_DEFAULT_VALUE) {   //  Faire comme si on venait de cliquer pour sélectionner l'item à la position listIndex
+            listView.setSelection(listIndex);
+            listView.getAdapter().getView(listIndex, null, null).setSelected(true);
+            listView.requestFocusFromTouch();
         }
     }
 

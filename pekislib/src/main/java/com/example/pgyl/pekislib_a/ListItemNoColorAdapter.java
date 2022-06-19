@@ -1,32 +1,77 @@
 package com.example.pgyl.pekislib_a;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
+import android.widget.BaseAdapter;
 
-public class ListItemNoColorAdapter extends ArrayAdapter<String> {
+public class ListItemNoColorAdapter extends BaseAdapter {
     //region Variables
-    private final Context context;
-    private final String[] values;
+    private Context context;
+    private String[] textValues;
     //endregion
 
-    public ListItemNoColorAdapter(Context context, String[] values) {
-        super(context, R.layout.listitemnocolor, values);
+    public ListItemNoColorAdapter(Context context) {
+        super();
 
         this.context = context;
-        this.values = values;
+        init();
+    }
+
+    private void init() {
+        ;    //  NOP
+    }
+
+    public void setTextItems(String[] textValues) {
+        this.textValues = textValues;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View rowView = inflater.inflate(R.layout.listitemnocolor, parent, false);
-        TextView textView = rowView.findViewById(R.id.text1);
-        textView.setText(values[position]);
-
-        return rowView;
+    public int getCount() {
+        if (textValues == null) {
+            return 0;
+        } else {
+            return textValues.length;
+        }
     }
+
+    @Override
+    public Object getItem(int i) {
+        return null;
+    }
+
+    @Override
+    public long getItemId(int i) {
+        return i;
+    }
+
+    @Override
+    public View getView(final int position, View convertView, ViewGroup parent) {
+        ListItemNoColorViewHolder viewHolder;
+
+        if (convertView == null) {
+            LayoutInflater inflater = LayoutInflater.from(context);
+            convertView = inflater.inflate(R.layout.listitemnocolor, null);
+            viewHolder = buildViewHolder(convertView);
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = (ListItemNoColorViewHolder) convertView.getTag();
+        }
+        paintView(convertView, position);
+        return convertView;
+    }
+
+    public void paintView(View view, int index) {    //  Décoration proprement dite du getView
+        ListItemNoColorViewHolder viewHolder = (ListItemNoColorViewHolder) view.getTag();
+        viewHolder.textView.setText(textValues[index]);
+    }
+
+    private ListItemNoColorViewHolder buildViewHolder(View convertView) {
+        ListItemNoColorViewHolder viewHolder = new ListItemNoColorViewHolder();
+        viewHolder.textView = convertView.findViewById(R.id.TV_TXT);
+        return viewHolder;
+    }
+
 }

@@ -55,7 +55,7 @@ public class ListItemColorAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        ListItemColorViewHolder viewHolder;
+        ListItemNoColorViewHolder viewHolder;
 
         if (convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(context);
@@ -63,21 +63,21 @@ public class ListItemColorAdapter extends BaseAdapter {
             viewHolder = buildViewHolder(convertView);
             convertView.setTag(viewHolder);
         } else {
-            viewHolder = (ListItemColorViewHolder) convertView.getTag();
+            viewHolder = (ListItemNoColorViewHolder) convertView.getTag();
         }
         paintView(convertView, position);
         return convertView;
     }
 
     public void paintView(View view, int index) {    //  Décoration proprement dite du getView
-        ListItemColorViewHolder viewHolder = (ListItemColorViewHolder) view.getTag();
+        ListItemNoColorViewHolder viewHolder = (ListItemNoColorViewHolder) view.getTag();
         viewHolder.colorWheelView.disableMarker();
         viewHolder.colorWheelView.setColors(colorValues.get(index));
         viewHolder.textView.setText(textValues[index]);
     }
 
-    private ListItemColorViewHolder buildViewHolder(View convertView) {
-        ListItemColorViewHolder viewHolder = new ListItemColorViewHolder();
+    private ListItemNoColorViewHolder buildViewHolder(View convertView) {
+        ListItemNoColorViewHolder viewHolder = new ListItemNoColorViewHolder();
         viewHolder.colorWheelView = convertView.findViewById(R.id.COLORS_VIEW);
         viewHolder.textView = convertView.findViewById(R.id.TV_TXT);
         return viewHolder;

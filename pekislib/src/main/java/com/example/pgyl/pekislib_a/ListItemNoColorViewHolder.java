@@ -2,7 +2,7 @@ package com.example.pgyl.pekislib_a;
 
 import android.widget.TextView;
 
-public class ListItemColorViewHolder {
+public class ListItemNoColorViewHolder {
     //region Variables
     ColorWheelView colorWheelView;
     TextView textView;
