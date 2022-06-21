@@ -1,19 +1,18 @@
 package com.example.pgyl.pekislib_a;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-public class ListItemNoColorAdapter extends BaseAdapter {
+public class ListItemSimpleAdapter extends BaseAdapter {
     //region Variables
     private Context context;
     private String[] textValues;
     //endregion
 
-    public ListItemNoColorAdapter(Context context) {
+    public ListItemSimpleAdapter(Context context) {
         super();
 
         this.context = context;
@@ -49,27 +48,27 @@ public class ListItemNoColorAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        ListItemNoColorViewHolder viewHolder;
+        ListItemSimpleViewHolder viewHolder;
 
         if (convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(context);
-            convertView = inflater.inflate(R.layout.listitemnocolor, null);
+            convertView = inflater.inflate(R.layout.listitemsimpple, null);
             viewHolder = buildViewHolder(convertView);
             convertView.setTag(viewHolder);
         } else {
-            viewHolder = (ListItemNoColorViewHolder) convertView.getTag();
+            viewHolder = (ListItemSimpleViewHolder) convertView.getTag();
         }
         paintView(convertView, position);
         return convertView;
     }
 
     public void paintView(View view, int index) {    //  Décoration proprement dite du getView
-        ListItemNoColorViewHolder viewHolder = (ListItemNoColorViewHolder) view.getTag();
+        ListItemSimpleViewHolder viewHolder = (ListItemSimpleViewHolder) view.getTag();
         viewHolder.textView.setText(textValues[index]);
     }
 
-    private ListItemNoColorViewHolder buildViewHolder(View convertView) {
-        ListItemNoColorViewHolder viewHolder = new ListItemNoColorViewHolder();
+    private ListItemSimpleViewHolder buildViewHolder(View convertView) {
+        ListItemSimpleViewHolder viewHolder = new ListItemSimpleViewHolder();
         viewHolder.textView = convertView.findViewById(R.id.TV_TXT);
         return viewHolder;
     }

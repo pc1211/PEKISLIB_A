@@ -76,6 +76,7 @@ public class PresetsActivity extends Activity {
 
     private final int LIST_INDEX_DEFAULT_VALUE = NOT_FOUND;
     private final int COLUMN_INDEX_DEFAULT_VALUE = 1;
+    private final int LIST_INDEX_REBUILDING = -2;
     //endregion
     //region Variables
     private PresetsHandler presetsHandler;
@@ -278,7 +279,7 @@ public class PresetsActivity extends Activity {
 
     private void onPresetClick(int pos, View view) {
         view.setSelected(!view.isSelected());  //  L'item est sélectionné (ou désélectionné si on le presse à nouveau)
-        if ((pos != listIndex)) {
+        if (pos != listIndex) {
             if (presetsHandler.getCount() > 0) {
                 preset = presetsHandler.getPreset(pos);
                 listIndex = pos;
@@ -318,6 +319,7 @@ public class PresetsActivity extends Activity {
             String presetId = presetsHandler.getPresetId(listIndex);
             presetsHandler.sortPresets();
             listIndex = presetsHandler.getIndex(presetId);
+            preset = presetsHandler.getPreset(listIndex);
         } else {
             presetsHandler.sortPresets();
         }
@@ -328,20 +330,28 @@ public class PresetsActivity extends Activity {
             listView.setAdapter(lvAdapter);
             lvAdapter = null;
         } else {   //  Sans roue de couleur
-            ListItemNoColorAdapter lvAdapter = new ListItemNoColorAdapter(this);
+            ListItemSimpleAdapter lvAdapter = new ListItemSimpleAdapter(this);
             lvAdapter.setTextItems(presetsHandler.getConcatenatedDisplayPresetDataList());
             listView.setAdapter(lvAdapter);
             lvAdapter = null;
         }
-        if (listIndex != LIST_INDEX_DEFAULT_VALUE) {   //  Faire comme si on venait de cliquer pour sélectionner l'item à la position listIndex
-            listView.post(new Runnable() {   //  post car listView doit être bien prêt
+        if (listIndex != LIST_INDEX_DEFAULT_VALUE) {   //  Simuler un click sur l'item à la position listIndex
+            final long RENDERING_DELAY_MILLIS = 200;
+            listView.postDelayed(new Runnable() {   //  Délai pour être sûr que listView soit bien prêt (après le setAdapter)
                 @Override
                 public void run() {
-                    int oldListIndex = listIndex;
-                    listIndex = LIST_INDEX_DEFAULT_VALUE;
-                    listView.performItemClick(listView.getChildAt(oldListIndex), oldListIndex, listView.getChildAt(oldListIndex).getId());
+                    if (listIndex < listView.getFirstVisiblePosition() || listIndex > listView.getLastVisiblePosition()) {  //  Non visible
+                        listView.setSelection(listIndex);   //  Pour voir l'item à la position listIndex (sans le sélectionner)
+                    }
+                    listView.postDelayed(new Runnable() {   //  Délai pour être sûr que listView soit bien prêt (après l'éventuel setSelection)
+                        @Override
+                        public void run() {
+                            View view = listView.getChildAt(listIndex - listView.getFirstVisiblePosition());   //  L'item à la position listIndex est maintenant sûrement visible
+                            view.setSelected(true);   //  L'item à la position listIndex apparaît alors comme sélectionné
+                        }
+                    }, RENDERING_DELAY_MILLIS);
                 }
-            });
+            }, RENDERING_DELAY_MILLIS);
         }
     }
 
