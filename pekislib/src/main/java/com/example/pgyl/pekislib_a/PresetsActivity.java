@@ -340,7 +340,7 @@ public class PresetsActivity extends Activity {
             listView.postDelayed(new Runnable() {   //  Délai pour être sûr que listView soit bien prêt (après le setAdapter)
                 @Override
                 public void run() {
-                    if (listIndex < listView.getFirstVisiblePosition() || listIndex > listView.getLastVisiblePosition()) {  //  Non visible
+                    if ((listIndex < listView.getFirstVisiblePosition()) || (listIndex > listView.getLastVisiblePosition())) {  //  Non visible
                         listView.setSelection(listIndex);   //  Pour voir l'item à la position listIndex (sans le sélectionner)
                     }
                     listView.postDelayed(new Runnable() {   //  Délai pour être sûr que listView soit bien prêt (après l'éventuel setSelection)
