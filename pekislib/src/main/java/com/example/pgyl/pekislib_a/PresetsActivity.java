@@ -20,9 +20,9 @@ import java.util.logging.Logger;
 
 import static com.example.pgyl.pekislib_a.Constants.ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
-import static com.example.pgyl.pekislib_a.Constants.NOT_FOUND;
 import static com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITIES;
 import static com.example.pgyl.pekislib_a.Constants.SHP_FILE_NAME_SUFFIX;
+import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_TITLE;
 import static com.example.pgyl.pekislib_a.InputButtonsActivity.KEYBOARDS;
@@ -74,7 +74,7 @@ public class PresetsActivity extends Activity {
         SELECT_INDEX, COLUMN_INDEX
     }
 
-    private final int LIST_INDEX_DEFAULT_VALUE = NOT_FOUND;
+    private final int LIST_INDEX_DEFAULT_VALUE = UNDEFINED;
     private final int COLUMN_INDEX_DEFAULT_VALUE = 1;
     private final int LIST_INDEX_REBUILDING = -2;
     //endregion
@@ -336,22 +336,29 @@ public class PresetsActivity extends Activity {
             lvAdapter = null;
         }
         if (listIndex != LIST_INDEX_DEFAULT_VALUE) {   //  Simuler un click sur l'item à la position listIndex
-            final long RENDERING_DELAY_MILLIS = 200;
-            listView.postDelayed(new Runnable() {   //  Délai pour être sûr que listView soit bien prêt (après le setAdapter)
-                @Override
+            final long MINIMAL_DELAY_MILLIS = 10;
+
+            final Runnable runnable = new Runnable() {
+                boolean needInit = true;
+
                 public void run() {
-                    if ((listIndex < listView.getFirstVisiblePosition()) || (listIndex > listView.getLastVisiblePosition())) {  //  Non visible
-                        listView.setSelection(listIndex);   //  Pour voir l'item à la position listIndex (sans le sélectionner)
-                    }
-                    listView.postDelayed(new Runnable() {   //  Délai pour être sûr que listView soit bien prêt (après l'éventuel setSelection)
-                        @Override
-                        public void run() {
-                            View view = listView.getChildAt(listIndex - listView.getFirstVisiblePosition());   //  L'item à la position listIndex est maintenant sûrement visible
-                            view.setSelected(true);   //  L'item à la position listIndex apparaît alors comme sélectionné
+                    if (listView.getChildCount() == 0) {   //  listView pas encore prêt
+                        listView.postDelayed(this, MINIMAL_DELAY_MILLIS);   //  On attendra jusqu'à ce qu'il soit prêt
+                    } else {   //  listView est maintenant prêt
+                        if ((listIndex < listView.getFirstVisiblePosition()) || (listIndex > listView.getLastVisiblePosition())) {   //  L'item à la position listIndex est invisible
+                            if (needInit) {
+                                needInit = false;   //  Le setSelection ne doit être effectué qu'au 1er passage!
+                                listView.setSelection(listIndex);   //  Pour voir l'item à la position listIndex (sans le sélectionner)
+                            }
+                            listView.postDelayed(this, MINIMAL_DELAY_MILLIS);   //  On attendra jusqu'à ce qu'il soit visible
+                        } else {   //  L'item à la position listIndex est maintenant visible
+                            View view = listView.getChildAt(listIndex - listView.getFirstVisiblePosition());
+                            view.setSelected(true);   //  et apparaît alors comme sélectionné; Il n'y a plus de nécessité de relancer le runnable
                         }
-                    }, RENDERING_DELAY_MILLIS);
+                    }
                 }
-            }, RENDERING_DELAY_MILLIS);
+            };
+            listView.postDelayed(runnable, MINIMAL_DELAY_MILLIS);   //  Lancer le runnable
         }
     }
 

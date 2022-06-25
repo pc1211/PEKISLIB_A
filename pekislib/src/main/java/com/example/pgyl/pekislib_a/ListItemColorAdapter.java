@@ -22,8 +22,7 @@ public class ListItemColorAdapter extends BaseAdapter {
         init();
     }
 
-    private void init() {
-        ;    //  NOP
+    private void init() {//  NOP
     }
 
     public void setTextItems(String[] textValues) {

@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
+
 public class ListItemSimpleAdapter extends BaseAdapter {
     //region Variables
     private Context context;
@@ -19,8 +21,7 @@ public class ListItemSimpleAdapter extends BaseAdapter {
         init();
     }
 
-    private void init() {
-        ;    //  NOP
+    private void init() {//  NOP
     }
 
     public void setTextItems(String[] textValues) {
