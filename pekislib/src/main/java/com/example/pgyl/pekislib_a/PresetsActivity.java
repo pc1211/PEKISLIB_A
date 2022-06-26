@@ -339,15 +339,15 @@ public class PresetsActivity extends Activity {
             final long MINIMAL_DELAY_MILLIS = 10;
 
             final Runnable runnable = new Runnable() {
-                boolean needInit = true;
+                boolean isFirstTime = true;
 
                 public void run() {
                     if (listView.getChildCount() == 0) {   //  listView pas encore prêt
                         listView.postDelayed(this, MINIMAL_DELAY_MILLIS);   //  On attendra jusqu'à ce qu'il soit prêt
                     } else {   //  listView est maintenant prêt
                         if ((listIndex < listView.getFirstVisiblePosition()) || (listIndex > listView.getLastVisiblePosition())) {   //  L'item à la position listIndex est invisible
-                            if (needInit) {
-                                needInit = false;   //  Le setSelection ne doit être effectué qu'au 1er passage!
+                            if (isFirstTime) {
+                                isFirstTime = false;   //  Le setSelection ne doit être effectué qu'au 1er passage!
                                 listView.setSelection(listIndex);   //  Pour voir l'item à la position listIndex (sans le sélectionner)
                             }
                             listView.postDelayed(this, MINIMAL_DELAY_MILLIS);   //  On attendra jusqu'à ce qu'il soit visible
