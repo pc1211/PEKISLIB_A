@@ -278,8 +278,8 @@ public class PresetsActivity extends Activity {
     }
 
     private void onPresetClick(int pos, View view) {
-        view.setSelected(!view.isSelected());  //  L'item est sélectionné (ou désélectionné si on le presse à nouveau)
         if (pos != listIndex) {
+            view.setSelected(true);
             if (presetsHandler.getCount() > 0) {
                 preset = presetsHandler.getPreset(pos);
                 listIndex = pos;
