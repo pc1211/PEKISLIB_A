@@ -436,15 +436,15 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
 
         int colValue = Color.parseColor(COLOR_PREFIX + color);
         for (int i = 0; i <= (text.length() - 1); i = i + 1) {
-            Character ch = text.charAt(i);
+            int code = (int) text.charAt(i);   //  Conversion ASCII
             DotMatrixSymbol symbol = null;
             if (extraFont != null) {
                 font = extraFont;
-                symbol = font.getSymbol(ch);
+                symbol = font.getSymbolByCode(code);
             }
             if (symbol == null) {
                 font = defaultFont;
-                symbol = font.getSymbol(ch);
+                symbol = font.getSymbolByCode(code);
             }
             //  Le symbole et sa fonte ont été déterminés
             symbolPos.offset(symbol.getPosOffset().x, symbol.getPosOffset().y);   //  Appliquer un décalage éventuel avant l'affichage (si symbole de surcharge)

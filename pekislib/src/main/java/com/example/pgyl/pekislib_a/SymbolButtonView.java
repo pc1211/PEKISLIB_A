@@ -39,9 +39,10 @@ public final class SymbolButtonView extends View {
     private long minClickTimeInterval;
     private long lastClickUpTime;
     private BUTTON_STATES buttonState;
-    private int frontColor;
-    private int backColor;
-    private int extraColor;
+    private int unpressedFrontColor;
+    private int unpressedBackColor;
+    private int pressedFrontColor;
+    private int pressedBackColor;
     private boolean clickDownInButtonZone;
     private RectF buttonZone;
     private Bitmap viewBitmap;
@@ -122,10 +123,11 @@ public final class SymbolButtonView extends View {
         this.symbolSizeCoeff = symbolSizeCoeff;
     }
 
-    public void setColors(String frontColor, String backColor, String extraColor) {
-        this.frontColor = Color.parseColor(COLOR_PREFIX + frontColor);
-        this.backColor = Color.parseColor(COLOR_PREFIX + backColor);
-        this.extraColor = Color.parseColor(COLOR_PREFIX + extraColor);
+    public void setColors(String unpressedFrontColor, String unpressedBackColor, String pressedFrontColor, String pressedBackColor) {
+        this.unpressedFrontColor = Color.parseColor(COLOR_PREFIX + unpressedFrontColor);
+        this.unpressedBackColor = Color.parseColor(COLOR_PREFIX + unpressedBackColor);
+        this.pressedFrontColor = Color.parseColor(COLOR_PREFIX + pressedFrontColor);
+        this.pressedBackColor = Color.parseColor(COLOR_PREFIX + pressedBackColor);
         invalidate();
     }
 
@@ -170,11 +172,11 @@ public final class SymbolButtonView extends View {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {   //  Unpressed(Front/Back), Pressed(Back/Extra)
+    protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        int displayFrontColor = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? backColor : frontColor);
-        int displayBackColor = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? extraColor : backColor);
+        int displayFrontColor = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? pressedFrontColor : unpressedFrontColor);
+        int displayBackColor = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? pressedBackColor : unpressedBackColor);
         viewCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
         viewCanvas.drawBitmap(symbolBitmap, 0, 0, null);
         viewCanvas.drawColor(displayFrontColor, PorterDuff.Mode.SRC_IN);

@@ -9,28 +9,31 @@ public class DotMatrixFontUtils {
     }
 
     public static BiDimensions getFontTextDimensions(String text, DotMatrixFont extraFont, DotMatrixFont defaultFont) {   //  Spécifier extraFont différent de null si text mélange extraFont et defaultFont; extraFont a la priorité sur defaultFont
-        BiDimensions fontTextDimensions;
-        DotMatrixSymbol symbol;
-
         String extraFontText = "";
         String defaultFontText = "";
+
         for (int i = 0; i <= (text.length() - 1); i = i + 1) {
-            String t = text.substring(i, i + 1);
-            Character ch = text.charAt(i);
-            symbol = null;
+            char ch = text.charAt(i);
+            DotMatrixSymbol symbol = null;
             if (extraFont != null) {
-                symbol = extraFont.getSymbol(ch);
+                symbol = extraFont.getSymbolByCode((int) ch);   //  Conversion ASCII
             }
             if (symbol != null) {
-                extraFontText = extraFontText + t;
+                extraFontText = extraFontText + ch;
             } else {
-                defaultFontText = defaultFontText + t;
+                defaultFontText = defaultFontText + ch;
             }
         }
-        fontTextDimensions = defaultFont.getTextDimensions(defaultFontText);
+
+        BiDimensions fontTextDimensions = new BiDimensions(0, 0);
+        BiDimensions defaultFontTextDimensions = defaultFont.getTextDimensions(defaultFontText);
         if (extraFont != null) {
-            fontTextDimensions.set(fontTextDimensions.width + extraFont.getTextDimensions(extraFontText).width, Math.max(extraFont.getTextDimensions(extraFontText).height, fontTextDimensions.height));
+            BiDimensions extraFontTextDimensions = extraFont.getTextDimensions(extraFontText);
+            fontTextDimensions.set(defaultFontTextDimensions.width + extraFontTextDimensions.width, Math.max(defaultFontTextDimensions.height, extraFontTextDimensions.height));
+        } else {
+            fontTextDimensions.set(defaultFontTextDimensions.width, defaultFontTextDimensions.height);
         }
+
         return fontTextDimensions;
     }
 
