@@ -198,7 +198,7 @@ public class InputButtonsActivity extends Activity {
                         "7", "8", "9", NA, NA, NA, NA, NA,
                         NA, "0", "/", NA, NA, NA, NA, NA}),
 
-        POSINT(
+        INTEGER(
                 new String[]{   //  Portrait
                         "1", "2", "3", SPECIAL_BUTTONS.BACK.toString(),
                         "4", "5", "6", SPECIAL_BUTTONS.CLEAR.toString(),
@@ -582,7 +582,7 @@ public class InputButtonsActivity extends Activity {
             if (keyboard.equals(KEYBOARDS.DATE_JJMMAAAA)) {
                 errorParseCandidate = parseDATEJJMMAAAA(candidate, smin, smax);
             }
-            if (keyboard.equals(KEYBOARDS.POSINT)) {
+            if (keyboard.equals(KEYBOARDS.INTEGER)) {
                 errorParseCandidate = parsePosInteger(candidate, smin, smax);
             }
             if (keyboard.equals(KEYBOARDS.LONG)) {
@@ -708,7 +708,7 @@ public class InputButtonsActivity extends Activity {
                 }
             }
         } catch (NumberFormatException ex) {
-            errorParsePosInteger = ERROR_PARSE + KEYBOARDS.POSINT;
+            errorParsePosInteger = ERROR_PARSE + KEYBOARDS.INTEGER;
         }
         return errorParsePosInteger;
     }

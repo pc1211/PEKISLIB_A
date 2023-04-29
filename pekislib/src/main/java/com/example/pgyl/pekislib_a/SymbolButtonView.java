@@ -34,9 +34,12 @@ public final class SymbolButtonView extends View {
 
     //region Constantes
     private final float SIZE_COEFF_DEFAULT = 0.9f;   //  (0..1)
+    private final int PC_BACK_CORNER_RADIUS = 35;    //  % appliqué à 1/2 largeur ou hauteur pour déterminer le rayon du coin arrondi
     //endregion
     //region Variables
     private long minClickTimeInterval;
+    private int pcBackCornerRadius;
+    private int backCornerRadius;
     private long lastClickUpTime;
     private BUTTON_STATES buttonState;
     private int unpressedFrontColor;
@@ -48,7 +51,6 @@ public final class SymbolButtonView extends View {
     private Bitmap viewBitmap;
     private Canvas viewCanvas;
     private Paint backPaint;
-    private float backCornerRadius;
     private RectF viewCanvasRect;
     private RectF symbolCellCanvasRect;
     private Bitmap symbolBitmap;
@@ -73,6 +75,7 @@ public final class SymbolButtonView extends View {
         buttonZone = new RectF();
         buttonState = BUTTON_STATES.UNPRESSED;
         minClickTimeInterval = MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE;
+        pcBackCornerRadius = PC_BACK_CORNER_RADIUS;
         lastClickUpTime = 0;
         symbolSizeCoeff = SIZE_COEFF_DEFAULT;
         symbolRelativePositionCoeffs = ALIGN_WIDTH_HEIGHT;
@@ -97,8 +100,6 @@ public final class SymbolButtonView extends View {
 
     @Override
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
-        final int BACK_CORNER_RADIUS = 35;  //  % appliqué à 1/2 largeur ou hauteur pour déterminer le rayon du coin arrondi
-
         super.onSizeChanged(w, h, oldw, oldh);
 
         viewBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
@@ -107,7 +108,7 @@ public final class SymbolButtonView extends View {
         symbolCellCanvasRect = PointRectUtils.getMaxSubRect(viewCanvasRect, ALIGN_WIDTH_HEIGHT, SQUARE_ASPECT_RATIO, FULL_SIZE_COEFF);
         symbolBitmap = createSymbolBitmap(symbolPicture);
         buttonZone.set(getLeft() + symbolCellCanvasRect.left, getTop() + symbolCellCanvasRect.top, getLeft() + symbolCellCanvasRect.right, getTop() + symbolCellCanvasRect.bottom);
-        backCornerRadius = (Math.min(w, h) * BACK_CORNER_RADIUS) / 200;    //  Rayon pour coin arrondi (% appliqué à la moitié de la largeur ou hauteur)
+        backCornerRadius = (Math.min(w, h) * pcBackCornerRadius) / 200;    //  Rayon pour coin arrondi (% appliqué à la moitié de la largeur ou hauteur)
     }
 
     public void setSVGImageResource(int resId) {
@@ -133,6 +134,10 @@ public final class SymbolButtonView extends View {
 
     public void setMinClickTimeInterval(long minClickTimeInterval) {
         this.minClickTimeInterval = minClickTimeInterval;
+    }
+
+    public void setPcBackCornerRadius(int pcBackCornerRadius) {
+        this.pcBackCornerRadius = pcBackCornerRadius;
     }
 
     public boolean onButtonTouch(View v, MotionEvent event) {
