@@ -1,5 +1,6 @@
 package com.example.pgyl.pekislib_a;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,8 +72,9 @@ public class DotMatrixFont {
         BiDimensions textDimensions;
 
         textDimensions = new BiDimensions(0, 0);
-        for (int i = 0; i <= (text.length() - 1); i = i + 1) {
-            symbol = codeMap.get((int) text.charAt(i));   //  Conversion ASCII
+        byte[] textBytes = text.getBytes(StandardCharsets.US_ASCII);   //  Conversion ASCII
+        for (int i = 0; i <= (textBytes.length - 1); i = i + 1) {
+            symbol = codeMap.get((int) textBytes[i]);
             if (symbol != null) {
                 if (!symbol.isOverwrite()) {   //  Les symboles de surcharge ne sont pas comptés
                     textDimensions.width = textDimensions.width + symbol.getDimensions().width + rightMargin;

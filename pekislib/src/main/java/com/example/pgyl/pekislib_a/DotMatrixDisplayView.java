@@ -15,6 +15,8 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.nio.charset.StandardCharsets;
+
 import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
 import static com.example.pgyl.pekislib_a.MiscUtils.BiDimensions;
@@ -435,8 +437,9 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         DotMatrixFont font = null;
 
         int colValue = Color.parseColor(COLOR_PREFIX + color);
-        for (int i = 0; i <= (text.length() - 1); i = i + 1) {
-            int code = (int) text.charAt(i);   //  Conversion ASCII
+        byte[] textBytes = text.getBytes(StandardCharsets.US_ASCII);   //  Conversion ASCII
+        for (int i = 0; i <= (textBytes.length - 1); i = i + 1) {
+            int code = textBytes[i];
             DotMatrixSymbol symbol = null;
             if (extraFont != null) {
                 font = extraFont;

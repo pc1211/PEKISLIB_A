@@ -1,5 +1,7 @@
 package com.example.pgyl.pekislib_a;
 
+import java.nio.charset.StandardCharsets;
+
 import static com.example.pgyl.pekislib_a.MiscUtils.BiDimensions;
 
 public class DotMatrixFontUtils {
@@ -12,16 +14,18 @@ public class DotMatrixFontUtils {
         String extraFontText = "";
         String defaultFontText = "";
 
-        for (int i = 0; i <= (text.length() - 1); i = i + 1) {
-            char ch = text.charAt(i);
+        DotMatrixFont font = null;
+        byte[] textBytes = text.getBytes(StandardCharsets.US_ASCII);   //  Conversion ASCII
+        for (int i = 0; i <= (textBytes.length - 1); i = i + 1) {
+            String textchar = text.substring(i, i + 1);
             DotMatrixSymbol symbol = null;
             if (extraFont != null) {
-                symbol = extraFont.getSymbolByCode((int) ch);   //  Conversion ASCII
+                symbol = extraFont.getSymbolByCode((int) textBytes[i]);
             }
             if (symbol != null) {
-                extraFontText = extraFontText + ch;
+                extraFontText = extraFontText + textchar;
             } else {
-                defaultFontText = defaultFontText + ch;
+                defaultFontText = defaultFontText + textchar;
             }
         }
 
@@ -36,5 +40,4 @@ public class DotMatrixFontUtils {
 
         return fontTextDimensions;
     }
-
 }
