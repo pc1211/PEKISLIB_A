@@ -118,6 +118,14 @@ public class StringDBUtils {
         stringDB.insertOrReplaceRowById(tableName, TABLE_IDS.DEFAULT.toString(), values);
     }
 
+    public static void createPresetWithDefaultValues(StringDB stringDB, String tableName, String[] defaults) {
+        PresetsHandler presetsHandler = new PresetsHandler(stringDB);
+        presetsHandler.setTableName(tableName);
+        presetsHandler.createNewPreset(defaults);
+        presetsHandler.saveAndClose();
+        presetsHandler = null;
+    }
+
     //region ACTIVITY_INFOS
     public static boolean isColdStartStatusOfActivity(StringDB stringDB, String activityName) {
         return stringDB.selectFieldByIdOrCreate(getActivityInfosTableName(), activityName, getActivityInfosStartStatusIndex()).equals(ACTIVITY_START_STATUS.COLD.toString());
@@ -126,9 +134,6 @@ public class StringDBUtils {
     public static void setStartStatusOfActivity(StringDB stringDB, String activityName, ACTIVITY_START_STATUS activityStartStatus) {
         stringDB.insertOrReplaceFieldById(getActivityInfosTableName(), activityName, getActivityInfosStartStatusIndex(), activityStartStatus.toString());
     }
-    //endregion
-
-    //region TEMP
     //endregion
 
 }

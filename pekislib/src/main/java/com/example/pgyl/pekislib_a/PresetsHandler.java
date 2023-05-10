@@ -146,7 +146,7 @@ public class PresetsHandler {
         int maxId = 0;
         if (!presets.isEmpty()) {
             for (int i = 0; i <= (presets.size() - 1); i = i + 1) {
-                int k = Integer.valueOf(presets.get(i)[TABLE_ID_INDEX].substring(TABLE_IDS.PRESET.toString().length()));  // N° de PRESET
+                int k = Integer.parseInt(presets.get(i)[TABLE_ID_INDEX].substring(TABLE_IDS.PRESET.toString().length()));  // N° de PRESET
                 if (k > maxId) {
                     maxId = k;
                 }

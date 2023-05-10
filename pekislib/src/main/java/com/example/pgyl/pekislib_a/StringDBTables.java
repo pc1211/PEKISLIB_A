@@ -7,7 +7,7 @@ public class StringDBTables {
 
     //  TABLES
     private enum PEKISLIB_TABLES {
-        ACTIVITY_INFOS(PekislibTableDataFields.activityInfos.class), TEMP(PekislibTableDataFields.temp.class);
+        ACTIVITY_INFOS(PekislibTableDataFields.activityInfos.class);
 
         private int dataFieldsCount;
         private String description;
@@ -71,16 +71,5 @@ public class StringDBTables {
         return PekislibTableDataFields.activityInfos.START_STATUS.INDEX();
     }
     //endregion
-
-    //region TEMP
-    public static String getTempTableName() {
-        return PEKISLIB_TABLES.TEMP.toString();
-    }
-
-    public static int getTempValueIndex() {
-        return PekislibTableDataFields.temp.VALUE.INDEX();
-    }
-    //endregion
-
 
 }
