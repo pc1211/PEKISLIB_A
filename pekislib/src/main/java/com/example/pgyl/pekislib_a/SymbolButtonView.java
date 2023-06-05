@@ -32,6 +32,13 @@ public final class SymbolButtonView extends View {
 
     private onCustomClickListener mOnCustomClickListener;
 
+    public static class SymbolButtonViewColorBox {
+        public String unpressedFrontColor;
+        public String unpressedBackColor;
+        public String pressedFrontColor;
+        public String pressedBackColor;
+    }
+
     //region Constantes
     private final float SIZE_COEFF_DEFAULT = 0.9f;   //  (0..1)
     private final int PC_BACK_CORNER_RADIUS = 35;    //  % appliqué à 1/2 largeur ou hauteur pour déterminer le rayon du coin arrondi
@@ -42,10 +49,10 @@ public final class SymbolButtonView extends View {
     private int backCornerRadius;
     private long lastClickUpTime;
     private BUTTON_STATES buttonState;
-    private int unpressedFrontColor;
-    private int unpressedBackColor;
-    private int pressedFrontColor;
-    private int pressedBackColor;
+    public int unpressedFrontColor;
+    public int unpressedBackColor;
+    public int pressedFrontColor;
+    public int pressedBackColor;
     private boolean clickDownInButtonZone;
     private RectF buttonZone;
     private Bitmap viewBitmap;
@@ -124,12 +131,14 @@ public final class SymbolButtonView extends View {
         this.symbolSizeCoeff = symbolSizeCoeff;
     }
 
-    public void setColors(String unpressedFrontColor, String unpressedBackColor, String pressedFrontColor, String pressedBackColor) {
-        this.unpressedFrontColor = Color.parseColor(COLOR_PREFIX + unpressedFrontColor);
-        this.unpressedBackColor = Color.parseColor(COLOR_PREFIX + unpressedBackColor);
-        this.pressedFrontColor = Color.parseColor(COLOR_PREFIX + pressedFrontColor);
-        this.pressedBackColor = Color.parseColor(COLOR_PREFIX + pressedBackColor);
-        invalidate();
+    public void setColors(SymbolButtonViewColorBox colorBox) {
+        if (colorBox != null) {
+            unpressedFrontColor = Color.parseColor(COLOR_PREFIX + colorBox.unpressedFrontColor);
+            unpressedBackColor = Color.parseColor(COLOR_PREFIX + colorBox.unpressedBackColor);
+            pressedFrontColor = Color.parseColor(COLOR_PREFIX + colorBox.pressedFrontColor);
+            pressedBackColor = Color.parseColor(COLOR_PREFIX + colorBox.pressedBackColor);
+            invalidate();
+        }
     }
 
     public void setMinClickTimeInterval(long minClickTimeInterval) {
