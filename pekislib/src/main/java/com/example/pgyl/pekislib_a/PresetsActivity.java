@@ -18,6 +18,7 @@ import android.widget.ListView;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.example.pgyl.pekislib_a.ColorUtils.ButtonColorBox;
 import static com.example.pgyl.pekislib_a.Constants.ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
 import static com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITIES;
@@ -90,6 +91,7 @@ public class PresetsActivity extends Activity {
     private int listIndex;
     private int columnIndex;
     private CustomButton[] buttons;
+    private ButtonColorBox buttonColorBox;
     private ListView listView;
     private boolean validReturnFromCalledActivity;
     private String calledActivityName;
@@ -104,6 +106,7 @@ public class PresetsActivity extends Activity {
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         getActionBar().setTitle(getIntent().getStringExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString()));
         setupOrientationLayout();
+        buttonColorBox = new ButtonColorBox();
         setupButtons();
         setupList();
         validReturnFromCalledActivity = false;
@@ -115,6 +118,7 @@ public class PresetsActivity extends Activity {
 
         savePreferences();
         setCurrentsForActivity(stringDB, PEKISLIB_ACTIVITIES.PRESETS.toString(), tableName, preset);
+        buttonColorBox = null;
         presetsHandler.saveAndClose();
         presetsHandler = null;
         stringDB.close();
@@ -309,9 +313,9 @@ public class PresetsActivity extends Activity {
         final String SPECIAL_FIELD_PRESSED_COLOR = "995400";
 
         boolean needSpecialColor = (listIndex != LIST_INDEX_DEFAULT_VALUE);
-        String pressedColor = ((needSpecialColor) ? SPECIAL_FIELD_PRESSED_COLOR : BUTTON_STATES.PRESSED.DEFAULT_COLOR());
-        String unpressedColor = ((needSpecialColor) ? SPECIAL_FIELD_UNPRESSED_COLOR : BUTTON_STATES.UNPRESSED.DEFAULT_COLOR());
-        buttons[COMMANDS.FIELD.INDEX()].setColors(pressedColor, unpressedColor);
+        buttonColorBox.unpressedBackColor = (needSpecialColor) ? SPECIAL_FIELD_UNPRESSED_COLOR : BUTTON_STATES.UNPRESSED.DEFAULT_COLOR();
+        buttonColorBox.pressedBackColor = (needSpecialColor) ? SPECIAL_FIELD_PRESSED_COLOR : BUTTON_STATES.PRESSED.DEFAULT_COLOR();
+        buttons[COMMANDS.FIELD.INDEX()].setBackColors(buttonColorBox);
     }
 
     private void rebuildPresets() {
@@ -439,7 +443,9 @@ public class PresetsActivity extends Activity {
 
         for (COMMANDS command : COMMANDS.values()) {
             if (command.equals(COMMANDS.OK)) {
-                buttons[command.INDEX()].setColors(OK_PRESSED_COLOR_DEFAULT, OK_UNPRESSED_COLOR_DEFAULT);
+                buttonColorBox.unpressedBackColor = OK_UNPRESSED_COLOR_DEFAULT;
+                buttonColorBox.pressedBackColor = OK_PRESSED_COLOR_DEFAULT;
+                buttons[command.INDEX()].setBackColors(buttonColorBox);
             }
         }
     }

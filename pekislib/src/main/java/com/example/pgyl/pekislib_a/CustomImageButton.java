@@ -10,6 +10,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 
+import static com.example.pgyl.pekislib_a.ColorUtils.ButtonColorBox;
 import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
 import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
@@ -19,11 +20,13 @@ public final class CustomImageButton extends ImageButton {
     private long minClickTimeInterval;
     private long lastClickUpTime;
     private BUTTON_STATES buttonState;
-    private int unpressedColor;
-    private int pressedColor;
+    private int unpressedFrontColor;
+    private int unpressedBackColor;
+    private int pressedFrontColor;
+    private int pressedBackColor;
     private boolean clickDownInButtonZone;
     private Rect buttonZone;
-    private Drawable drawable;
+    private Drawable backgroundDrawable;
     //endregion
 
     public CustomImageButton(Context context, AttributeSet attrs) {
@@ -34,7 +37,7 @@ public final class CustomImageButton extends ImageButton {
     private void init() {
         final long MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE = 0;   //   Interval de temps (ms) minimum imposé entre 2 click
 
-        drawable = getBackground().getConstantState().newDrawable().mutate();
+        backgroundDrawable = getBackground().getConstantState().newDrawable().mutate();
         buttonState = BUTTON_STATES.UNPRESSED;
         minClickTimeInterval = MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE;
         lastClickUpTime = 0;
@@ -44,29 +47,37 @@ public final class CustomImageButton extends ImageButton {
                 return onButtonTouch(v, event);
             }
         });
-        setColors(BUTTON_STATES.PRESSED.DEFAULT_COLOR(), BUTTON_STATES.UNPRESSED.DEFAULT_COLOR());
     }
 
-    public void setColors(String pressedColor, String unpressedColor) {
-        this.pressedColor = ((pressedColor != null) ? Color.parseColor(COLOR_PREFIX + pressedColor) : UNDEFINED);
-        this.unpressedColor = ((unpressedColor != null) ? Color.parseColor(COLOR_PREFIX + unpressedColor) : UNDEFINED);
-        updateDisplayColor();
+    public void setColors(ButtonColorBox colorBox) {
+        if (colorBox != null) {
+            unpressedFrontColor = (colorBox.unpressedFrontColor != null) ? Color.parseColor(COLOR_PREFIX + colorBox.unpressedFrontColor) : UNDEFINED;
+            unpressedBackColor = (colorBox.unpressedBackColor != null) ? Color.parseColor(COLOR_PREFIX + colorBox.unpressedBackColor) : UNDEFINED;
+            pressedFrontColor = (colorBox.pressedFrontColor != null) ? Color.parseColor(COLOR_PREFIX + colorBox.pressedFrontColor) : UNDEFINED;
+            pressedBackColor = (colorBox.pressedBackColor != null) ? Color.parseColor(COLOR_PREFIX + colorBox.pressedBackColor) : UNDEFINED;
+            updateDisplayColors();
+        }
     }
 
     public void setMinClickTimeInterval(long minClickTimeInterval) {
         this.minClickTimeInterval = minClickTimeInterval;
     }
 
-    private void updateDisplayColor() {
-        int color;
-
-        color = ((buttonState.equals(BUTTON_STATES.UNPRESSED)) ? unpressedColor : pressedColor);
-        if (color != UNDEFINED) {
-            drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+    private void updateDisplayColors() {
+        int frontColor = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? pressedFrontColor : unpressedFrontColor);
+        if (frontColor != UNDEFINED) {
+            setColorFilter(frontColor, PorterDuff.Mode.SRC_ATOP);
         } else {
-            drawable.clearColorFilter();
+            clearColorFilter();
         }
-        setBackground(drawable);
+
+        int backColor = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? pressedBackColor : unpressedBackColor);
+        if (backColor != UNDEFINED) {
+            backgroundDrawable.setColorFilter(backColor, PorterDuff.Mode.SRC_IN);
+        } else {
+            backgroundDrawable.clearColorFilter();
+        }
+        setBackground(backgroundDrawable);
         invalidate();
     }
 
@@ -76,7 +87,7 @@ public final class CustomImageButton extends ImageButton {
             clickDownInButtonZone = true;
             buttonState = BUTTON_STATES.PRESSED;
             v.getParent().requestDisallowInterceptTouchEvent(true);   //  Une listView éventuelle (qui contient des items avec ce contrôle et voudrait scroller) ne pourra voler l'événement ACTION_MOVE de ce contrôle
-            updateDisplayColor();
+            updateDisplayColors();
             return true;
         }
         if ((action == MotionEvent.ACTION_MOVE) || (action == MotionEvent.ACTION_UP)) {
@@ -88,7 +99,7 @@ public final class CustomImageButton extends ImageButton {
                     if (action == MotionEvent.ACTION_UP) {
                         long nowm = System.currentTimeMillis();
                         buttonState = BUTTON_STATES.UNPRESSED;
-                        updateDisplayColor();
+                        updateDisplayColors();
                         if ((nowm - lastClickUpTime) >= minClickTimeInterval) {   //  OK pour traiter le click
                             lastClickUpTime = nowm;
                             performClick();
@@ -99,7 +110,7 @@ public final class CustomImageButton extends ImageButton {
                 } else {
                     clickDownInButtonZone = false;
                     buttonState = BUTTON_STATES.UNPRESSED;
-                    updateDisplayColor();
+                    updateDisplayColors();
                 }
             }
             return (action == MotionEvent.ACTION_MOVE);

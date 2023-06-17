@@ -15,6 +15,7 @@ import android.view.View;
 
 import com.larvalabs.svgandroid.SVGParser;
 
+import static com.example.pgyl.pekislib_a.ColorUtils.ButtonColorBox;
 import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
 import static com.example.pgyl.pekislib_a.PointRectUtils.ALIGN_WIDTH_HEIGHT;
@@ -32,13 +33,6 @@ public final class SymbolButtonView extends View {
 
     private onCustomClickListener mOnCustomClickListener;
 
-    public static class SymbolButtonViewColorBox {
-        public String unpressedFrontColor;
-        public String unpressedBackColor;
-        public String pressedFrontColor;
-        public String pressedBackColor;
-    }
-
     //region Constantes
     private final float SIZE_COEFF_DEFAULT = 0.9f;   //  (0..1)
     private final int PC_BACK_CORNER_RADIUS = 35;    //  % appliqué à 1/2 largeur ou hauteur pour déterminer le rayon du coin arrondi
@@ -49,10 +43,10 @@ public final class SymbolButtonView extends View {
     private int backCornerRadius;
     private long lastClickUpTime;
     private BUTTON_STATES buttonState;
-    public int unpressedFrontColor;
-    public int unpressedBackColor;
-    public int pressedFrontColor;
-    public int pressedBackColor;
+    private int unpressedFrontColor;
+    private int unpressedBackColor;
+    private int pressedFrontColor;
+    private int pressedBackColor;
     private boolean clickDownInButtonZone;
     private RectF buttonZone;
     private Bitmap viewBitmap;
@@ -131,7 +125,7 @@ public final class SymbolButtonView extends View {
         this.symbolSizeCoeff = symbolSizeCoeff;
     }
 
-    public void setColors(SymbolButtonViewColorBox colorBox) {
+    public void setColors(ButtonColorBox colorBox) {
         if (colorBox != null) {
             unpressedFrontColor = Color.parseColor(COLOR_PREFIX + colorBox.unpressedFrontColor);
             unpressedBackColor = Color.parseColor(COLOR_PREFIX + colorBox.unpressedBackColor);
@@ -189,12 +183,12 @@ public final class SymbolButtonView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        int displayFrontColor = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? pressedFrontColor : unpressedFrontColor);
-        int displayBackColor = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? pressedBackColor : unpressedBackColor);
+        int frontColor = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? pressedFrontColor : unpressedFrontColor);
+        int backColor = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? pressedBackColor : unpressedBackColor);
         viewCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
         viewCanvas.drawBitmap(symbolBitmap, 0, 0, null);
-        viewCanvas.drawColor(displayFrontColor, PorterDuff.Mode.SRC_IN);
-        backPaint.setColor(displayBackColor);
+        viewCanvas.drawColor(frontColor, PorterDuff.Mode.SRC_IN);
+        backPaint.setColor(backColor);
         viewCanvas.drawRoundRect(symbolCellCanvasRect, backCornerRadius, backCornerRadius, backPaint);
         canvas.drawBitmap(viewBitmap, 0, 0, null);
     }

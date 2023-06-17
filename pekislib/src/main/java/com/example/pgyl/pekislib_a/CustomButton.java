@@ -10,6 +10,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 
+import static com.example.pgyl.pekislib_a.ColorUtils.ButtonColorBox;
 import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
 import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
@@ -19,11 +20,11 @@ public final class CustomButton extends Button {
     private long minClickTimeInterval;
     private long lastClickUpTime;
     private BUTTON_STATES buttonState;
-    private int unpressedColor;
-    private int pressedColor;
+    private int unpressedBackColor;
+    private int pressedBackColor;
     private boolean clickDownInButtonZone;
     private Rect buttonZone;
-    private Drawable drawable;
+    private Drawable backgroundDrawable;
     //endregion
 
     public CustomButton(Context context, AttributeSet attrs) {
@@ -34,7 +35,7 @@ public final class CustomButton extends Button {
     private void init() {
         final long MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE = 0;   //   Interval de temps (ms) minimum imposé entre 2 click
 
-        drawable = getBackground().getConstantState().newDrawable().mutate();
+        backgroundDrawable = getBackground().getConstantState().newDrawable().mutate();
         buttonState = BUTTON_STATES.UNPRESSED;
         minClickTimeInterval = MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE;
         lastClickUpTime = 0;
@@ -44,29 +45,28 @@ public final class CustomButton extends Button {
                 return onButtonTouch(v, event);
             }
         });
-        setColors(BUTTON_STATES.PRESSED.DEFAULT_COLOR(), BUTTON_STATES.UNPRESSED.DEFAULT_COLOR());
     }
 
-    public void setColors(String pressedColor, String unpressedColor) {
-        this.pressedColor = ((pressedColor != null) ? Color.parseColor(COLOR_PREFIX + pressedColor) : UNDEFINED);
-        this.unpressedColor = ((unpressedColor != null) ? Color.parseColor(COLOR_PREFIX + unpressedColor) : UNDEFINED);
-        updateDisplayColor();
+    public void setBackColors(ButtonColorBox colorBox) {
+        if (colorBox != null) {
+            unpressedBackColor = (colorBox.unpressedBackColor != null) ? Color.parseColor(COLOR_PREFIX + colorBox.unpressedBackColor) : UNDEFINED;
+            pressedBackColor = (colorBox.pressedBackColor != null) ? Color.parseColor(COLOR_PREFIX + colorBox.pressedBackColor) : UNDEFINED;
+            updateDisplayBackColors();
+        }
     }
 
     public void setMinClickTimeInterval(long minClickTimeInterval) {
         this.minClickTimeInterval = minClickTimeInterval;
     }
 
-    private void updateDisplayColor() {
-        int color;
-
-        color = ((buttonState.equals(BUTTON_STATES.UNPRESSED)) ? unpressedColor : pressedColor);
-        if (color != UNDEFINED) {
-            drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+    private void updateDisplayBackColors() {
+        int backColor = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? pressedBackColor : unpressedBackColor);
+        if (backColor != UNDEFINED) {
+            backgroundDrawable.setColorFilter(backColor, PorterDuff.Mode.SRC_IN);
         } else {
-            drawable.clearColorFilter();
+            backgroundDrawable.clearColorFilter();
         }
-        setBackground(drawable);
+        setBackground(backgroundDrawable);
         invalidate();
     }
 
@@ -76,7 +76,7 @@ public final class CustomButton extends Button {
             clickDownInButtonZone = true;
             buttonState = BUTTON_STATES.PRESSED;
             v.getParent().requestDisallowInterceptTouchEvent(true);   //  Une listView éventuelle (qui contient des items avec ce contrôle et voudrait scroller) ne pourra voler l'événement ACTION_MOVE de ce contrôle
-            updateDisplayColor();
+            updateDisplayBackColors();
             return true;
         }
         if ((action == MotionEvent.ACTION_MOVE) || (action == MotionEvent.ACTION_UP)) {
@@ -88,7 +88,7 @@ public final class CustomButton extends Button {
                     if (action == MotionEvent.ACTION_UP) {
                         long nowm = System.currentTimeMillis();
                         buttonState = BUTTON_STATES.UNPRESSED;
-                        updateDisplayColor();
+                        updateDisplayBackColors();
                         if ((nowm - lastClickUpTime) >= minClickTimeInterval) {   //  OK pour traiter le click
                             lastClickUpTime = nowm;
                             performClick();
@@ -99,7 +99,7 @@ public final class CustomButton extends Button {
                 } else {
                     clickDownInButtonZone = false;
                     buttonState = BUTTON_STATES.UNPRESSED;
-                    updateDisplayColor();
+                    updateDisplayBackColors();
                 }
             }
             return (action == MotionEvent.ACTION_MOVE);

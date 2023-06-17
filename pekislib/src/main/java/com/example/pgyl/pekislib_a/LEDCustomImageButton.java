@@ -9,6 +9,8 @@ import android.widget.LinearLayout;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.example.pgyl.pekislib_a.ColorUtils.ButtonColorBox;
+
 public class LEDCustomImageButton extends LinearLayout {
     public interface onCustomClickListener {
         void onCustomClick();
@@ -77,8 +79,8 @@ public class LEDCustomImageButton extends LinearLayout {
         return (String.format("%06X", ledView.getLEDColor(LEDView.STATES.OFF)));
     }
 
-    public void setButtonColors(String pressedColor, String unpressedColor) {
-        customImageButton.setColors(pressedColor, unpressedColor);
+    public void setButtonColors(ButtonColorBox colorBox) {
+        customImageButton.setColors(colorBox);
     }
 
     public void setButtonImageResource(int resId) {
