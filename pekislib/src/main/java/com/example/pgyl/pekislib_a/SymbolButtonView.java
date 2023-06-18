@@ -127,7 +127,7 @@ public final class SymbolButtonView extends View {
 
     public void setColors(ButtonColorBox colorBox) {
         if (colorBox != null) {
-            unpressedFrontColor = Color.parseColor(COLOR_PREFIX + colorBox.unpressedFrontColor);
+            unpressedFrontColor = Color.parseColor(COLOR_PREFIX + colorBox.unpressedFrontColor);   //  Null interdit
             unpressedBackColor = Color.parseColor(COLOR_PREFIX + colorBox.unpressedBackColor);
             pressedFrontColor = Color.parseColor(COLOR_PREFIX + colorBox.pressedFrontColor);
             pressedBackColor = Color.parseColor(COLOR_PREFIX + colorBox.pressedBackColor);

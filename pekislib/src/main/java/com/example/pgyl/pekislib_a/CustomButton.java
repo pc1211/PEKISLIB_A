@@ -13,7 +13,6 @@ import android.widget.Button;
 import static com.example.pgyl.pekislib_a.ColorUtils.ButtonColorBox;
 import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
-import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
 
 public final class CustomButton extends Button {
     //region Variables
@@ -49,8 +48,8 @@ public final class CustomButton extends Button {
 
     public void setBackColors(ButtonColorBox colorBox) {
         if (colorBox != null) {
-            unpressedBackColor = (colorBox.unpressedBackColor != null) ? Color.parseColor(COLOR_PREFIX + colorBox.unpressedBackColor) : UNDEFINED;
-            pressedBackColor = (colorBox.pressedBackColor != null) ? Color.parseColor(COLOR_PREFIX + colorBox.pressedBackColor) : UNDEFINED;
+            unpressedBackColor = (colorBox.unpressedBackColor != null) ? Color.parseColor(COLOR_PREFIX + colorBox.unpressedBackColor) : Integer.MAX_VALUE;   //  7F FF FF FF
+            pressedBackColor = (colorBox.pressedBackColor != null) ? Color.parseColor(COLOR_PREFIX + colorBox.pressedBackColor) : Integer.MAX_VALUE;
             updateDisplayBackColors();
         }
     }
@@ -61,7 +60,7 @@ public final class CustomButton extends Button {
 
     private void updateDisplayBackColors() {
         int backColor = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? pressedBackColor : unpressedBackColor);
-        if (backColor != UNDEFINED) {
+        if (backColor != Integer.MAX_VALUE) {
             backgroundDrawable.setColorFilter(backColor, PorterDuff.Mode.SRC_IN);
         } else {
             backgroundDrawable.clearColorFilter();
