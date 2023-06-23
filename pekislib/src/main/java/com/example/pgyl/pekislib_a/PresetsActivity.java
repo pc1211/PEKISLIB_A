@@ -77,7 +77,6 @@ public class PresetsActivity extends Activity {
 
     private final int LIST_INDEX_DEFAULT_VALUE = UNDEFINED;
     private final int COLUMN_INDEX_DEFAULT_VALUE = 1;
-    private final int LIST_INDEX_REBUILDING = -2;
     //endregion
     //region Variables
     private PresetsHandler presetsHandler;
@@ -106,7 +105,6 @@ public class PresetsActivity extends Activity {
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         getActionBar().setTitle(getIntent().getStringExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString()));
         setupOrientationLayout();
-        buttonColorBox = new ButtonColorBox();
         setupButtons();
         setupList();
         validReturnFromCalledActivity = false;
@@ -132,6 +130,7 @@ public class PresetsActivity extends Activity {
         shpFileName = getPackageName() + "." + getClass().getSimpleName() + SHP_FILE_NAME_SUFFIX;
         tableName = getIntent().getStringExtra(TABLE_EXTRA_KEYS.TABLE.toString());
         isTypeColors = getIntent().getStringExtra(PRESETS_ACTIVITY_EXTRA_KEYS.DISPLAY_TYPE.toString()).equals(PRESETS_ACTIVITY_DISPLAY_TYPE.COLORS.toString());
+        buttonColorBox = new ButtonColorBox();
 
         setupStringDB();
         setupPresetsHandler();
