@@ -36,16 +36,16 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
 
     public enum SCROLL_DIRECTIONS {LEFT, RIGHT, TOP, BOTTOM}
 
-    private class StateColor {
+    private static class StateColor {
         int pressed;
         int unpressed;
     }
 
-    private class DimensionsSet {
+    private static class DimensionsSet {
         int width;               //  Largeur donnée pour l'affichage
         Rect internalMargins;    //  Marge autour de l'affichage proprement dit
-        int dotCellSideSize;         //  Taille d'un carré + Espace entre 2 carrés, à calculer selon le nombre de carrés en largeur (cf displayRect)
-        int dotSideSize;             //  Taille d'un carré (dotCellSideSize / (1 + Coefficient de taille de l'espace entre carrés))
+        int dotCellSideSize;     //  Taille d'un carré + Espace entre 2 carrés, à calculer selon le nombre de carrés en largeur (cf displayRect)
+        int dotSideSize;         //  Taille d'un carré (dotCellSideSize / (1 + Coefficient de taille de l'espace entre carrés))
         int slackWidth;          //  Compense les arrondis (dûs au calcul de dotCellSideSize et dotSSideize), de telle sorte que internalMargins.left + (displayRect.width -1) * dotCellSideSize + dotSideSize + internalMargins.right +slackWidth = width
         int height;              //  internalMargins.top + (displayRect.width -1) * dotCellSideSize + dotSideSize + internalMargins.bottom
 

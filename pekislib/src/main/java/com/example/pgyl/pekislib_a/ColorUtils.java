@@ -7,13 +7,6 @@ import static com.example.pgyl.pekislib_a.Constants.HEX_RADIX;
 
 public class ColorUtils {
 
-    public static class ButtonColorBox {
-        public String unpressedFrontColor;   //  "RRGGBB" (ou Null si pas de couleur => ClearColorFilter)
-        public String unpressedBackColor;
-        public String pressedFrontColor;
-        public String pressedBackColor;
-    }
-
     public static String RGBToHSV(String RGBColorText) {   //  RRGGBB -> HHSSVV  (HSV dégradé, en particulier H, ramené sur 255 au lieu de 360)
         float[] hsvStruc = new float[3];
 

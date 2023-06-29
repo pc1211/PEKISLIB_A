@@ -3,6 +3,12 @@ package com.example.pgyl.pekislib_a;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Picture;
+import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.widget.Toast;
 
 import java.util.Arrays;
@@ -53,5 +59,16 @@ public class MiscUtils {
 
     public static int getStringIndexOf(String string, String[] stringArray) {
         return Arrays.asList(stringArray).indexOf(string);
+    }
+
+    public static Picture getPictureFromDrawable(Drawable drawable) {
+        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+        Picture picture = new Picture();
+        Canvas canvas = picture.beginRecording(bitmap.getWidth(), bitmap.getHeight());
+        canvas.drawBitmap(bitmap, null, new RectF(0f, 0f, (float) bitmap.getWidth(), (float) bitmap.getHeight()), null);
+        picture.endRecording();
+        canvas = null;
+        bitmap = null;
+        return picture;
     }
 }

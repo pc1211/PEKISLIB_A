@@ -9,9 +9,7 @@ import android.widget.LinearLayout;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.example.pgyl.pekislib_a.ColorUtils.ButtonColorBox;
-
-public class LEDCustomImageButton extends LinearLayout {
+public class LEDCustomButton extends LinearLayout {
     public interface onCustomClickListener {
         void onCustomClick();
     }
@@ -22,73 +20,65 @@ public class LEDCustomImageButton extends LinearLayout {
 
     private onCustomClickListener mOnCustomClickListener;
 
-    private CustomImageButton customImageButton;
+    private CustomButton customButton;
     private LEDView ledView;
 
-    public LEDCustomImageButton(Context context, AttributeSet attrs) {
+    public LEDCustomButton(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
     private void init(Context context) {
         final String BUTTON_XML_NAME = "BUTTON";
-        final String STATE_XML_NAME = "STATE";
+        final String LED_XML_NAME = "LED";
 
         setOrientation(LinearLayout.VERTICAL);
-        LayoutInflater.from(context).inflate(R.layout.statecustomimagebutton, this, true);
+        LayoutInflater.from(context).inflate(R.layout.ledcustombutton, this, true);
         Class rid = R.id.class;
         try {
-            customImageButton = findViewById(rid.getField(BUTTON_XML_NAME).getInt(rid));
-            ledView = findViewById(rid.getField(STATE_XML_NAME).getInt(rid));
+            customButton = findViewById(rid.getField(BUTTON_XML_NAME).getInt(rid));
+            ledView = findViewById(rid.getField(LED_XML_NAME).getInt(rid));
         } catch (IllegalAccessException | NoSuchFieldException ex) {
             Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
         }
-        customImageButton.setOnClickListener(new View.OnClickListener() {
+        customButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 onButtonClick();
             }
         });
     }
 
-    public boolean getLEDState() {
-        return (ledView.getState().equals(LEDView.STATES.ON) ? true : false);
+    public boolean getState() {
+        return ledView.getState().equals(LEDView.STATES.ON);
     }
 
-    public void setLEDOn() {
+    public void setStateOn() {
         ledView.setState(LEDView.STATES.ON);
     }
 
-    public void setLEDOff() {
+    public void setStateOff() {
         ledView.setState(LEDView.STATES.OFF);
     }
 
-    public void setLEDOnColor(String onColor) {
+    public void setLEDOnColor(String onColor) {    //  RRGGBB
         ledView.setLEDColor(LEDView.STATES.ON, onColor);
     }
 
-    public void setLEDOffColor(String offColor) {
+    public void setLEDOffColor(String offColor) {    //  RRGGBB
         ledView.setLEDColor(LEDView.STATES.OFF, offColor);
     }
 
-    public String getLEDOnColor() {
-        return (String.format("%06X", ledView.getLEDColor(LEDView.STATES.ON)));
+    public void updateDisplayButtonBackColors() {
+        customButton.updateDisplayBackColors();
     }
 
-    public String getLEDOffColor() {
-        return (String.format("%06X", ledView.getLEDColor(LEDView.STATES.OFF)));
-    }
-
-    public void setButtonColors(ButtonColorBox colorBox) {
-        customImageButton.setColors(colorBox);
-    }
-
-    public void setButtonImageResource(int resId) {
-        customImageButton.setImageResource(resId);
+    public ButtonColorBox getButtonColorBox() {
+        return customButton.getColorBox();
     }
 
     public void setButtonMinClickTimeInterval(long minClickTimeInterval) {
-        customImageButton.setMinClickTimeInterval(minClickTimeInterval);
+        customButton.setMinClickTimeInterval(minClickTimeInterval);
     }
 
     private void onButtonClick() {

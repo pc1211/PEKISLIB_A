@@ -12,7 +12,7 @@ public class Constants {
     public enum ACTIVITY_EXTRA_KEYS {TITLE}
 
     public enum BUTTON_STATES {
-        UNPRESSED(null), PRESSED("FF9A22");
+        UNPRESSED("A0A0A0"), PRESSED("FF9A22");
 
         private String valueDefaultColor;
 

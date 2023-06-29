@@ -10,7 +10,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 
-import static com.example.pgyl.pekislib_a.ColorUtils.ButtonColorBox;
+import static com.example.pgyl.pekislib_a.ButtonColorBox.COLOR_TYPES;
 import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
 
@@ -19,8 +19,8 @@ public final class CustomButton extends Button {
     private long minClickTimeInterval;
     private long lastClickUpTime;
     private BUTTON_STATES buttonState;
-    private int unpressedBackColor;
-    private int pressedBackColor;
+    private ButtonColorBox colorBox;
+    private int unpressedBackColorDefault;
     private boolean clickDownInButtonZone;
     private Rect buttonZone;
     private Drawable backgroundDrawable;
@@ -32,8 +32,14 @@ public final class CustomButton extends Button {
     }
 
     private void init() {
-        final long MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE = 0;   //   Interval de temps (ms) minimum imposé entre 2 click
+        final long MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE = 0;    //  Interval de temps (ms) minimum imposé entre 2 click
+        final String UNPRESSED_BACK_COLOR_DEFAULT = "A0A0A0";    //  Voir plus bas, sera remplacé par la couleur Android par défaut (clearColorFilter())
+        final String PRESSED_BACK_COLOR_DEFAULT = "FF9A22";
 
+        colorBox = new ButtonColorBox();
+        colorBox.setColor(COLOR_TYPES.UNPRESSED_BACK_COLOR, UNPRESSED_BACK_COLOR_DEFAULT);
+        colorBox.setColor(COLOR_TYPES.PRESSED_BACK_COLOR, PRESSED_BACK_COLOR_DEFAULT);
+        unpressedBackColorDefault = Color.parseColor(COLOR_PREFIX + UNPRESSED_BACK_COLOR_DEFAULT);
         backgroundDrawable = getBackground().getConstantState().newDrawable().mutate();
         buttonState = BUTTON_STATES.UNPRESSED;
         minClickTimeInterval = MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE;
@@ -46,21 +52,17 @@ public final class CustomButton extends Button {
         });
     }
 
-    public void setBackColors(ButtonColorBox colorBox) {
-        if (colorBox != null) {
-            unpressedBackColor = (colorBox.unpressedBackColor != null) ? Color.parseColor(COLOR_PREFIX + colorBox.unpressedBackColor) : Integer.MAX_VALUE;   //  7F FF FF FF
-            pressedBackColor = (colorBox.pressedBackColor != null) ? Color.parseColor(COLOR_PREFIX + colorBox.pressedBackColor) : Integer.MAX_VALUE;
-            updateDisplayBackColors();
-        }
+    public ButtonColorBox getColorBox() {   //   On peut alors modifier les couleurs (colorBox.setColor...), puis faire updateDisplayBackColors() pour mettre à jour l'affichage
+        return colorBox;
     }
 
     public void setMinClickTimeInterval(long minClickTimeInterval) {
         this.minClickTimeInterval = minClickTimeInterval;
     }
 
-    private void updateDisplayBackColors() {
-        int backColor = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? pressedBackColor : unpressedBackColor);
-        if (backColor != Integer.MAX_VALUE) {
+    public void updateDisplayBackColors() {
+        int backColor = (buttonState.equals(BUTTON_STATES.PRESSED) ? colorBox.getColor(COLOR_TYPES.PRESSED_BACK_COLOR).intValue : colorBox.getColor(COLOR_TYPES.UNPRESSED_BACK_COLOR).intValue);
+        if (backColor != unpressedBackColorDefault) {
             backgroundDrawable.setColorFilter(backColor, PorterDuff.Mode.SRC_IN);
         } else {
             backgroundDrawable.clearColorFilter();
