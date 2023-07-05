@@ -103,9 +103,7 @@ public class PresetsActivity extends Activity {
 
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         getActionBar().setTitle(getIntent().getStringExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString()));
-        setupOrientationLayout();
-        setupButtons();
-        setupList();
+
         validReturnFromCalledActivity = false;
     }
 
@@ -124,6 +122,10 @@ public class PresetsActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        setupOrientationLayout();
+        setupButtons();
+        setupList();
 
         shpFileName = getPackageName() + "." + getClass().getSimpleName() + SHP_FILE_NAME_SUFFIX;
         tableName = getIntent().getStringExtra(TABLE_EXTRA_KEYS.TABLE.toString());

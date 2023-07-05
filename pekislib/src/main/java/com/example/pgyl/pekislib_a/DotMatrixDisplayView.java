@@ -208,8 +208,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         inDrawing = true;
         viewCanvas.drawBitmap(dotFormStencilBitmap, displayRect.left, displayRect.top, dotFormStencilPaint);  //  Pochoir pour obtenir la forme de point souhaitée
         dotCellOrigin.x = dotMatrixRect.left + dimensionsSet.internalMargins.left;   //  Coordonnée x du 1er point d'une ligne
-        int gridX = displayRect.left;
         for (int i = 0; i <= (displayRect.width() - 1); i = i + 1) {   //  Parcourir la ligne
+            int gridX = displayRect.left + i;
             if (scrollRect != null) {
                 if ((gridX >= scrollRect.left) && (gridX <= (scrollRect.right - 1))) {  //  On est dans une zone éventuellement en cours de scroll
                     gridX = gridX + scrollOffset.x;
@@ -219,8 +219,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                 }
             }
             dotCellOrigin.y = dotMatrixRect.top + dimensionsSet.internalMargins.top;   //  Coordonnée y du 1er point d'une colonne
-            int gridY = displayRect.top;
             for (int j = 0; j <= (displayRect.height() - 1); j = j + 1) {   //  Parcourir la colonne
+                int gridY = displayRect.top + j;
                 if (scrollRect != null) {
                     if ((gridY >= scrollRect.top) && (gridY <= (scrollRect.bottom - 1))) {   //  On est dans une zone éventuellement en cours de scroll
                         gridY = gridY + scrollOffset.y;
@@ -232,10 +232,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                 dotPaint.setColor(((buttonState.equals(BUTTON_STATES.PRESSED)) ^ invertOn) ? colorCodes[gridY][gridX].pressed : colorCodes[gridY][gridX].unpressed);
                 viewCanvas.drawRect(dotCellOrigin.x, dotCellOrigin.y, dotCellOrigin.x + dimensionsSet.dotSideSize, dotCellOrigin.y + dimensionsSet.dotSideSize, dotPaint);   //  Dessiner un carré (dans ce qui reste comme espace pour lui dans le pochoir)
                 dotCellOrigin.y = dotCellOrigin.y + dimensionsSet.dotCellSideSize;   //  Passer au prochain point de la colonne
-                gridY = gridY + 1;
             }
             dotCellOrigin.x = dotCellOrigin.x + dimensionsSet.dotCellSideSize;   //  Passer au prochain point de la ligne
-            gridX = gridX + 1;
         }
         canvas.drawBitmap(viewBitmap, 0, 0, null);
         inDrawing = false;

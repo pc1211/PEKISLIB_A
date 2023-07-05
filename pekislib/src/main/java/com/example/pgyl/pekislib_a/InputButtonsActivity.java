@@ -357,9 +357,6 @@ public class InputButtonsActivity extends Activity {
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         title = getIntent().getStringExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString());
         getActionBar().setTitle(title);
-        setupOrientationLayout();
-        setupButtons();
-        setupKeyboardButtons();
     }
 
     @Override
@@ -379,6 +376,10 @@ public class InputButtonsActivity extends Activity {
         final boolean APPEND_DEFAULT_VALUE = false;
 
         super.onResume();
+
+        setupOrientationLayout();
+        setupButtons();
+        setupKeyboardButtons();
 
         shpFileName = getPackageName() + "." + getClass().getSimpleName() + SHP_FILE_NAME_SUFFIX;
         tableName = getIntent().getStringExtra(TABLE_EXTRA_KEYS.TABLE.toString());

@@ -33,8 +33,6 @@ public class HelpActivity extends Activity {
 
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         getActionBar().setTitle(HELP_ACTIVITY_TITLE);
-        setContentView(R.layout.help);
-        webView = findViewById(R.id.webview);
     }
 
     @Override
@@ -44,6 +42,9 @@ public class HelpActivity extends Activity {
         final String ENCODING = "utf-8";
 
         super.onResume();
+
+        setContentView(R.layout.help);
+        webView = findViewById(R.id.webview);
 
         int resourceId = getIntent().getIntExtra(HELP_ACTIVITY_EXTRA_KEYS.HTML_ID.toString(), 0);
         String html = getHtmlFromFile(resourceId);
