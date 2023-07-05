@@ -6,10 +6,6 @@ import static com.example.pgyl.pekislib_a.MiscUtils.BiDimensions;
 
 public class DotMatrixFontUtils {
 
-    public static BiDimensions getFontTextDimensions(String text, DotMatrixFont dotMatrixFont) {
-        return getFontTextDimensions(text, null, dotMatrixFont);
-    }
-
     public static BiDimensions getFontTextDimensions(String text, DotMatrixFont extraFont, DotMatrixFont defaultFont) {   //  Spécifier extraFont différent de null si text mélange extraFont et defaultFont; extraFont a la priorité sur defaultFont
         String extraFontText = "";
         String defaultFontText = "";

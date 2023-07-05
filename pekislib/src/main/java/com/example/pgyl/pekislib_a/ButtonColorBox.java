@@ -2,6 +2,8 @@ package com.example.pgyl.pekislib_a;
 
 import android.graphics.Color;
 
+import com.example.pgyl.pekislib_a.ColorUtils.ColorDef;
+
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
 
 public class ButtonColorBox {   //  Pour les ImageButtonView (ou CustomButton mais uniquement unpressedBackColor et pressedBackColor)
@@ -11,11 +13,6 @@ public class ButtonColorBox {   //  Pour les ImageButtonView (ou CustomButton ma
         public int INDEX() {
             return ordinal();
         }
-    }
-
-    public static class ColorDef {
-        public String stringValue;   //  "RRGGBB"
-        public int intValue;         //  RGB int value (avec préfixe FF)
     }
 
     private ColorDef[] colors;
@@ -36,8 +33,8 @@ public class ButtonColorBox {   //  Pour les ImageButtonView (ou CustomButton ma
     }
 
     public void setColor(COLOR_TYPES colorType, String color) {   // color: Null interdit
-        colors[colorType.INDEX()].stringValue = color;
-        colors[colorType.INDEX()].intValue = Color.parseColor(COLOR_PREFIX + color);
+        colors[colorType.INDEX()].RGB = color;
+        colors[colorType.INDEX()].code = Color.parseColor(COLOR_PREFIX + color);
     }
 
     public ColorDef getColor(COLOR_TYPES colorType) {   //  Colordef est retourné, donc avec .stringValue et .intValue

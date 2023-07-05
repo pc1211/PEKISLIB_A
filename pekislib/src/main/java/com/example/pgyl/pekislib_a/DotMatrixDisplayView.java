@@ -17,8 +17,11 @@ import android.view.View;
 
 import java.nio.charset.StandardCharsets;
 
+import static com.example.pgyl.pekislib_a.ButtonColorBox.COLOR_TYPES;
+import static com.example.pgyl.pekislib_a.ColorUtils.StateColorCode;
 import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
+import static com.example.pgyl.pekislib_a.DotMatrixFontUtils.getFontTextDimensions;
 import static com.example.pgyl.pekislib_a.MiscUtils.BiDimensions;
 import static com.example.pgyl.pekislib_a.PointRectUtils.ALIGN_WIDTH_HEIGHT;
 import static com.example.pgyl.pekislib_a.PointRectUtils.getSubRect;
@@ -36,11 +39,6 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
 
     public enum SCROLL_DIRECTIONS {LEFT, RIGHT, TOP, BOTTOM}
 
-    private static class StateColor {
-        int pressed;
-        int unpressed;
-    }
-
     private static class DimensionsSet {
         int width;               //  Largeur donnée pour l'affichage
         Rect internalMargins;    //  Marge autour de l'affichage proprement dit
@@ -55,7 +53,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     }
 
     //region Variables
-    private StateColor[][] gridStateColors;
+    private StateColorCode[][] colorCodes;
     private RectF internalMarginCoeffs;
     private RectF externalMarginCoeffs;
     private DimensionsSet dimensionsSet;
@@ -64,6 +62,10 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     private Rect gridRect;
     private Rect displayRect;
     private Rect scrollRect;
+    private Rect canvasRect;
+    private RectF dotMatrixRect;
+    private RectF dotRect;
+    private Rect textRect;
     private Point scrollOffset;
     private Point symbolPos;
     private float dotSpacingCoeff;
@@ -77,11 +79,9 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     private Paint dotPaint;
     private Paint dotFormStencilPaint;
     private Paint dotFormStencilTransparentPaint;
-    private Rect canvasRect;
-    private RectF dotMatrixRect;
-    private RectF dotRect;
     private float backCornerRadius;
     private float backCornerRadiusCoeff;
+    private ButtonColorBox colorBox;
     private int backColor;
     private long minClickTimeInterval;
     private long lastClickUpTime;
@@ -119,6 +119,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         buttonState = BUTTON_STATES_DEFAULT;
         scrollRect = null;
         dotRect = new RectF();
+        textRect = new Rect();
+        colorBox = new ButtonColorBox();
         dimensionsSet = new DimensionsSet();
         dimensionsSetTemp = new DimensionsSet();
         maxDimensions = new BiDimensions(0, 0);
@@ -143,10 +145,12 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
 
+        colorBox.close();
+        colorBox = null;
         dimensionsSet = null;
         dimensionsSetTemp = null;
         maxDimensions = null;
-        gridStateColors = null;
+        colorCodes = null;
         dotPaint = null;
         dotFormStencilTransparentPaint = null;
         dotFormStencilPaint = null;
@@ -204,8 +208,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         inDrawing = true;
         viewCanvas.drawBitmap(dotFormStencilBitmap, displayRect.left, displayRect.top, dotFormStencilPaint);  //  Pochoir pour obtenir la forme de point souhaitée
         dotCellOrigin.x = dotMatrixRect.left + dimensionsSet.internalMargins.left;   //  Coordonnée x du 1er point d'une ligne
+        int gridX = displayRect.left;
         for (int i = 0; i <= (displayRect.width() - 1); i = i + 1) {   //  Parcourir la ligne
-            int gridX = displayRect.left + i;
             if (scrollRect != null) {
                 if ((gridX >= scrollRect.left) && (gridX <= (scrollRect.right - 1))) {  //  On est dans une zone éventuellement en cours de scroll
                     gridX = gridX + scrollOffset.x;
@@ -215,8 +219,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                 }
             }
             dotCellOrigin.y = dotMatrixRect.top + dimensionsSet.internalMargins.top;   //  Coordonnée y du 1er point d'une colonne
+            int gridY = displayRect.top;
             for (int j = 0; j <= (displayRect.height() - 1); j = j + 1) {   //  Parcourir la colonne
-                int gridY = displayRect.top + j;
                 if (scrollRect != null) {
                     if ((gridY >= scrollRect.top) && (gridY <= (scrollRect.bottom - 1))) {   //  On est dans une zone éventuellement en cours de scroll
                         gridY = gridY + scrollOffset.y;
@@ -225,11 +229,13 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
                         }
                     }
                 }
-                dotPaint.setColor(((buttonState.equals(BUTTON_STATES.PRESSED)) ^ invertOn) ? gridStateColors[gridY][gridX].pressed : gridStateColors[gridY][gridX].unpressed);
+                dotPaint.setColor(((buttonState.equals(BUTTON_STATES.PRESSED)) ^ invertOn) ? colorCodes[gridY][gridX].pressed : colorCodes[gridY][gridX].unpressed);
                 viewCanvas.drawRect(dotCellOrigin.x, dotCellOrigin.y, dotCellOrigin.x + dimensionsSet.dotSideSize, dotCellOrigin.y + dimensionsSet.dotSideSize, dotPaint);   //  Dessiner un carré (dans ce qui reste comme espace pour lui dans le pochoir)
                 dotCellOrigin.y = dotCellOrigin.y + dimensionsSet.dotCellSideSize;   //  Passer au prochain point de la colonne
+                gridY = gridY + 1;
             }
             dotCellOrigin.x = dotCellOrigin.x + dimensionsSet.dotCellSideSize;   //  Passer au prochain point de la ligne
+            gridX = gridX + 1;
         }
         canvas.drawBitmap(viewBitmap, 0, 0, null);
         inDrawing = false;
@@ -274,12 +280,16 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         return false;
     }
 
+    public ButtonColorBox getColorBox() {
+        return colorBox;
+    }
+
     public void setGridRect(Rect gridRect) {   //  Grille (carrés) sous-jacente de stockage des valeurs affichées  (left=0, top=0, right=width, bottom=height)
         this.gridRect = gridRect;
-        gridStateColors = new StateColor[gridRect.height()][gridRect.width()];
+        colorCodes = new StateColorCode[gridRect.height()][gridRect.width()];
         for (int i = 0; i <= (gridRect.width() - 1); i = i + 1) {
             for (int j = 0; j <= (gridRect.height() - 1); j = j + 1) {
-                gridStateColors[j][i] = new StateColor();
+                colorCodes[j][i] = new StateColorCode();
             }
         }
     }
@@ -413,30 +423,36 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         invalidate();
     }
 
-    public void setDot(int x, int y, String pressedColor, String unpressedColor) {
-        gridStateColors[y][x].pressed = Color.parseColor(COLOR_PREFIX + pressedColor);
-        gridStateColors[y][x].unpressed = Color.parseColor(COLOR_PREFIX + unpressedColor);
-    }
-
-    public void fillRect(Rect rect, String pressedColor, String unpressedColor) {
-        int pressedColValue = Color.parseColor(COLOR_PREFIX + pressedColor);
-        int unpressedColValue = Color.parseColor(COLOR_PREFIX + unpressedColor);
+    public void drawBackRect(Rect rect) {
+        int unpressedColorCode = colorBox.getColor(COLOR_TYPES.UNPRESSED_BACK_COLOR).code;
+        int pressedColorCode = colorBox.getColor(COLOR_TYPES.PRESSED_BACK_COLOR).code;
         for (int i = rect.left; i <= (rect.right - 1); i = i + 1) {
             for (int j = rect.top; j <= (rect.bottom - 1); j = j + 1) {
-                gridStateColors[j][i].pressed = pressedColValue;
-                gridStateColors[j][i].unpressed = unpressedColValue;
+                colorCodes[j][i].unpressed = unpressedColorCode;
+                colorCodes[j][i].pressed = pressedColorCode;
             }
         }
     }
 
-    public void writeText(String text, String onColor, DotMatrixFont dotMatrixFont) {
-        writeText(text, onColor, null, dotMatrixFont);
+    public Rect getTextRect(String text, DotMatrixFont extraFont, DotMatrixFont defaultFont) {   //  extraFont éventuellement null
+        BiDimensions dimensions = getFontTextDimensions(text, extraFont, defaultFont);
+        textRect.left = symbolPos.x;
+        textRect.top = symbolPos.y;
+        textRect.right = textRect.left + dimensions.width;
+        textRect.bottom = textRect.top + dimensions.height;
+        return textRect;
     }
 
-    public void writeText(String text, String color, DotMatrixFont extraFont, DotMatrixFont defaultFont) {   //  A partir de symbolPos; Spécifier extraFont différent de null si text mélange extraFont et defaultFont; extraFont a la priorité sur defaultFont
+    public void drawDot(int x, int y, String unpressedColor, String pressedColor) {
+        colorCodes[y][x].unpressed = Color.parseColor(COLOR_PREFIX + unpressedColor);
+        colorCodes[y][x].pressed = Color.parseColor(COLOR_PREFIX + pressedColor);
+    }
+
+    public void drawFrontText(String text, DotMatrixFont extraFont, DotMatrixFont defaultFont) {   //  A partir de symbolPos; Spécifier extraFont différent de null si text mélange extraFont et defaultFont; extraFont a la priorité sur defaultFont
         DotMatrixFont font = null;
 
-        int colValue = Color.parseColor(COLOR_PREFIX + color);
+        int unpressedColorCode = colorBox.getColor(COLOR_TYPES.UNPRESSED_FRONT_COLOR).code;
+        int pressedColorCode = colorBox.getColor(COLOR_TYPES.PRESSED_FRONT_COLOR).code;
         byte[] textBytes = text.getBytes(StandardCharsets.US_ASCII);   //  Conversion ASCII
         for (int i = 0; i <= (textBytes.length - 1); i = i + 1) {
             int code = textBytes[i];
@@ -451,7 +467,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
             }
             //  Le symbole et sa fonte ont été déterminés
             symbolPos.offset(symbol.getPosOffset().x, symbol.getPosOffset().y);   //  Appliquer un décalage éventuel avant l'affichage (si symbole de surcharge)
-            drawSymbol(symbol, colValue);
+            drawSymbol(symbol, unpressedColorCode, pressedColorCode);
             symbolPos.offset(-symbol.getPosOffset().x, -symbol.getPosOffset().y);   //  Retour au bercail
             if (!symbol.isOverwrite()) {
                 symbolPos.offset(symbol.getDimensions().width + font.getRightMargin(), 0);   //  Prêt pour l'affichage du symbole suivant, sur la même ligne
@@ -460,17 +476,19 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         font = null;
     }
 
-    private void drawSymbol(DotMatrixSymbol symbol, int colValue) {   //  A partir de symbolPos; Seuls les points correspondant au traçage du symbole (valeurs 1) sont remplacés
+    private void drawSymbol(DotMatrixSymbol symbol, int unpressedColorCode, int pressedColorCode) {   //  A partir de symbolPos; Seuls les points correspondant au tracé du symbole (valeurs 1) sont remplacés
         int[][] symbolData = symbol.getData();
+        int gridX = symbolPos.x;
         for (int i = 0; i <= (symbol.getDimensions().width - 1); i = i + 1) {
-            int gridX = symbolPos.x + i;
+            int gridY = symbolPos.y;
             for (int j = 0; j <= (symbol.getDimensions().height - 1); j = j + 1) {
-                int gridY = symbolPos.y + j;
                 if (symbolData[j][i] == 1) {   //  Valeur 1 => Point à remplacer dans la grille
-                    gridStateColors[gridY][gridX].pressed = gridStateColors[gridY][gridX].unpressed;
-                    gridStateColors[gridY][gridX].unpressed = colValue;
+                    colorCodes[gridY][gridX].unpressed = unpressedColorCode;
+                    colorCodes[gridY][gridX].pressed = pressedColorCode;
                 }
+                gridY = gridY + 1;
             }
+            gridX = gridX + 1;
         }
     }
 

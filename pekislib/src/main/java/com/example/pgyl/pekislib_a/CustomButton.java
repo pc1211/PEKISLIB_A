@@ -61,7 +61,7 @@ public final class CustomButton extends Button {
     }
 
     public void updateDisplayBackColors() {
-        int backColor = (buttonState.equals(BUTTON_STATES.PRESSED) ? colorBox.getColor(COLOR_TYPES.PRESSED_BACK_COLOR).intValue : colorBox.getColor(COLOR_TYPES.UNPRESSED_BACK_COLOR).intValue);
+        int backColor = (buttonState.equals(BUTTON_STATES.PRESSED) ? colorBox.getColor(COLOR_TYPES.PRESSED_BACK_COLOR).code : colorBox.getColor(COLOR_TYPES.UNPRESSED_BACK_COLOR).code);
         if (backColor != unpressedBackColorDefault) {
             backgroundDrawable.setColorFilter(backColor, PorterDuff.Mode.SRC_IN);
         } else {

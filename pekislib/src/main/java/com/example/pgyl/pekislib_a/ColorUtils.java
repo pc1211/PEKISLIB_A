@@ -7,6 +7,16 @@ import static com.example.pgyl.pekislib_a.Constants.HEX_RADIX;
 
 public class ColorUtils {
 
+    public static class ColorDef {
+        public String RGB;   //  "RRGGBB" (avec préfixe FF)
+        public int code;     //  RGB int code
+    }
+
+    public static class StateColorCode {
+        int pressed;
+        int unpressed;
+    }
+
     public static String RGBToHSV(String RGBColorText) {   //  RRGGBB -> HHSSVV  (HSV dégradé, en particulier H, ramené sur 255 au lieu de 360)
         float[] hsvStruc = new float[3];
 
