@@ -32,7 +32,7 @@ public class ButtonColorBox {   //  Pour les ImageButtonView (ou CustomButton ma
         colors = null;
     }
 
-    public void setColor(COLOR_TYPES colorType, String color) {   // color: Null interdit
+    public void setColor(COLOR_TYPES colorType, String color) {
         if (color == null) {
             colors[colorType.INDEX()] = null;
         } else {   //  color null

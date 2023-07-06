@@ -306,13 +306,13 @@ public class PresetsActivity extends Activity {
     }
 
     private void updateDisplayButtonFieldColor() {
-        final String SPECIAL_FIELD_UNPRESSED_COLOR = "FF9A22";
-        final String SPECIAL_FIELD_PRESSED_COLOR = "995400";
+        final String FIELD_UNPRESSED_COLOR = "FF9A22";
+        final String FIELD_PRESSED_COLOR = "995400";
 
         ButtonColorBox buttonColorBox = buttons[COMMANDS.FIELD.INDEX()].getColorBox();
         boolean needSpecialColor = (listIndex != LIST_INDEX_DEFAULT_VALUE);
-        buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_BACK_COLOR, (needSpecialColor) ? SPECIAL_FIELD_UNPRESSED_COLOR : null);
-        buttonColorBox.setColor(COLOR_TYPES.PRESSED_BACK_COLOR, (needSpecialColor) ? SPECIAL_FIELD_PRESSED_COLOR : null);
+        buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_BACK_COLOR, (needSpecialColor) ? FIELD_UNPRESSED_COLOR : null);
+        buttonColorBox.setColor(COLOR_TYPES.PRESSED_BACK_COLOR, (needSpecialColor) ? FIELD_PRESSED_COLOR : null);
         buttons[COMMANDS.FIELD.INDEX()].updateDisplayBackColors();
     }
 

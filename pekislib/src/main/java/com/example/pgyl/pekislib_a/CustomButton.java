@@ -13,6 +13,9 @@ import static com.example.pgyl.pekislib_a.ColorUtils.ColorDef;
 import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
 
 public final class CustomButton extends Button {
+    //region Constantes
+    final String PRESSED_BACK_COLOR_DEFAULT = "FF9A22";
+    //endregion
     //region Variables
     private long minClickTimeInterval;
     private long lastClickUpTime;
@@ -29,10 +32,9 @@ public final class CustomButton extends Button {
 
     private void init() {
         final long MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE = 0;    //  Interval de temps (ms) minimum imposé entre 2 click
-        final String PRESSED_BACK_COLOR_DEFAULT = "FF9A22";
 
         colorBox = new ButtonColorBox();
-        colorBox.setColor(COLOR_TYPES.UNPRESSED_BACK_COLOR, null);   //  Null cad Couleur Android par défault
+        colorBox.setColor(COLOR_TYPES.UNPRESSED_BACK_COLOR, null);   //  Null => Couleur Android par défault
         colorBox.setColor(COLOR_TYPES.PRESSED_BACK_COLOR, PRESSED_BACK_COLOR_DEFAULT);
         buttonState = BUTTON_STATES.UNPRESSED;
         minClickTimeInterval = MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE;
@@ -58,7 +60,13 @@ public final class CustomButton extends Button {
         if (backColor != null) {
             getBackground().setColorFilter(backColor.RGBCode, PorterDuff.Mode.MULTIPLY);
         } else {   //  Null => Couleur par défaut
-            getBackground().clearColorFilter();
+            if (buttonState.equals(BUTTON_STATES.PRESSED)) {
+                colorBox.setColor(COLOR_TYPES.PRESSED_BACK_COLOR, PRESSED_BACK_COLOR_DEFAULT);
+                backColor = colorBox.getColor(COLOR_TYPES.PRESSED_BACK_COLOR);
+                getBackground().setColorFilter(backColor.RGBCode, PorterDuff.Mode.MULTIPLY);
+            } else {
+                getBackground().clearColorFilter();
+            }
         }
         invalidate();
     }
