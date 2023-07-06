@@ -8,8 +8,8 @@ import static com.example.pgyl.pekislib_a.Constants.HEX_RADIX;
 public class ColorUtils {
 
     public static class ColorDef {
-        public String RGB;   //  "RRGGBB" (avec préfixe FF)
-        public int code;     //  RGB int code
+        public String RGBHex;   //  "RRGGBB" (avec préfixe FF)
+        public int RGBCode;     //  RGB int code
     }
 
     public static class StateColorCode {

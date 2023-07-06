@@ -11,23 +11,9 @@ public class Constants {
 
     public enum ACTIVITY_EXTRA_KEYS {TITLE}
 
-    public enum BUTTON_STATES {
-        UNPRESSED("A0A0A0"), PRESSED("FF9A22");
+    public enum BUTTON_STATES {UNPRESSED, PRESSED}
 
-        private String valueDefaultColor;
-
-        BUTTON_STATES(String valueDefaultColor) {
-            this.valueDefaultColor = valueDefaultColor;
-        }
-
-        public String DEFAULT_COLOR() {
-            return valueDefaultColor;
-        }
-    }
-
-    public enum SWITCHES {
-        ON, OFF
-    }
+    public enum SWITCHES {ON, OFF}
 
     public static final String REGEXP_SIX_CHARS = ".{6}";  //  6 caractères
     public static final String REGEXP_SIX_CHARS_ERROR_MESSAGE = "Required: 6 chars";

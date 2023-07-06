@@ -20,7 +20,6 @@ import java.util.logging.Logger;
 
 import static com.example.pgyl.pekislib_a.ButtonColorBox.COLOR_TYPES;
 import static com.example.pgyl.pekislib_a.Constants.ACTIVITY_EXTRA_KEYS;
-import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
 import static com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITIES;
 import static com.example.pgyl.pekislib_a.Constants.SHP_FILE_NAME_SUFFIX;
 import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
@@ -312,8 +311,8 @@ public class PresetsActivity extends Activity {
 
         ButtonColorBox buttonColorBox = buttons[COMMANDS.FIELD.INDEX()].getColorBox();
         boolean needSpecialColor = (listIndex != LIST_INDEX_DEFAULT_VALUE);
-        buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_BACK_COLOR, (needSpecialColor) ? SPECIAL_FIELD_UNPRESSED_COLOR : BUTTON_STATES.UNPRESSED.DEFAULT_COLOR());
-        buttonColorBox.setColor(COLOR_TYPES.PRESSED_BACK_COLOR, (needSpecialColor) ? SPECIAL_FIELD_PRESSED_COLOR : BUTTON_STATES.PRESSED.DEFAULT_COLOR());
+        buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_BACK_COLOR, (needSpecialColor) ? SPECIAL_FIELD_UNPRESSED_COLOR : null);
+        buttonColorBox.setColor(COLOR_TYPES.PRESSED_BACK_COLOR, (needSpecialColor) ? SPECIAL_FIELD_PRESSED_COLOR : null);
         buttons[COMMANDS.FIELD.INDEX()].updateDisplayBackColors();
     }
 

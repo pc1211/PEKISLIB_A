@@ -422,8 +422,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     }
 
     public void drawBackRect(Rect rect) {
-        int unpressedColorCode = colorBox.getColor(COLOR_TYPES.UNPRESSED_BACK_COLOR).code;
-        int pressedColorCode = colorBox.getColor(COLOR_TYPES.PRESSED_BACK_COLOR).code;
+        int unpressedColorCode = colorBox.getColor(COLOR_TYPES.UNPRESSED_BACK_COLOR).RGBCode;
+        int pressedColorCode = colorBox.getColor(COLOR_TYPES.PRESSED_BACK_COLOR).RGBCode;
         for (int i = rect.left; i <= (rect.right - 1); i = i + 1) {
             for (int j = rect.top; j <= (rect.bottom - 1); j = j + 1) {
                 colorCodes[j][i].unpressed = unpressedColorCode;
@@ -449,8 +449,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     public void drawFrontText(String text, DotMatrixFont extraFont, DotMatrixFont defaultFont) {   //  A partir de symbolPos; Spécifier extraFont différent de null si text mélange extraFont et defaultFont; extraFont a la priorité sur defaultFont
         DotMatrixFont font = null;
 
-        int unpressedColorCode = colorBox.getColor(COLOR_TYPES.UNPRESSED_FRONT_COLOR).code;
-        int pressedColorCode = colorBox.getColor(COLOR_TYPES.PRESSED_FRONT_COLOR).code;
+        int unpressedColorCode = colorBox.getColor(COLOR_TYPES.UNPRESSED_FRONT_COLOR).RGBCode;
+        int pressedColorCode = colorBox.getColor(COLOR_TYPES.PRESSED_FRONT_COLOR).RGBCode;
         byte[] textBytes = text.getBytes(StandardCharsets.US_ASCII);   //  Conversion ASCII
         for (int i = 0; i <= (textBytes.length - 1); i = i + 1) {
             int code = textBytes[i];

@@ -138,10 +138,6 @@ public final class ImageButtonView extends View {
         this.symbolSizeCoeff = symbolSizeCoeff;
     }
 
-    public void updateDisplayColors() {
-        invalidate();
-    }
-
     public ButtonColorBox getColorBox() {   //   On peut alors modifier les couleurs (colorBox.setColor...), puis faire updateDisplayColors() pour mettre à jour l'affichage
         return colorBox;
     }
@@ -194,14 +190,18 @@ public final class ImageButtonView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        int frontColor = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? colorBox.getColor(COLOR_TYPES.PRESSED_FRONT_COLOR).code : colorBox.getColor(COLOR_TYPES.UNPRESSED_FRONT_COLOR).code);
-        int backColor = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? colorBox.getColor(COLOR_TYPES.PRESSED_BACK_COLOR).code : colorBox.getColor(COLOR_TYPES.UNPRESSED_BACK_COLOR).code);
+        int frontColor = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? colorBox.getColor(COLOR_TYPES.PRESSED_FRONT_COLOR).RGBCode : colorBox.getColor(COLOR_TYPES.UNPRESSED_FRONT_COLOR).RGBCode);
+        int backColor = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? colorBox.getColor(COLOR_TYPES.PRESSED_BACK_COLOR).RGBCode : colorBox.getColor(COLOR_TYPES.UNPRESSED_BACK_COLOR).RGBCode);
         viewCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
         viewCanvas.drawBitmap(symbolBitmap, 0, 0, null);
         viewCanvas.drawColor(frontColor, PorterDuff.Mode.SRC_IN);
         backPaint.setColor(backColor);
         viewCanvas.drawRoundRect(viewCanvasRect, backCornerRadius, backCornerRadius, backPaint);
         canvas.drawBitmap(viewBitmap, 0, 0, null);
+    }
+
+    public void updateDisplayColors() {
+        invalidate();
     }
 
 }
