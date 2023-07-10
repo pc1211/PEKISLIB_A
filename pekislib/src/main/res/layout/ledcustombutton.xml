@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="46dp"
+    android:layout_marginLeft="4dp"
+    android:layout_weight="8">
 
     <com.example.pgyl.pekislib_a.LEDView
-        android:id="@+id/LED"
+        android:id="@+id/BTN_CUR_PROP_0"
         android:layout_width="match_parent"
-        android:layout_height="6dp"
-        android:layout_marginLeft="4dp"
-        android:layout_marginTop="2dp"
-        android:layout_marginRight="4dp" />
+        android:layout_height="0dp"
+        android:layout_weight="8" />
 
-    <com.example.pgyl.pekislib_a.CustomButton
-        android:id="@+id/BUTTON"
+    <com.example.pgyl.pekislib_a.ImageButtonView
+        android:id="@+id/BTN_SCORE"
         android:layout_width="match_parent"
-        android:layout_height="40dp" />
-</merge>
+        android:layout_height="0dp"
+        android:layout_marginTop="4dp"
+        android:layout_weight="1" />
+</LinearLayout>

@@ -11,17 +11,26 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 
 import com.larvalabs.svgandroid.SVGParser;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static com.example.pgyl.pekislib_a.ButtonColorBox.COLOR_TYPES;
+import static com.example.pgyl.pekislib_a.ColorUtils.ColorDef;
 import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
+import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
+import static com.example.pgyl.pekislib_a.MiscUtils.DpToPixels;
 import static com.example.pgyl.pekislib_a.MiscUtils.getPictureFromDrawable;
 import static com.example.pgyl.pekislib_a.PointRectUtils.ALIGN_WIDTH_HEIGHT;
+import static com.example.pgyl.pekislib_a.PointRectUtils.getMaxSubRect;
 
-public final class ImageButtonView extends View {
+public final class ImageButtonView extends TextView {
     public interface onCustomClickListener {
         void onCustomClick();
     }
@@ -37,18 +46,24 @@ public final class ImageButtonView extends View {
     private int backCornerRadius;
     private long lastClickUpTime;
     private BUTTON_STATES buttonState;
+    private float outlineStrokeWidthPx;
+    private String outlineColor;
     private ButtonColorBox colorBox;
+    private Map<COLOR_TYPES, String> defaultColorsMap;
     private boolean clickDownInButtonZone;
     private RectF buttonZone;
     private Bitmap viewBitmap;
     private Canvas viewCanvas;
-    private Paint backPaint;
+    private Paint imageBackPaint;
+    private Paint buttonBackPaint;
+    private Paint buttonOutlinePaint;
     private RectF viewCanvasRect;
-    private Bitmap symbolBitmap;
+    private RectF viewCanvasRectExceptOutline;
+    private Bitmap imageBitmap;
     private Picture picture;
-    private float symbolAspectRatio;
-    private RectF symbolRelativePositionCoeffs;
-    private float symbolSizeCoeff;
+    private float imageAspectRatio;
+    private RectF imageRelativePositionCoeffs;
+    private float imageSizeCoeff;
     private Context context;
     //endregion
 
@@ -61,46 +76,90 @@ public final class ImageButtonView extends View {
 
     public void init() {
         final float SIZE_COEFF_DEFAULT = 0.8f;   //  (0..1)
+        final String TEXT_DEFAULT = "";
+        final String TEXT_COLOR_DEFAULT = "000000";
+        final int OUTLINE_STROKE_WIDTH_DP_DEFAULT = 2;   //  dp
+        final String OUTLINE_COLOR_DEFAULT = "A0A0A0";
         final int PC_BACK_CORNER_RADIUS_DEFAULT = 35;    //  % appliqué à 1/2 largeur ou hauteur pour déterminer le rayon du coin arrondi
         final long MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE = 0;   //   Interval de temps (ms) minimum imposé entre 2 click
-        final String UNPRESSED_FRONT_COLOR_DEFAULT = "000000";
-        final String UNPRESSED_BACK_COLOR_DEFAULT = "A0A0A0";
-        final String PRESSED_FRONT_COLOR_DEFAULT = UNPRESSED_FRONT_COLOR_DEFAULT;
-        final String PRESSED_BACK_COLOR_DEFAULT = "FF9A22";
 
-        colorBox = new ButtonColorBox();
-        colorBox.setColor(COLOR_TYPES.UNPRESSED_FRONT_COLOR, UNPRESSED_FRONT_COLOR_DEFAULT);
-        colorBox.setColor(COLOR_TYPES.UNPRESSED_BACK_COLOR, UNPRESSED_BACK_COLOR_DEFAULT);
-        colorBox.setColor(COLOR_TYPES.PRESSED_FRONT_COLOR, PRESSED_FRONT_COLOR_DEFAULT);
-        colorBox.setColor(COLOR_TYPES.PRESSED_BACK_COLOR, PRESSED_BACK_COLOR_DEFAULT);
-        backPaint = new Paint();
-        backPaint.setAntiAlias(true);
-        backPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OVER));
         buttonZone = new RectF();
         buttonState = BUTTON_STATES.UNPRESSED;
-        minClickTimeInterval = MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE;
         pcBackCornerRadius = PC_BACK_CORNER_RADIUS_DEFAULT;
+        imageSizeCoeff = SIZE_COEFF_DEFAULT;
+        outlineStrokeWidthPx = (int) DpToPixels(OUTLINE_STROKE_WIDTH_DP_DEFAULT, context);
+        outlineColor = OUTLINE_COLOR_DEFAULT;
+        minClickTimeInterval = MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE;
+        imageRelativePositionCoeffs = ALIGN_WIDTH_HEIGHT;
+        picture = null;   //  En attendant l'affectation éventuelle via setSVGImageResource ou setPNGImageResource
         lastClickUpTime = 0;
-        symbolSizeCoeff = SIZE_COEFF_DEFAULT;
-        symbolRelativePositionCoeffs = ALIGN_WIDTH_HEIGHT;
         setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 return onButtonTouch(v, event);
             }
         });
+        setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+        setText(TEXT_DEFAULT);
+        setTextColor(Color.parseColor(COLOR_PREFIX + TEXT_COLOR_DEFAULT));
+        setupColorBox();
+        setupImageBackPaint();
+        setupButtonBackPaint();
+        setupButtonOutlinePaint();
+    }
+
+    public void setSVGImageResource(int resId) {
+        picture = SVGParser.getSVGFromResource(getResources(), resId).getPicture();
+        imageAspectRatio = (float) picture.getHeight() / (float) picture.getWidth();
+    }
+
+    public void setPNGImageResource(int resId) {
+        picture = getPictureFromDrawable((BitmapDrawable) getResources().getDrawable(resId, context.getTheme()));
+        imageAspectRatio = (float) picture.getHeight() / (float) picture.getWidth();
+    }
+
+    public ButtonColorBox getColorBox() {   //   On peut alors modifier les couleurs (colorBox.setColor...), puis faire updateDisplayColors() pour mettre à jour l'affichage
+        return colorBox;
+    }
+
+    public void setImageRelativePositionCoeffs(RectF imageRelativePositionCoeffs) {
+        this.imageRelativePositionCoeffs = imageRelativePositionCoeffs;
+    }
+
+    public void setImageSizeCoeff(float imageSizeCoeff) {
+        this.imageSizeCoeff = imageSizeCoeff;
+    }
+
+    public void setOutlineColor(String outlineColor) {
+        this.outlineColor = outlineColor;
+    }
+
+    public void setOutlineStrokeWidthDp(int outlineStrokeWidthDp) {
+        outlineStrokeWidthPx = (int) DpToPixels(outlineStrokeWidthDp, context);
+    }
+
+    public void setMinClickTimeInterval(long minClickTimeInterval) {
+        this.minClickTimeInterval = minClickTimeInterval;
+    }
+
+    public void setPcBackCornerRadius(int pcBackCornerRadius) {
+        this.pcBackCornerRadius = pcBackCornerRadius;
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
 
-        symbolBitmap = null;
+        imageBitmap = null;
         viewBitmap = null;
         viewCanvas = null;
-        backPaint = null;
+        imageBackPaint = null;
+        buttonBackPaint = null;
+        buttonOutlinePaint = null;
         colorBox.close();
         colorBox = null;
+        defaultColorsMap.clear();
+        defaultColorsMap = null;
         picture = null;
     }
 
@@ -111,43 +170,40 @@ public final class ImageButtonView extends View {
         viewBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         viewCanvas = new Canvas(viewBitmap);
         viewCanvasRect = new RectF(0, 0, w, h);
+        viewCanvasRectExceptOutline = new RectF(outlineStrokeWidthPx, outlineStrokeWidthPx, w - outlineStrokeWidthPx, h - outlineStrokeWidthPx);
 
-        symbolBitmap = Bitmap.createBitmap((int) viewCanvasRect.width(), (int) viewCanvasRect.height(), Bitmap.Config.ARGB_8888);
-        Canvas symbolViewCanvas = new Canvas(symbolBitmap);
-        symbolViewCanvas.drawPicture(picture, PointRectUtils.getMaxSubRect(viewCanvasRect, symbolRelativePositionCoeffs, symbolAspectRatio, symbolSizeCoeff));
-
+        imageBitmap = Bitmap.createBitmap((int) viewCanvasRectExceptOutline.width(), (int) viewCanvasRectExceptOutline.height(), Bitmap.Config.ARGB_8888);
+        if (picture != null) {
+            Canvas imageViewCanvas = new Canvas(imageBitmap);
+            imageViewCanvas.drawPicture(picture, getMaxSubRect(viewCanvasRectExceptOutline, imageRelativePositionCoeffs, imageAspectRatio, imageSizeCoeff));
+        }
         buttonZone.set(getLeft() + viewCanvasRect.left, getTop() + viewCanvasRect.top, getLeft() + viewCanvasRect.right, getTop() + viewCanvasRect.bottom);
         backCornerRadius = (Math.min(w, h) * pcBackCornerRadius) / 200;    //  Rayon pour coin arrondi (% appliqué à la moitié de la largeur ou hauteur)
     }
 
-    public void setSVGImageResource(int resId) {
-        picture = SVGParser.getSVGFromResource(getResources(), resId).getPicture();
-        symbolAspectRatio = (float) picture.getHeight() / (float) picture.getWidth();
-    }
+    @Override
+    protected void onDraw(Canvas canvas) {
+        int frontColor = (buttonState.equals(BUTTON_STATES.PRESSED)) ? getColor(COLOR_TYPES.PRESSED_FRONT_COLOR).RGBCode : getColor(COLOR_TYPES.UNPRESSED_FRONT_COLOR).RGBCode;
+        int backColor = (buttonState.equals(BUTTON_STATES.PRESSED)) ? getColor(COLOR_TYPES.PRESSED_BACK_COLOR).RGBCode : getColor(COLOR_TYPES.UNPRESSED_BACK_COLOR).RGBCode;
 
-    public void setPNGImageResource(int resId) {
-        picture = getPictureFromDrawable((BitmapDrawable) getResources().getDrawable(resId, context.getTheme()));
-        symbolAspectRatio = (float) picture.getHeight() / (float) picture.getWidth();
-    }
+        if (picture != null) {
+            viewCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
+            viewCanvas.drawBitmap(imageBitmap, 0, 0, null);
+            viewCanvas.drawColor(frontColor, PorterDuff.Mode.SRC_IN);
+            imageBackPaint.setColor(backColor);
+            viewCanvas.drawRoundRect(viewCanvasRectExceptOutline, backCornerRadius, backCornerRadius, imageBackPaint);
+        } else {   //  Null => Ractangle simple
+            buttonBackPaint.setColor(backColor);
+            viewCanvas.drawRoundRect(viewCanvasRectExceptOutline, backCornerRadius, backCornerRadius, buttonBackPaint);
+        }
+        if (outlineStrokeWidthPx != 0) {
+            buttonOutlinePaint.setStrokeWidth(outlineStrokeWidthPx);
+            buttonOutlinePaint.setColor(Color.parseColor(COLOR_PREFIX + outlineColor));
+            viewCanvas.drawRoundRect(viewCanvasRectExceptOutline, backCornerRadius, backCornerRadius, buttonOutlinePaint);
+        }
+        canvas.drawBitmap(viewBitmap, 0, 0, null);
 
-    public void setSymbolRelativePositionCoeffs(RectF symbolRelativePositionCoeffs) {
-        this.symbolRelativePositionCoeffs = symbolRelativePositionCoeffs;
-    }
-
-    public void setSymbolSizeCoeff(float symbolSizeCoeff) {
-        this.symbolSizeCoeff = symbolSizeCoeff;
-    }
-
-    public ButtonColorBox getColorBox() {   //   On peut alors modifier les couleurs (colorBox.setColor...), puis faire updateDisplayColors() pour mettre à jour l'affichage
-        return colorBox;
-    }
-
-    public void setMinClickTimeInterval(long minClickTimeInterval) {
-        this.minClickTimeInterval = minClickTimeInterval;
-    }
-
-    public void setPcBackCornerRadius(int pcBackCornerRadius) {
-        this.pcBackCornerRadius = pcBackCornerRadius;
+        super.onDraw(canvas);   //  Dessinera le texte au-dessus de l'image
     }
 
     public boolean onButtonTouch(View v, MotionEvent event) {
@@ -186,22 +242,54 @@ public final class ImageButtonView extends View {
         return false;
     }
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-
-        int frontColor = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? colorBox.getColor(COLOR_TYPES.PRESSED_FRONT_COLOR).RGBCode : colorBox.getColor(COLOR_TYPES.UNPRESSED_FRONT_COLOR).RGBCode);
-        int backColor = ((buttonState.equals(BUTTON_STATES.PRESSED)) ? colorBox.getColor(COLOR_TYPES.PRESSED_BACK_COLOR).RGBCode : colorBox.getColor(COLOR_TYPES.UNPRESSED_BACK_COLOR).RGBCode);
-        viewCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
-        viewCanvas.drawBitmap(symbolBitmap, 0, 0, null);
-        viewCanvas.drawColor(frontColor, PorterDuff.Mode.SRC_IN);
-        backPaint.setColor(backColor);
-        viewCanvas.drawRoundRect(viewCanvasRect, backCornerRadius, backCornerRadius, backPaint);
-        canvas.drawBitmap(viewBitmap, 0, 0, null);
-    }
-
     public void updateDisplayColors() {
         invalidate();
     }
 
+    private ColorDef getColor(COLOR_TYPES colorType) {   //  Si Null rencontré (cad souhait de couleur par défaut lors du ColorBox.setColor), alors renvoyer couleur par défaut
+        ColorDef colorDef = colorBox.getColor(colorType);
+        if (colorDef == null) {
+            colorBox.setColor(colorType, defaultColorsMap.get(colorType));
+            colorDef = colorBox.getColor(colorType);
+        }
+        return colorDef;
+    }
+
+    private void setupColorBox() {
+        final String UNPRESSED_FRONT_COLOR_DEFAULT = "000000";
+        final String UNPRESSED_BACK_COLOR_DEFAULT = "C0C0C0";
+        final String PRESSED_FRONT_COLOR_DEFAULT = UNPRESSED_FRONT_COLOR_DEFAULT;
+        final String PRESSED_BACK_COLOR_DEFAULT = "FF9A22";
+
+        colorBox = new ButtonColorBox();
+        defaultColorsMap = new HashMap<COLOR_TYPES, String>();
+        defaultColorsMap.put(COLOR_TYPES.UNPRESSED_FRONT_COLOR, UNPRESSED_FRONT_COLOR_DEFAULT);
+        defaultColorsMap.put(COLOR_TYPES.UNPRESSED_BACK_COLOR, UNPRESSED_BACK_COLOR_DEFAULT);
+        defaultColorsMap.put(COLOR_TYPES.PRESSED_FRONT_COLOR, PRESSED_FRONT_COLOR_DEFAULT);
+        defaultColorsMap.put(COLOR_TYPES.PRESSED_BACK_COLOR, PRESSED_BACK_COLOR_DEFAULT);
+        for (COLOR_TYPES ct : COLOR_TYPES.values()) {
+            colorBox.setColor(ct, defaultColorsMap.get(ct));
+        }
+    }
+
+    private void setupImageBackPaint() {
+        imageBackPaint = new Paint();
+        imageBackPaint.setAntiAlias(true);
+        imageBackPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OVER));
+        imageBackPaint.setStyle(Paint.Style.FILL);
+    }
+
+    private void setupButtonBackPaint() {
+        buttonBackPaint = new Paint();
+        buttonBackPaint.setAntiAlias(true);
+        buttonBackPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+        buttonBackPaint.setStyle(Paint.Style.FILL);
+    }
+
+    private void setupButtonOutlinePaint() {
+        buttonOutlinePaint = new Paint();
+        buttonOutlinePaint.setAntiAlias(true);
+        buttonOutlinePaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER));
+        buttonOutlinePaint.setStyle(Paint.Style.STROKE);
+    }
 }

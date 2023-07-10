@@ -88,7 +88,7 @@ public class PresetsActivity extends Activity {
     private boolean isTypeColors;
     private int listIndex;
     private int columnIndex;
-    private CustomButton[] buttons;
+    private ImageButtonView[] buttons;
     private ListView listView;
     private boolean validReturnFromCalledActivity;
     private String calledActivityName;
@@ -313,7 +313,7 @@ public class PresetsActivity extends Activity {
         boolean needSpecialColor = (listIndex != LIST_INDEX_DEFAULT_VALUE);
         buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_BACK_COLOR, (needSpecialColor) ? FIELD_UNPRESSED_COLOR : null);
         buttonColorBox.setColor(COLOR_TYPES.PRESSED_BACK_COLOR, (needSpecialColor) ? FIELD_PRESSED_COLOR : null);
-        buttons[COMMANDS.FIELD.INDEX()].updateDisplayBackColors();
+        buttons[COMMANDS.FIELD.INDEX()].updateDisplayColors();
     }
 
     private void updateDisplayButtonSpecialColors() {
@@ -323,7 +323,7 @@ public class PresetsActivity extends Activity {
         ButtonColorBox buttonColorBox = buttons[COMMANDS.OK.INDEX()].getColorBox();
         buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_BACK_COLOR, OK_UNPRESSED_COLOR_DEFAULT);
         buttonColorBox.setColor(COLOR_TYPES.PRESSED_BACK_COLOR, OK_PRESSED_COLOR_DEFAULT);
-        buttons[COMMANDS.OK.INDEX()].updateDisplayBackColors();
+        buttons[COMMANDS.OK.INDEX()].updateDisplayColors();
     }
 
     private void rebuildPresets() {
@@ -404,7 +404,7 @@ public class PresetsActivity extends Activity {
         final String BUTTON_XML_PREFIX = "BTN_";
         final long BUTTON_MIN_CLICK_TIME_INTERVAL_MS = 500;
 
-        buttons = new CustomButton[COMMANDS.values().length];
+        buttons = new ImageButtonView[COMMANDS.values().length];
         Class rid = R.id.class;
         for (COMMANDS command : COMMANDS.values()) {
             try {
@@ -412,9 +412,9 @@ public class PresetsActivity extends Activity {
                 buttons[command.INDEX()].setText(command.TEXT());
                 buttons[command.INDEX()].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
                 final COMMANDS fcommand = command;
-                buttons[command.INDEX()].setOnClickListener(new View.OnClickListener() {
+                buttons[command.INDEX()].setCustomOnClickListener(new ImageButtonView.onCustomClickListener() {
                     @Override
-                    public void onClick(View v) {
+                    public void onCustomClick() {
                         onButtonClick(fcommand);
                     }
                 });

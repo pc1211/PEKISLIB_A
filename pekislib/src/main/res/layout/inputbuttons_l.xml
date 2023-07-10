@@ -8,62 +8,71 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
+        android:layout_marginRight="4dp"
         android:layout_weight="1"
         android:orientation="horizontal">
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P1" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P2"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P2" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P3"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P3" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P4"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P4" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P5"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P5" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P6"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P6" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P7"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P7" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P8"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P8" />
     </LinearLayout>
@@ -71,62 +80,71 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginRight="4dp"
         android:layout_weight="1"
         android:orientation="horizontal">
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P9"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P9" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P10"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P10" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P11"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P11" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P12"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P12" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P13"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P13" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P14"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P14" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P15"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P15" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P16"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P16" />
     </LinearLayout>
@@ -134,62 +152,71 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginRight="4dp"
         android:layout_weight="1"
         android:orientation="horizontal">
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P17"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P17" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P18"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P18" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P19"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P19" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P20"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P20" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P21"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P21" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P22"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P22" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P23"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P23" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P24"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P24" />
     </LinearLayout>
@@ -197,62 +224,71 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginRight="4dp"
         android:layout_weight="1"
         android:orientation="horizontal">
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P25"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P25" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P26"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P26" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P27"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P27" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P28"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P28" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P29"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P29" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P30"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P30" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P31"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P31" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_P32"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="P32" />
     </LinearLayout>
@@ -277,20 +313,24 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="4dp"
         android:layout_weight="1"
         android:orientation="horizontal">
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_CANCEL"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="Cancel" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_OK"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:text="OK"
             android:textStyle="bold" />

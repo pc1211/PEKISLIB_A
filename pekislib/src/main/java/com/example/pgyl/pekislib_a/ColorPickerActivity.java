@@ -11,9 +11,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.SeekBar;
 
 import java.util.Arrays;
@@ -98,7 +96,7 @@ public class ColorPickerActivity extends Activity {
     private ColorWheelView colorWheelView;
     private ColorWheelViewUpdater colorWheelViewUpdater;
     private String tableName;
-    private Button[] buttons;
+    private ImageButtonView[] buttons;
     private boolean validReturnFromCalledActivity;
     private String calledActivityName;
     private StringDB stringDB;
@@ -353,26 +351,20 @@ public class ColorPickerActivity extends Activity {
     private void setupButtons() {
         final String BUTTON_XML_PREFIX = "BTN_";
 
-        buttons = new Button[COMMANDS.values().length];
+        buttons = new ImageButtonView[COMMANDS.values().length];
         Class rid = R.id.class;
         for (COMMANDS command : COMMANDS.values()) {
             try {
                 buttons[command.INDEX()] = findViewById(rid.getField(BUTTON_XML_PREFIX + command.toString()).getInt(rid));   //  1, 2, 3 ... dans le XML
                 buttons[command.INDEX()].setText(command.TEXT());
                 final COMMANDS fcommand = command;
-                buttons[command.INDEX()].setOnClickListener(new Button.OnClickListener() {
+                buttons[command.INDEX()].setCustomOnClickListener(new ImageButtonView.onCustomClickListener() {
                     @Override
-                    public void onClick(View view) {
+                    public void onCustomClick() {
                         onButtonClick(fcommand);
                     }
                 });
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalArgumentException ex) {
-                Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (NoSuchFieldException ex) {
-                Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SecurityException ex) {
+            } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException ex) {
                 Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
             }
         }

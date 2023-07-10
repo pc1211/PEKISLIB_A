@@ -21,16 +21,18 @@
             android:paddingRight="15dp"
             android:progress="0" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_NEXT_COLOR_ITEM"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="2" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginRight="4dp"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -44,29 +46,33 @@
             android:paddingRight="15dp"
             android:progress="0" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_NEXT_COLOR_SPACE"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="2" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_COLOR_VALUE"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="2"
             android:textStyle="bold" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_PRESETS"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="2" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginRight="4dp"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -80,16 +86,18 @@
             android:paddingRight="15dp"
             android:progress="0" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_CANCEL"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1" />
 
-        <Button
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_OK"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:textStyle="bold" />
     </LinearLayout>

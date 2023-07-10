@@ -9,6 +9,7 @@ import android.graphics.Picture;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.util.TypedValue;
 import android.widget.Toast;
 
 import java.util.Arrays;
@@ -59,6 +60,10 @@ public class MiscUtils {
 
     public static int getStringIndexOf(String string, String[] stringArray) {
         return Arrays.asList(stringArray).indexOf(string);
+    }
+
+    public static float DpToPixels(int dp, Context context) {
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());
     }
 
     public static Picture getPictureFromDrawable(Drawable drawable) {

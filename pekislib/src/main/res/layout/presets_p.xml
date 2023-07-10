@@ -6,84 +6,84 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="36dp"
         android:layout_marginTop="8dp"
+        android:layout_marginRight="4dp"
         android:orientation="horizontal">
 
-        <com.example.pgyl.pekislib_a.CustomButton
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_NEXT_FIELD"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:background="@android:drawable/btn_default"
-            android:textColor="@android:color/black" />
+            android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
+            android:layout_weight="3" />
 
-        <com.example.pgyl.pekislib_a.CustomButton
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_CANCEL"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@android:drawable/btn_default"
-            android:textColor="@android:color/black" />
+            android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
+            android:layout_weight="1" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="36dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginRight="4dp"
         android:orientation="horizontal">
 
-        <com.example.pgyl.pekislib_a.CustomButton
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_FIELD"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="3"
-            android:background="@android:drawable/btn_default"
-            android:textColor="@android:color/black"
             android:textStyle="bold" />
 
-        <com.example.pgyl.pekislib_a.CustomButton
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_OK"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
             android:layout_weight="1"
-            android:background="@android:drawable/btn_default"
-            android:textColor="@android:color/black"
             android:textStyle="bold" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="36dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginRight="4dp"
         android:orientation="horizontal">
 
-        <com.example.pgyl.pekislib_a.CustomButton
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_ADD"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:background="@android:drawable/btn_default"
-            android:textColor="@android:color/black" />
+            android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
+            android:layout_weight="3" />
 
-        <com.example.pgyl.pekislib_a.CustomButton
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_REMOVE"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:background="@android:drawable/btn_default"
-            android:textColor="@android:color/black" />
+            android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
+            android:layout_weight="3" />
 
-        <com.example.pgyl.pekislib_a.CustomButton
+        <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_DEFAULT"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:background="@android:drawable/btn_default"
-            android:textColor="@android:color/black" />
+            android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
+            android:layout_weight="2" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="4dp"
         android:orientation="horizontal">
 
         <ListView

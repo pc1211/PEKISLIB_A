@@ -61,6 +61,16 @@ public final class LEDView extends View {
         cornerRadius = (Math.min(w, h) * CORNER_RADIUS) / 200;
     }
 
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
+        paint.setColor(ledColorsMap.get(state));
+        canvas.drawRoundRect(canvasRect, cornerRadius, cornerRadius, paint);
+    }
+
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
@@ -81,15 +91,6 @@ public final class LEDView extends View {
     public void setLEDColor(STATES state, String color) {   //  RRGGBB
         ledColorsMap.put(state, Color.parseColor(COLOR_PREFIX + color));
         invalidate();
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-
-        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
-        paint.setColor(ledColorsMap.get(state));
-        canvas.drawRoundRect(canvasRect, cornerRadius, cornerRadius, paint);
     }
 
     private void setupLEDColorsMap() {

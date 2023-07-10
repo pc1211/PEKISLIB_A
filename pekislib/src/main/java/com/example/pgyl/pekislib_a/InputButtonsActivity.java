@@ -10,9 +10,7 @@ import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.TextView;
 
 import java.text.ParseException;
@@ -342,8 +340,8 @@ public class InputButtonsActivity extends Activity {
     private String tableName;
     private int columnIndex;
     private KEYBOARDS keyboard;
-    private Button[] keyboardButtons;
-    private Button[] buttons;
+    private ImageButtonView[] keyboardButtons;
+    private ImageButtonView[] buttons;
     private TextView lbldisplay;
     private StringDB stringDB;
     private String shpFileName;
@@ -550,7 +548,7 @@ public class InputButtonsActivity extends Activity {
         lbldisplay.setTextSize(TypedValue.COMPLEX_UNIT_PX, ts);
     }
 
-    public void updateDisplayResizeButtonText(Button button) {
+    public void updateDisplayResizeButtonText(ImageButtonView button) {
         final double BUTTON_RELATIVE_TEXT_SIZE = 0.4;   //  Ratio souhaité entre textSize d'un bouton et sa hauteur
 
         float ts = (float) (BUTTON_RELATIVE_TEXT_SIZE * button.getHeight());
@@ -823,16 +821,16 @@ public class InputButtonsActivity extends Activity {
     private void setupButtons() {
         final String BUTTON_XML_PREFIX = "BTN_";
 
-        buttons = new Button[COMMANDS.values().length];
+        buttons = new ImageButtonView[COMMANDS.values().length];
         Class rid = R.id.class;
         for (COMMANDS command : COMMANDS.values()) {
             try {
                 buttons[command.INDEX()] = findViewById(rid.getField(BUTTON_XML_PREFIX + command.toString()).getInt(rid));   //  1, 2, 3 ... dans le XML
                 buttons[command.INDEX()].setText(command.TEXT());
                 final COMMANDS fcommand = command;
-                buttons[command.INDEX()].setOnClickListener(new Button.OnClickListener() {
+                buttons[command.INDEX()].setCustomOnClickListener(new ImageButtonView.onCustomClickListener() {
                     @Override
-                    public void onClick(View view) {
+                    public void onCustomClick() {
                         onButtonClick(fcommand);
                     }
                 });
@@ -847,14 +845,14 @@ public class InputButtonsActivity extends Activity {
 
         Class rid = R.id.class;
         lbldisplay = findViewById(R.id.LBL_DISPLAY);
-        keyboardButtons = new Button[BUTTONS_PER_PAGE];
+        keyboardButtons = new ImageButtonView[BUTTONS_PER_PAGE];
         for (int i = 0; i <= (BUTTONS_PER_PAGE - 1); i = i + 1) {
             try {
                 keyboardButtons[i] = findViewById(rid.getField(BUTTON_XML_PREFIX + (i + 1)).getInt(rid));  // BTN_P1, BTN_P2, ...
                 final int index = i;
-                keyboardButtons[i].setOnClickListener(new View.OnClickListener() {
+                keyboardButtons[i].setCustomOnClickListener(new ImageButtonView.onCustomClickListener() {
                     @Override
-                    public void onClick(View v) {
+                    public void onCustomClick() {
                         onKeyboardButtonClick(index);
                     }
                 });
