@@ -160,6 +160,10 @@ public class StringDB extends SQLiteOpenHelper {
         ssdb.execSQL(sqlForDeleteRows(tableName, whereCondition));
     }
 
+    public void deleteTable(String tablename) {
+        ssdb.execSQL(sqlForDeleteTable(tablename));
+    }
+
     private int getTableFieldsCount(String tableName) {
         Cursor cursor = ssdb.rawQuery(sqlForGetTableFieldsCount(tableName), null);
         int tableFieldsCount = cursor.getColumnNames().length;    //  cursor jamais null après rawQuery de sqlForGetTableFieldsCount
@@ -217,6 +221,10 @@ public class StringDB extends SQLiteOpenHelper {
             sql = sql + " WHERE " + whereCondition;
         }
         return sql;
+    }
+
+    private String sqlForDeleteTable(String tableName) {
+        return "DROP TABLE " + tableName;
     }
 
     private String sqlForTableExists(String tableName) {
