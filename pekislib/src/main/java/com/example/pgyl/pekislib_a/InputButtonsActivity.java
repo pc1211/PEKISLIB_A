@@ -355,6 +355,7 @@ public class InputButtonsActivity extends Activity {
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         title = getIntent().getStringExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString());
         getActionBar().setTitle(title);
+        setupOrientationLayout();
     }
 
     @Override
@@ -375,7 +376,6 @@ public class InputButtonsActivity extends Activity {
 
         super.onResume();
 
-        setupOrientationLayout();
         setupButtons();
         setupKeyboardButtons();
 

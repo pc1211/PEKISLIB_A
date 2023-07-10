@@ -49,6 +49,9 @@ public class ButtonColorBox {   //  Pour les ImageButtonView (ou CustomButton ma
     }
 
     public ColorDef getColor(COLOR_TYPES colorType) {   //  Colordef est retourné, donc avec .RGBHex et .RGBCode
+        if (colors == null) {
+            init();
+        }
         return colors[colorType.INDEX()];
     }
 }
