@@ -30,7 +30,7 @@ public class StringDB extends SQLiteOpenHelper {
         }    //  Index apparent pour l'utilisateur
     }
 
-    private final String NULL_STRING = "NULL@" + DATABASE_NAME;   //  Chaîne stockée en cas de champ null
+    private final String NULL_STRING = "@NULL@";   //  Chaîne stockée en cas de champ null
     //endregion
 
     //region Variables
@@ -160,8 +160,10 @@ public class StringDB extends SQLiteOpenHelper {
         ssdb.execSQL(sqlForDeleteRows(tableName, whereCondition));
     }
 
-    public void deleteTable(String tablename) {
-        ssdb.execSQL(sqlForDeleteTable(tablename));
+    public void deleteTableIfExists(String tablename) {
+        if (tableExists(tablename)) {
+            ssdb.execSQL(sqlForDeleteTable(tablename));
+        }
     }
 
     private int getTableFieldsCount(String tableName) {

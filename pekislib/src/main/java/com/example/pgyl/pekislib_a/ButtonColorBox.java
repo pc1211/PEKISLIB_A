@@ -34,17 +34,16 @@ public class ButtonColorBox {   //  Pour les ImageButtonView (ou CustomButton ma
 
     public void setColor(COLOR_TYPES colorType, String color) {
         if (colors == null) {
-            init();
-        } else {   //  colors non Null
-            if (color == null) {
-                colors[colorType.INDEX()] = null;
-            } else {   //  color non Null
-                if (colors[colorType.INDEX()] == null) {
-                    colors[colorType.INDEX()] = new ColorDef();
-                }
-                colors[colorType.INDEX()].RGBHex = color;
-                colors[colorType.INDEX()].RGBCode = Color.parseColor(COLOR_PREFIX + color);
+            init();   //  Maintenant colors est garanti non Null
+        }
+        if (color == null) {
+            colors[colorType.INDEX()] = null;
+        } else {   //  color non Null
+            if (colors[colorType.INDEX()] == null) {
+                colors[colorType.INDEX()] = new ColorDef();   //  Maintenant colors[colorType.INDEX()] est garanti non Null
             }
+            colors[colorType.INDEX()].RGBHex = color;
+            colors[colorType.INDEX()].RGBCode = Color.parseColor(COLOR_PREFIX + color);
         }
     }
 

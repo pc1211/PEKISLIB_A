@@ -58,7 +58,7 @@ public class StringDBUtils {
         stringDB.insertOrReplaceRowById(tableName, TABLE_IDS.CURRENT.toString(), values);
     }
 
-    public static String getCurrents(StringDB stringDB, String tableName, int index) {
+    public static String getCurrent(StringDB stringDB, String tableName, int index) {
         return stringDB.selectFieldByIdOrCreate(tableName, TABLE_IDS.CURRENT.toString(), index);
     }
 

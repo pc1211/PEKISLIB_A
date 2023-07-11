@@ -292,6 +292,14 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         }
     }
 
+    public Rect getGridRect() {
+        return gridRect;
+    }
+
+    public void setDisplayRect(Rect displayRect) {   //  Emplacement de l'affichage (sous-rectangle de la grille gridRect) (left>=gridRect.left, top>=gridRect.top, right<=gridRect.right, bottom<=gridRect.bottom)
+        this.displayRect = displayRect;
+    }
+
     public Rect getDisplayRect() {
         return displayRect;
     }
@@ -317,19 +325,6 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         return symbolPos;
     }
 
-    public Rect getGridRect() {
-        return gridRect;
-    }
-
-    public void setDisplayRect(Rect displayRect) {   //  Emplacement de l'affichage (sous-rectangle de la grille gridRect) (left>=gridRect.left, top>=gridRect.top, right<=gridRect.right, bottom<=gridRect.bottom)
-        this.displayRect = displayRect;
-    }
-
-    public void rebuildStructure() {
-        setupDimensions(dimensionsSet, getWidth());
-        setupDrawParameters();
-    }
-
     public void setDotSpacingCoeff(String dotSpacingCoeff) {   //  Taille de l'espace entre chaque carré (en % de largeur d'un carré)
         this.dotSpacingCoeff = Float.parseFloat(dotSpacingCoeff) * .01f;
     }
@@ -347,7 +342,27 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
     }
 
     public void setBackColor(String color) {
-        backColor = Color.parseColor(COLOR_PREFIX + color);
+        backColor = Color.parseColor(COLOR_PREFIX + color);   //  Impossible d'utiliser ColorBox car déjà occupée par Front (ON TIME & ON LABEL) et Back (OFF); Background est donc stocké à part
+    }
+
+    public void setMinClickTimeInterval(long minClickTimeInterval) {
+        this.minClickTimeInterval = minClickTimeInterval;
+    }
+
+    private int getMarginSize(int length, float marginCoeff) {
+        return (int) (length * marginCoeff + 0.5f);
+    }
+
+    private int getDotCellSideSize(DimensionsSet dimensionsSet) {  //  Solution de l'équation telle que internalMargins.left + (displayRect.width -1) * dotCellSideSize + dotSideSize + internalMargins.right = width (si pas d'arrondis)
+        return (int) ((dimensionsSet.width - dimensionsSet.internalMargins.left - dimensionsSet.internalMargins.right) * (1 + dotSpacingCoeff) / (displayRect.width() * (1 + dotSpacingCoeff) - dotSpacingCoeff) + .5f);
+    }
+
+    private int getDotSideSize(DimensionsSet dimensionsSet) {
+        return (int) (dimensionsSet.dotCellSideSize / (1 + dotSpacingCoeff) + .5f);
+    }
+
+    private int getSlackWidth(DimensionsSet dimensionsSet) {
+        return dimensionsSet.width - (dimensionsSet.internalMargins.left + (displayRect.width() - 1) * dimensionsSet.dotCellSideSize + dimensionsSet.dotSideSize + dimensionsSet.internalMargins.right);
     }
 
     public void invert() {
@@ -413,12 +428,33 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         scrollOffset.set(0, 0);
     }
 
-    public void setMinClickTimeInterval(long minClickTimeInterval) {
-        this.minClickTimeInterval = minClickTimeInterval;
-    }
+    private BiDimensions getMaxDimensions(int proposedWidth, int proposedHeight) {   //  Trouver les dimensions maximum d'un rectangle pouvant afficher la grille dans un rectangle de dimensions données
+        int wMax = proposedWidth;
+        int hMax = proposedHeight;
+        int wMin = 0;
+        int wBest = 0;
+        int hBest = 0;
+        int oldW = 0;
+        int w = wMax;
+        do {
+            setupDimensions(dimensionsSetTemp, w);
+            int h = dimensionsSetTemp.height;
+            if (h <= hMax) {
+                wBest = w;   //  On a un nouveau candidat !
+                hBest = h;
+                if ((w == wMax) || (h == hMax)) {   //  Parfait !
+                    break;
+                }
+                wMin = w;   //  Examiner maintenant l'intervalle [w,wMax]
+            } else {   //  h > hMax
+                wMax = w;    // Examiner maintenant l'intervalle [wMin,w]
+            }
+            oldW = w;
+            w = (wMin + wMax) / 2;
+        } while (w != oldW);   //  Si w=oldW, on ne progresse plus => Accepter le dernier candidat
 
-    public void updateDisplay() {
-        invalidate();
+        maxDimensions.set(wBest, hBest);
+        return maxDimensions;
     }
 
     public void drawBackRect(Rect rect) {
@@ -490,6 +526,37 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         }
     }
 
+    private void createDotFormStencilBitmap() {   //  Préparer un pochoir avec des formes transparentes sur fond de backColor, pour donner aux futurs points la forme désirée
+        if (dotFormStencilBitmap != null) {
+            dotFormStencilBitmap.recycle();
+        }
+        dotFormStencilBitmap = Bitmap.createBitmap(canvasRect.width(), canvasRect.height(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(dotFormStencilBitmap);
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
+        dotFormStencilPaint.setColor(backColor);
+        canvas.drawRoundRect(dotMatrixRect, backCornerRadius, backCornerRadius, dotFormStencilPaint);   //  Maintenant on va faire des trous dedans :)
+
+        dotCellOrigin.x = dotMatrixRect.left + dimensionsSet.internalMargins.left;   //  Coordonnée x du 1er point d'une ligne
+        for (int i = 0; i <= (displayRect.width() - 1); i = i + 1) {   //  Parcourir la ligne
+            dotCellOrigin.y = dotMatrixRect.top + dimensionsSet.internalMargins.top;   //  Coordonnée y du 1er point d'une colonne
+            for (int j = 0; j <= (displayRect.height() - 1); j = j + 1) {   //  Parcourir la colonne
+                dotRect.set(dotCellOrigin.x, dotCellOrigin.y, dotCellOrigin.x + dimensionsSet.dotSideSize, dotCellOrigin.y + dimensionsSet.dotSideSize);
+                canvas.drawRoundRect(dotRect, dotCornerRadius, dotCornerRadius, dotFormStencilTransparentPaint);
+                dotCellOrigin.y = dotCellOrigin.y + dimensionsSet.dotCellSideSize;   //  Passer au prochain point de la colonne
+            }
+            dotCellOrigin.x = dotCellOrigin.x + dimensionsSet.dotCellSideSize;   //  Passer au prochain point de la ligne
+        }
+    }
+
+    public void updateDisplay() {
+        invalidate();
+    }
+
+    public void rebuildStructure() {
+        setupDimensions(dimensionsSet, getWidth());
+        setupDrawParameters();
+    }
+
     private void setupDotPaint() {
         dotPaint = new Paint();
         dotPaint.setAntiAlias(true);
@@ -532,73 +599,6 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract�
         }
         dimensionsSet.slackWidth = getSlackWidth(dimensionsSet);
         dimensionsSet.height = dimensionsSet.internalMargins.top + (displayRect.height() - 1) * dimensionsSet.dotCellSideSize + dimensionsSet.dotSideSize + dimensionsSet.internalMargins.bottom;
-    }
-
-    private int getMarginSize(int length, float marginCoeff) {
-        return (int) (length * marginCoeff + 0.5f);
-    }
-
-    private int getDotCellSideSize(DimensionsSet dimensionsSet) {  //  Solution de l'équation telle que internalMargins.left + (displayRect.width -1) * dotCellSideSize + dotSideSize + internalMargins.right = width (si pas d'arrondis)
-        return (int) ((dimensionsSet.width - dimensionsSet.internalMargins.left - dimensionsSet.internalMargins.right) * (1 + dotSpacingCoeff) / (displayRect.width() * (1 + dotSpacingCoeff) - dotSpacingCoeff) + .5f);
-    }
-
-    private int getDotSideSize(DimensionsSet dimensionsSet) {
-        return (int) (dimensionsSet.dotCellSideSize / (1 + dotSpacingCoeff) + .5f);
-    }
-
-    private int getSlackWidth(DimensionsSet dimensionsSet) {
-        return dimensionsSet.width - (dimensionsSet.internalMargins.left + (displayRect.width() - 1) * dimensionsSet.dotCellSideSize + dimensionsSet.dotSideSize + dimensionsSet.internalMargins.right);
-    }
-
-    private void createDotFormStencilBitmap() {   //  Préparer un pochoir avec des formes transparentes sur fond de backColor, pour donner aux futurs points la forme désirée
-        if (dotFormStencilBitmap != null) {
-            dotFormStencilBitmap.recycle();
-        }
-        dotFormStencilBitmap = Bitmap.createBitmap(canvasRect.width(), canvasRect.height(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(dotFormStencilBitmap);
-        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
-        dotFormStencilPaint.setColor(backColor);
-        canvas.drawRoundRect(dotMatrixRect, backCornerRadius, backCornerRadius, dotFormStencilPaint);   //  Maintenant on va faire des trous dedans :)
-
-        dotCellOrigin.x = dotMatrixRect.left + dimensionsSet.internalMargins.left;   //  Coordonnée x du 1er point d'une ligne
-        for (int i = 0; i <= (displayRect.width() - 1); i = i + 1) {   //  Parcourir la ligne
-            dotCellOrigin.y = dotMatrixRect.top + dimensionsSet.internalMargins.top;   //  Coordonnée y du 1er point d'une colonne
-            for (int j = 0; j <= (displayRect.height() - 1); j = j + 1) {   //  Parcourir la colonne
-                dotRect.set(dotCellOrigin.x, dotCellOrigin.y, dotCellOrigin.x + dimensionsSet.dotSideSize, dotCellOrigin.y + dimensionsSet.dotSideSize);
-                canvas.drawRoundRect(dotRect, dotCornerRadius, dotCornerRadius, dotFormStencilTransparentPaint);
-                dotCellOrigin.y = dotCellOrigin.y + dimensionsSet.dotCellSideSize;   //  Passer au prochain point de la colonne
-            }
-            dotCellOrigin.x = dotCellOrigin.x + dimensionsSet.dotCellSideSize;   //  Passer au prochain point de la ligne
-        }
-    }
-
-    private BiDimensions getMaxDimensions(int proposedWidth, int proposedHeight) {   //  Trouver les dimensions maximum d'un rectangle pouvant afficher la grille dans un rectangle de dimensions données
-        int wMax = proposedWidth;
-        int hMax = proposedHeight;
-        int wMin = 0;
-        int wBest = 0;
-        int hBest = 0;
-        int oldW = 0;
-        int w = wMax;
-        do {
-            setupDimensions(dimensionsSetTemp, w);
-            int h = dimensionsSetTemp.height;
-            if (h <= hMax) {
-                wBest = w;   //  On a un nouveau candidat !
-                hBest = h;
-                if ((w == wMax) || (h == hMax)) {   //  Parfait !
-                    break;
-                }
-                wMin = w;   //  Examiner maintenant l'intervalle [w,wMax]
-            } else {   //  h > hMax
-                wMax = w;    // Examiner maintenant l'intervalle [wMin,w]
-            }
-            oldW = w;
-            w = (wMin + wMax) / 2;
-        } while (w != oldW);   //  Si w=oldW, on ne progresse plus => Accepter le dernier candidat
-
-        maxDimensions.set(wBest, hBest);
-        return maxDimensions;
     }
 
 }
