@@ -7,7 +7,7 @@ public class StringDBTables {
 
     //  TABLES
     private enum PEKISLIB_TABLES {
-        ACTIVITY_INFOS(PekislibTableDataFields.activityInfos.class), DATA_VERSIONS(PekislibTableDataFields.dataVersions.class);
+        ACTIVITY_INFOS(PekislibTableDataFields.activityInfos.class), APP_INFOS(PekislibTableDataFields.appInfos.class);
 
         private int dataFieldsCount;
         private String description;
@@ -51,7 +51,7 @@ public class StringDBTables {
             }   //  INDEX 0 pour identifiant utilisateur
         }
 
-        enum dataVersions implements PekislibTableDataFields {
+        enum appInfos implements PekislibTableDataFields {
             DATA_VERSION;
 
             public int INDEX() {
@@ -72,13 +72,13 @@ public class StringDBTables {
     }
     //endregion
 
-    //region DATA_VERSIONS
-    public static String getDataVersionsTableName() {
-        return PEKISLIB_TABLES.DATA_VERSIONS.toString();
+    //region APP_INFOS
+    public static String getAppInfosTableName() {
+        return PEKISLIB_TABLES.APP_INFOS.toString();
     }
 
-    public static int getDataVersionsDataVersionIndex() {
-        return PekislibTableDataFields.dataVersions.DATA_VERSION.INDEX();
+    public static int getAppInfosDataVersionIndex() {
+        return PekislibTableDataFields.appInfos.DATA_VERSION.INDEX();
     }
     //endregion
 
