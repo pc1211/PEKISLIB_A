@@ -206,7 +206,7 @@ public final class ImageButtonView extends TextView {
                 imageBackPaint.setColor(backColor);
                 viewCanvas.drawRoundRect(viewCanvasRectExceptOutline, backCornerRadius, backCornerRadius, imageBackPaint);
             }
-        } else {   //  Null => Ractangle simple suffit (Back); le Front sera le texte (avec sa couleur)
+        } else {   //  Pas de Picture => Ractangle simple suffit (Back); le Front sera le texte (avec sa couleur)
             if (hasBackColorFilter) {
                 buttonBackPaint.setColor(backColor);
                 viewCanvas.drawRoundRect(viewCanvasRectExceptOutline, backCornerRadius, backCornerRadius, buttonBackPaint);
