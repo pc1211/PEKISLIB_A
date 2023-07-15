@@ -49,6 +49,8 @@ public final class ImageButtonView extends TextView {
     private float outlineStrokeWidthPx;
     private String outlineColor;
     private ButtonColorBox colorBox;
+    private boolean hasFrontColorFilter;
+    private boolean hasBackColorFilter;
     private Map<COLOR_TYPES, String> defaultColorsMap;
     private boolean clickDownInButtonZone;
     private RectF buttonZone;
@@ -122,6 +124,14 @@ public final class ImageButtonView extends TextView {
         return colorBox;
     }
 
+    public void setHasFrontColorFilter(boolean hasFrontColorFilter) {
+        this.hasFrontColorFilter = hasFrontColorFilter;
+    }
+
+    public void setHasBackColorFilter(boolean hasBackColorFilter) {
+        this.hasBackColorFilter = hasBackColorFilter;
+    }
+
     public void setImageRelativePositionCoeffs(RectF imageRelativePositionCoeffs) {
         this.imageRelativePositionCoeffs = imageRelativePositionCoeffs;
     }
@@ -189,12 +199,18 @@ public final class ImageButtonView extends TextView {
         if (picture != null) {
             viewCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
             viewCanvas.drawBitmap(imageBitmap, 0, 0, null);
-            viewCanvas.drawColor(frontColor, PorterDuff.Mode.SRC_IN);
-            imageBackPaint.setColor(backColor);
-            viewCanvas.drawRoundRect(viewCanvasRectExceptOutline, backCornerRadius, backCornerRadius, imageBackPaint);
-        } else {   //  Null => Ractangle simple
-            buttonBackPaint.setColor(backColor);
-            viewCanvas.drawRoundRect(viewCanvasRectExceptOutline, backCornerRadius, backCornerRadius, buttonBackPaint);
+            if (hasFrontColorFilter) {
+                viewCanvas.drawColor(frontColor, PorterDuff.Mode.SRC_IN);
+            }
+            if (hasBackColorFilter) {
+                imageBackPaint.setColor(backColor);
+                viewCanvas.drawRoundRect(viewCanvasRectExceptOutline, backCornerRadius, backCornerRadius, imageBackPaint);
+            }
+        } else {   //  Null => Ractangle simple suffit (Back); le Front sera le texte (avec sa couleur)
+            if (hasBackColorFilter) {
+                buttonBackPaint.setColor(backColor);
+                viewCanvas.drawRoundRect(viewCanvasRectExceptOutline, backCornerRadius, backCornerRadius, buttonBackPaint);
+            }
         }
         if (outlineStrokeWidthPx != 0) {
             buttonOutlinePaint.setStrokeWidth(outlineStrokeWidthPx);
@@ -256,12 +272,16 @@ public final class ImageButtonView extends TextView {
     }
 
     private void setupColorBox() {
+        final boolean HAS_FRONT_COLOR_FILTER_DEFAULT = true;
+        final boolean HAS_BACK_COLOR_FILTER_DEFAULT = true;
         final String UNPRESSED_FRONT_COLOR_DEFAULT = "000000";
         final String UNPRESSED_BACK_COLOR_DEFAULT = "C0C0C0";
         final String PRESSED_FRONT_COLOR_DEFAULT = UNPRESSED_FRONT_COLOR_DEFAULT;
         final String PRESSED_BACK_COLOR_DEFAULT = "FF9A22";
 
         colorBox = new ButtonColorBox();
+        hasFrontColorFilter = HAS_FRONT_COLOR_FILTER_DEFAULT;
+        hasBackColorFilter = HAS_BACK_COLOR_FILTER_DEFAULT;
         defaultColorsMap = new HashMap<COLOR_TYPES, String>();
         defaultColorsMap.put(COLOR_TYPES.UNPRESSED_FRONT_COLOR, UNPRESSED_FRONT_COLOR_DEFAULT);
         defaultColorsMap.put(COLOR_TYPES.UNPRESSED_BACK_COLOR, UNPRESSED_BACK_COLOR_DEFAULT);
