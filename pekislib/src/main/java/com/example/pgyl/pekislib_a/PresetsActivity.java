@@ -18,7 +18,7 @@ import android.widget.ListView;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.example.pgyl.pekislib_a.ButtonColorBox.COLOR_TYPES;
+import static com.example.pgyl.pekislib_a.ColorUtils.BUTTON_COLOR_TYPES;
 import static com.example.pgyl.pekislib_a.Constants.ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITIES;
 import static com.example.pgyl.pekislib_a.Constants.SHP_FILE_NAME_SUFFIX;
@@ -309,10 +309,11 @@ public class PresetsActivity extends Activity {
         final String FIELD_UNPRESSED_COLOR = "FF9A22";
         final String FIELD_PRESSED_COLOR = "995400";
 
-        ButtonColorBox buttonColorBox = buttons[COMMANDS.FIELD.INDEX()].getColorBox();
+        ColorBox colorBox = buttons[COMMANDS.FIELD.INDEX()].getColorBox();
+        ColorBox defaultColorbox = buttons[COMMANDS.FIELD.INDEX()].getDefaultColorBox();
         boolean needSpecialColor = (listIndex != LIST_INDEX_DEFAULT_VALUE);
-        buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_BACK_COLOR, (needSpecialColor) ? FIELD_UNPRESSED_COLOR : null);
-        buttonColorBox.setColor(COLOR_TYPES.PRESSED_BACK_COLOR, (needSpecialColor) ? FIELD_PRESSED_COLOR : null);
+        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK_COLOR.INDEX(), (needSpecialColor) ? FIELD_UNPRESSED_COLOR : defaultColorbox.getColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK_COLOR.INDEX()).RGBString);
+        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_BACK_COLOR.INDEX(), (needSpecialColor) ? FIELD_PRESSED_COLOR : defaultColorbox.getColor(BUTTON_COLOR_TYPES.PRESSED_BACK_COLOR.INDEX()).RGBString);
         buttons[COMMANDS.FIELD.INDEX()].updateDisplayColors();
     }
 
@@ -320,9 +321,9 @@ public class PresetsActivity extends Activity {
         final String OK_UNPRESSED_COLOR_DEFAULT = "668CFF";
         final String OK_PRESSED_COLOR_DEFAULT = "0040FF";
 
-        ButtonColorBox buttonColorBox = buttons[COMMANDS.OK.INDEX()].getColorBox();
-        buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_BACK_COLOR, OK_UNPRESSED_COLOR_DEFAULT);
-        buttonColorBox.setColor(COLOR_TYPES.PRESSED_BACK_COLOR, OK_PRESSED_COLOR_DEFAULT);
+        ColorBox colorBox = buttons[COMMANDS.OK.INDEX()].getColorBox();
+        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK_COLOR.INDEX(), OK_UNPRESSED_COLOR_DEFAULT);
+        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_BACK_COLOR.INDEX(), OK_PRESSED_COLOR_DEFAULT);
         buttons[COMMANDS.OK.INDEX()].updateDisplayColors();
     }
 

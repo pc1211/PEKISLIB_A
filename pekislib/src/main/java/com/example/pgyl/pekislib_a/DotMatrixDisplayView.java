@@ -17,7 +17,7 @@ import android.view.View;
 
 import java.nio.charset.StandardCharsets;
 
-import static com.example.pgyl.pekislib_a.ButtonColorBox.COLOR_TYPES;
+import static com.example.pgyl.pekislib_a.ColorUtils.DOT_MATRIX_COLOR_TYPES;
 import static com.example.pgyl.pekislib_a.ColorUtils.StateColorCode;
 import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
@@ -81,8 +81,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
     private Paint dotFormStencilTransparentPaint;
     private float backCornerRadius;
     private float backCornerRadiusCoeff;
-    private ButtonColorBox colorBox;
-    private int backColor;
+    private ColorBox colorBox;
     private long minClickTimeInterval;
     private long lastClickUpTime;
     private BUTTON_STATES buttonState;
@@ -120,7 +119,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         scrollRect = null;
         dotRect = new RectF();
         textRect = new Rect();
-        colorBox = new ButtonColorBox();
+        colorBox = new ColorBox();
+        colorBox.setColor(DOT_MATRIX_COLOR_TYPES.BACK_SCREEN_COLOR.INDEX(), BACK_COLOR_DEFAULT);
         dimensionsSet = new DimensionsSet();
         dimensionsSetTemp = new DimensionsSet();
         maxDimensions = new BiDimensions(0, 0);
@@ -132,7 +132,6 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         setupDotPaint();
         setupDotFormStencilPaint();
         setupDotFormStencilTransparentPaint();
-        setBackColor(BACK_COLOR_DEFAULT);
         setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -278,7 +277,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         return false;
     }
 
-    public ButtonColorBox getColorBox() {
+    public ColorBox getColorBox() {
         return colorBox;
     }
 
@@ -339,10 +338,6 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
 
     public void setExternalMarginCoeffs(RectF externalMarginCoeffs) {   //  Positionnement par rapport au parent
         this.externalMarginCoeffs = externalMarginCoeffs;
-    }
-
-    public void setBackColor(String color) {
-        backColor = Color.parseColor(COLOR_PREFIX + color);   //  Impossible d'utiliser ColorBox car d√©j√† occup√©e par Front (ON TIME & ON LABEL) et Back (OFF); Background est donc stock√© √† part
     }
 
     public void setMinClickTimeInterval(long minClickTimeInterval) {
@@ -458,8 +453,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
     }
 
     public void drawBackRect(Rect rect) {
-        int unpressedColorCode = colorBox.getColor(COLOR_TYPES.UNPRESSED_BACK_COLOR).RGBCode;
-        int pressedColorCode = colorBox.getColor(COLOR_TYPES.PRESSED_BACK_COLOR).RGBCode;
+        int unpressedColorCode = colorBox.getColor(DOT_MATRIX_COLOR_TYPES.UNPRESSED_BACK_COLOR.INDEX()).RGBInt;
+        int pressedColorCode = colorBox.getColor(DOT_MATRIX_COLOR_TYPES.PRESSED_BACK_COLOR.INDEX()).RGBInt;
         for (int i = rect.left; i <= (rect.right - 1); i = i + 1) {
             for (int j = rect.top; j <= (rect.bottom - 1); j = j + 1) {
                 colorCodes[j][i].unpressed = unpressedColorCode;
@@ -485,8 +480,8 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
     public void drawFrontText(String text, DotMatrixFont extraFont, DotMatrixFont defaultFont) {   //  A partir de symbolPos; Sp√©cifier extraFont diff√©rent de null si text m√©lange extraFont et defaultFont; extraFont a la priorit√© sur defaultFont
         DotMatrixFont font = null;
 
-        int unpressedColorCode = colorBox.getColor(COLOR_TYPES.UNPRESSED_FRONT_COLOR).RGBCode;
-        int pressedColorCode = colorBox.getColor(COLOR_TYPES.PRESSED_FRONT_COLOR).RGBCode;
+        int unpressedColorCode = colorBox.getColor(DOT_MATRIX_COLOR_TYPES.UNPRESSED_FRONT_COLOR.INDEX()).RGBInt;
+        int pressedColorCode = colorBox.getColor(DOT_MATRIX_COLOR_TYPES.PRESSED_FRONT_COLOR.INDEX()).RGBInt;
         byte[] textBytes = text.getBytes(StandardCharsets.US_ASCII);   //  Conversion ASCII
         for (int i = 0; i <= (textBytes.length - 1); i = i + 1) {
             int code = textBytes[i];
@@ -533,7 +528,7 @@ public final class DotMatrixDisplayView extends View {  //  Affichage de caract√
         dotFormStencilBitmap = Bitmap.createBitmap(canvasRect.width(), canvasRect.height(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(dotFormStencilBitmap);
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
-        dotFormStencilPaint.setColor(backColor);
+        dotFormStencilPaint.setColor(colorBox.getColor(DOT_MATRIX_COLOR_TYPES.BACK_SCREEN_COLOR.INDEX()).RGBInt);
         canvas.drawRoundRect(dotMatrixRect, backCornerRadius, backCornerRadius, dotFormStencilPaint);   //  Maintenant on va faire des trous dedans :)
 
         dotCellOrigin.x = dotMatrixRect.left + dimensionsSet.internalMargins.left;   //  Coordonn√©e x du 1er point d'une ligne

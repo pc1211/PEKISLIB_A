@@ -18,19 +18,15 @@ import android.widget.TextView;
 
 import com.larvalabs.svgandroid.SVGParser;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static com.example.pgyl.pekislib_a.ButtonColorBox.COLOR_TYPES;
-import static com.example.pgyl.pekislib_a.ColorUtils.ColorDef;
+import static com.example.pgyl.pekislib_a.ColorUtils.BUTTON_COLOR_TYPES;
 import static com.example.pgyl.pekislib_a.Constants.BUTTON_STATES;
-import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
 import static com.example.pgyl.pekislib_a.MiscUtils.DpToPixels;
 import static com.example.pgyl.pekislib_a.MiscUtils.getPictureFromDrawable;
 import static com.example.pgyl.pekislib_a.PointRectUtils.ALIGN_WIDTH_HEIGHT;
 import static com.example.pgyl.pekislib_a.PointRectUtils.getMaxSubRect;
 
 public final class ImageButtonView extends TextView {
+
     public interface onCustomClickListener {
         void onCustomClick();
     }
@@ -47,11 +43,10 @@ public final class ImageButtonView extends TextView {
     private long lastClickUpTime;
     private BUTTON_STATES buttonState;
     private float outlineStrokeWidthPx;
-    private String outlineColor;
-    private ButtonColorBox colorBox;
+    private ColorBox colorBox;
+    private ColorBox defaultColorBox;
     private boolean hasFrontColorFilter;
     private boolean hasBackColorFilter;
-    private Map<COLOR_TYPES, String> defaultColorsMap;
     private boolean clickDownInButtonZone;
     private RectF buttonZone;
     private Bitmap viewBitmap;
@@ -76,12 +71,10 @@ public final class ImageButtonView extends TextView {
         init();
     }
 
-    public void init() {
+    public void init() {   //  Le bouton par défaut est un rectangle arrondi gris, entouré de gris clair, devenant orange si pressé :), avec un texte noir
+        final int OUTLINE_STROKE_WIDTH_DP_DEFAULT = 2;   //  dp
         final float SIZE_COEFF_DEFAULT = 0.8f;   //  (0..1)
         final String TEXT_DEFAULT = "";
-        final String TEXT_COLOR_DEFAULT = "000000";
-        final int OUTLINE_STROKE_WIDTH_DP_DEFAULT = 2;   //  dp
-        final String OUTLINE_COLOR_DEFAULT = "A0A0A0";
         final int PC_BACK_CORNER_RADIUS_DEFAULT = 35;    //  % appliqué à 1/2 largeur ou hauteur pour déterminer le rayon du coin arrondi
         final long MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE = 0;   //   Interval de temps (ms) minimum imposé entre 2 click
 
@@ -90,7 +83,6 @@ public final class ImageButtonView extends TextView {
         pcBackCornerRadius = PC_BACK_CORNER_RADIUS_DEFAULT;
         imageSizeCoeff = SIZE_COEFF_DEFAULT;
         outlineStrokeWidthPx = (int) DpToPixels(OUTLINE_STROKE_WIDTH_DP_DEFAULT, context);
-        outlineColor = OUTLINE_COLOR_DEFAULT;
         minClickTimeInterval = MIN_CLICK_TIME_INTERVAL_DEFAULT_VALUE;
         imageRelativePositionCoeffs = ALIGN_WIDTH_HEIGHT;
         picture = null;   //  En attendant l'affectation éventuelle via setSVGImageResource ou setPNGImageResource
@@ -103,7 +95,7 @@ public final class ImageButtonView extends TextView {
         });
         setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
         setText(TEXT_DEFAULT);
-        setTextColor(Color.parseColor(COLOR_PREFIX + TEXT_COLOR_DEFAULT));
+        setupDefaultColorBox();
         setupColorBox();
         setupImageBackPaint();
         setupButtonBackPaint();
@@ -120,8 +112,12 @@ public final class ImageButtonView extends TextView {
         imageAspectRatio = (float) picture.getHeight() / (float) picture.getWidth();
     }
 
-    public ButtonColorBox getColorBox() {   //   On peut alors modifier les couleurs (colorBox.setColor...), puis faire updateDisplayColors() pour mettre à jour l'affichage
+    public ColorBox getColorBox() {   //   On peut alors modifier les couleurs (colorBox.setColor...), puis faire updateDisplayColors() pour mettre à jour l'affichage
         return colorBox;
+    }
+
+    public ColorBox getDefaultColorBox() {   //   On peut alors modifier les couleurs (colorBox.setColor...), puis faire updateDisplayColors() pour mettre à jour l'affichage
+        return defaultColorBox;
     }
 
     public void setHasFrontColorFilter(boolean hasFrontColorFilter) {
@@ -138,10 +134,6 @@ public final class ImageButtonView extends TextView {
 
     public void setImageSizeCoeff(float imageSizeCoeff) {
         this.imageSizeCoeff = imageSizeCoeff;
-    }
-
-    public void setOutlineColor(String outlineColor) {
-        this.outlineColor = outlineColor;
     }
 
     public void setOutlineStrokeWidthDp(int outlineStrokeWidthDp) {
@@ -168,8 +160,6 @@ public final class ImageButtonView extends TextView {
         buttonOutlinePaint = null;
         colorBox.close();
         colorBox = null;
-        defaultColorsMap.clear();
-        defaultColorsMap = null;
         picture = null;
     }
 
@@ -193,8 +183,10 @@ public final class ImageButtonView extends TextView {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        int frontColor = (buttonState.equals(BUTTON_STATES.PRESSED)) ? getColor(COLOR_TYPES.PRESSED_FRONT_COLOR).RGBCode : getColor(COLOR_TYPES.UNPRESSED_FRONT_COLOR).RGBCode;
-        int backColor = (buttonState.equals(BUTTON_STATES.PRESSED)) ? getColor(COLOR_TYPES.PRESSED_BACK_COLOR).RGBCode : getColor(COLOR_TYPES.UNPRESSED_BACK_COLOR).RGBCode;
+        int frontColor = (buttonState.equals(BUTTON_STATES.PRESSED)) ? colorBox.getColor(BUTTON_COLOR_TYPES.PRESSED_FRONT_COLOR.INDEX()).RGBInt : colorBox.getColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT_COLOR.INDEX()).RGBInt;
+        int backColor = (buttonState.equals(BUTTON_STATES.PRESSED)) ? colorBox.getColor(BUTTON_COLOR_TYPES.PRESSED_BACK_COLOR.INDEX()).RGBInt : colorBox.getColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK_COLOR.INDEX()).RGBInt;
+        int outlineColor = colorBox.getColor(BUTTON_COLOR_TYPES.OUTLINE_COLOR.INDEX()).RGBInt;
+        int textColor = colorBox.getColor(BUTTON_COLOR_TYPES.TEXT_COLOR.INDEX()).RGBInt;
 
         if (picture != null) {
             viewCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
@@ -214,10 +206,11 @@ public final class ImageButtonView extends TextView {
         }
         if (outlineStrokeWidthPx != 0) {
             buttonOutlinePaint.setStrokeWidth(outlineStrokeWidthPx);
-            buttonOutlinePaint.setColor(Color.parseColor(COLOR_PREFIX + outlineColor));
+            buttonOutlinePaint.setColor(outlineColor);
             viewCanvas.drawRoundRect(viewCanvasRectExceptOutline, backCornerRadius, backCornerRadius, buttonOutlinePaint);
         }
         canvas.drawBitmap(viewBitmap, 0, 0, null);
+        setTextColor(textColor);
 
         super.onDraw(canvas);   //  Dessinera le texte au-dessus de l'image
     }
@@ -262,34 +255,36 @@ public final class ImageButtonView extends TextView {
         invalidate();
     }
 
-    private ColorDef getColor(COLOR_TYPES colorType) {   //  Si Null rencontré (cad souhait de couleur par défaut lors du ColorBox.setColor), alors renvoyer couleur par défaut
-        ColorDef colorDef = colorBox.getColor(colorType);
-        if (colorDef == null) {
-            colorBox.setColor(colorType, defaultColorsMap.get(colorType));
-            colorDef = colorBox.getColor(colorType);
-        }
-        return colorDef;
+    private void setupDefaultColorBox() {
+        final String UNPRESSED_FRONT_COLOR_DEFAULT = "000000";
+        final String UNPRESSED_BACK_COLOR_DEFAULT = "C0C0C0";
+        final String PRESSED_FRONT_COLOR_DEFAULT = UNPRESSED_FRONT_COLOR_DEFAULT;
+        final String PRESSED_BACK_COLOR_DEFAULT = "FF9A22";
+        final String OUTLINE_COLOR_DEFAULT = "A0A0A0";
+        final String TEXT_COLOR_DEFAULT = "000000";
+
+        defaultColorBox = new ColorBox();
+        defaultColorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT_COLOR.INDEX(), UNPRESSED_FRONT_COLOR_DEFAULT);
+        defaultColorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK_COLOR.INDEX(), UNPRESSED_BACK_COLOR_DEFAULT);
+        defaultColorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_FRONT_COLOR.INDEX(), PRESSED_FRONT_COLOR_DEFAULT);
+        defaultColorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_BACK_COLOR.INDEX(), PRESSED_BACK_COLOR_DEFAULT);
+        defaultColorBox.setColor(BUTTON_COLOR_TYPES.OUTLINE_COLOR.INDEX(), OUTLINE_COLOR_DEFAULT);
+        defaultColorBox.setColor(BUTTON_COLOR_TYPES.TEXT_COLOR.INDEX(), TEXT_COLOR_DEFAULT);
     }
 
     private void setupColorBox() {
         final boolean HAS_FRONT_COLOR_FILTER_DEFAULT = true;
         final boolean HAS_BACK_COLOR_FILTER_DEFAULT = true;
-        final String UNPRESSED_FRONT_COLOR_DEFAULT = "000000";
-        final String UNPRESSED_BACK_COLOR_DEFAULT = "C0C0C0";
-        final String PRESSED_FRONT_COLOR_DEFAULT = UNPRESSED_FRONT_COLOR_DEFAULT;
-        final String PRESSED_BACK_COLOR_DEFAULT = "FF9A22";
 
-        colorBox = new ButtonColorBox();
+        colorBox = new ColorBox();
         hasFrontColorFilter = HAS_FRONT_COLOR_FILTER_DEFAULT;
         hasBackColorFilter = HAS_BACK_COLOR_FILTER_DEFAULT;
-        defaultColorsMap = new HashMap<COLOR_TYPES, String>();
-        defaultColorsMap.put(COLOR_TYPES.UNPRESSED_FRONT_COLOR, UNPRESSED_FRONT_COLOR_DEFAULT);
-        defaultColorsMap.put(COLOR_TYPES.UNPRESSED_BACK_COLOR, UNPRESSED_BACK_COLOR_DEFAULT);
-        defaultColorsMap.put(COLOR_TYPES.PRESSED_FRONT_COLOR, PRESSED_FRONT_COLOR_DEFAULT);
-        defaultColorsMap.put(COLOR_TYPES.PRESSED_BACK_COLOR, PRESSED_BACK_COLOR_DEFAULT);
-        for (COLOR_TYPES ct : COLOR_TYPES.values()) {
-            colorBox.setColor(ct, defaultColorsMap.get(ct));
-        }
+        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT_COLOR.INDEX(), defaultColorBox.getColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT_COLOR.INDEX()).RGBString);
+        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK_COLOR.INDEX(), defaultColorBox.getColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK_COLOR.INDEX()).RGBString);
+        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_FRONT_COLOR.INDEX(), defaultColorBox.getColor(BUTTON_COLOR_TYPES.PRESSED_FRONT_COLOR.INDEX()).RGBString);
+        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_BACK_COLOR.INDEX(), defaultColorBox.getColor(BUTTON_COLOR_TYPES.PRESSED_BACK_COLOR.INDEX()).RGBString);
+        colorBox.setColor(BUTTON_COLOR_TYPES.OUTLINE_COLOR.INDEX(), defaultColorBox.getColor(BUTTON_COLOR_TYPES.OUTLINE_COLOR.INDEX()).RGBString);
+        colorBox.setColor(BUTTON_COLOR_TYPES.TEXT_COLOR.INDEX(), defaultColorBox.getColor(BUTTON_COLOR_TYPES.TEXT_COLOR.INDEX()).RGBString);
     }
 
     private void setupImageBackPaint() {

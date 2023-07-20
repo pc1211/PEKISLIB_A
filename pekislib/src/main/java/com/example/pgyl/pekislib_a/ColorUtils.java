@@ -8,13 +8,29 @@ import static com.example.pgyl.pekislib_a.Constants.HEX_RADIX;
 public class ColorUtils {
 
     public static class ColorDef {
-        public String RGBHex;   //  "RRGGBB" (avec préfixe FF)
-        public int RGBCode;     //  RGB int code
+        public String RGBString;   //  "RRGGBB" Hex
+        public int RGBInt;     //  RGB int code
     }
 
     public static class StateColorCode {
         int pressed;
         int unpressed;
+    }
+
+    public static enum BUTTON_COLOR_TYPES {
+        UNPRESSED_FRONT_COLOR, UNPRESSED_BACK_COLOR, PRESSED_FRONT_COLOR, PRESSED_BACK_COLOR, OUTLINE_COLOR, TEXT_COLOR;
+
+        public int INDEX() {
+            return ordinal();
+        }
+    }
+
+    public static enum DOT_MATRIX_COLOR_TYPES {
+        UNPRESSED_FRONT_COLOR, UNPRESSED_BACK_COLOR, PRESSED_FRONT_COLOR, PRESSED_BACK_COLOR, BACK_SCREEN_COLOR;
+
+        public int INDEX() {
+            return ordinal();
+        }
     }
 
     public static String RGBToHSV(String RGBColorText) {   //  RRGGBB -> HHSSVV  (HSV dégradé, en particulier H, ramené sur 255 au lieu de 360)
