@@ -34,25 +34,15 @@ public class ColorBox {   //  Pour les ImageButtonView ou DotMatrixDisplayView
         int size = colors.size();
         if (colorIndex >= size) {   //  Augmenter l'arrayList jusque colorIndex inclus
             for (int i = 1; i <= (colorIndex - size + 1); i = i + 1) {
-                colors.add(null);
+                colors.add(new ColorDef());
             }
-        }   //  Maintenant colors.get(colorIndex) est garanti existant (mais éventuellement Null)
-        if (colors.get(colorIndex) == null) {
-            colors.set(colorIndex, new ColorDef());   //  Maintenant colors.get(colorIndex) est garanti non Null
-        }
+        }   //  Maintenant colors.get(colorIndex) est garanti non Null
         ColorDef colorDef = colors.get(colorIndex);
         colorDef.RGBString = color;
-        colorDef.RGBInt = Color.parseColor(COLOR_PREFIX + color);
+        colorDef.RGBInt = Color.parseColor(COLOR_PREFIX + color);   //  => FFRRGGBB Hex
     }
 
     public ColorDef getColor(int colorIndex) {   //  Colordef est retourné, donc avec .RGBString et .RGBInt
-        ColorDef colorDef = null;
-        if (colors == null) {
-            init();
-        }
-        if (colorIndex <= (colors.size() - 1)) {
-            colorDef = colors.get(colorIndex);
-        }
-        return colorDef;
+        return colors.get(colorIndex);
     }
 }
