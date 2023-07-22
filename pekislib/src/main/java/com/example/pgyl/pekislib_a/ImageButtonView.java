@@ -252,9 +252,7 @@ public final class ImageButtonView extends TextView {
 
     public void updateDisplay() {   //  A appeler à chaque mise à jour de colorBox (ou le cas échéant de defaultColorBow)
         setTextColor(colorBox.getColor(BUTTON_COLOR_TYPES.TEXT.INDEX()).RGBInt);   //  TextView.setTextColor ne devrait pas être appelé dans onDraw() car TextView.setTextColor appelle déjà lui-même invalidate() et donc onDraw() => Boucle infinie
-        if (getText().length() == 0) {   //  Pas de texte
-            invalidate();   //  Nécessaire ici car TextView.setTextColor n'appelle pas invalidate() s'il n'y a pas de texte
-        }
+        invalidate();   //  Semble obligatoire dans certains cas même après TextView.SetTextColor()
     }
 
     private void setupDefaultColorBox() {
