@@ -94,12 +94,13 @@ public final class ImageButtonView extends TextView {
             }
         });
         setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
-        setText(TEXT_DEFAULT);
-        setupDefaultColorBox();
-        setupColorBox();
         setupImageBackPaint();
         setupButtonBackPaint();
         setupButtonOutlinePaint();
+        setText(TEXT_DEFAULT);
+        setupDefaultColorBox();
+        setupColorBox();
+        setTextColor(defaultColorBox.getColor(BUTTON_COLOR_TYPES.TEXT.INDEX()).RGBInt);   //  Nécessaire ici car seul invalidate() est ensuite appelé (et non pas ImageButtonView.updateDisplay())
     }
 
     public void setSVGImageResource(int resId) {
@@ -183,10 +184,9 @@ public final class ImageButtonView extends TextView {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        int frontColor = (buttonState.equals(BUTTON_STATES.PRESSED)) ? colorBox.getColor(BUTTON_COLOR_TYPES.PRESSED_FRONT_COLOR.INDEX()).RGBInt : colorBox.getColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT_COLOR.INDEX()).RGBInt;
-        int backColor = (buttonState.equals(BUTTON_STATES.PRESSED)) ? colorBox.getColor(BUTTON_COLOR_TYPES.PRESSED_BACK_COLOR.INDEX()).RGBInt : colorBox.getColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK_COLOR.INDEX()).RGBInt;
-        int outlineColor = colorBox.getColor(BUTTON_COLOR_TYPES.OUTLINE_COLOR.INDEX()).RGBInt;
-        int textColor = colorBox.getColor(BUTTON_COLOR_TYPES.TEXT_COLOR.INDEX()).RGBInt;
+        int frontColor = (buttonState.equals(BUTTON_STATES.PRESSED)) ? colorBox.getColor(BUTTON_COLOR_TYPES.PRESSED_FRONT.INDEX()).RGBInt : colorBox.getColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT.INDEX()).RGBInt;
+        int backColor = (buttonState.equals(BUTTON_STATES.PRESSED)) ? colorBox.getColor(BUTTON_COLOR_TYPES.PRESSED_BACK.INDEX()).RGBInt : colorBox.getColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK.INDEX()).RGBInt;
+        int outlineColor = colorBox.getColor(BUTTON_COLOR_TYPES.OUTLINE.INDEX()).RGBInt;
 
         if (picture != null) {
             viewCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
@@ -198,7 +198,7 @@ public final class ImageButtonView extends TextView {
                 imageBackPaint.setColor(backColor);
                 viewCanvas.drawRoundRect(viewCanvasRectExceptOutline, backCornerRadius, backCornerRadius, imageBackPaint);
             }
-        } else {   //  Pas de Picture => Ractangle simple suffit (Back); le Front sera le texte (avec sa couleur)
+        } else {   //  Pas de Picture => Un ractangle simple suffit; Le texte (avec sa couleur) viendra au-dessus
             if (hasBackColorFilter) {
                 buttonBackPaint.setColor(backColor);
                 viewCanvas.drawRoundRect(viewCanvasRectExceptOutline, backCornerRadius, backCornerRadius, buttonBackPaint);
@@ -210,9 +210,8 @@ public final class ImageButtonView extends TextView {
             viewCanvas.drawRoundRect(viewCanvasRectExceptOutline, backCornerRadius, backCornerRadius, buttonOutlinePaint);
         }
         canvas.drawBitmap(viewBitmap, 0, 0, null);
-        setTextColor(textColor);
 
-        super.onDraw(canvas);   //  Dessinera le texte au-dessus de l'image
+        super.onDraw(canvas);   //  Dessinera le texte (avec sa couleur) au-dessus
     }
 
     public boolean onButtonTouch(View v, MotionEvent event) {
@@ -251,8 +250,9 @@ public final class ImageButtonView extends TextView {
         return false;
     }
 
-    public void updateDisplayColors() {
-        invalidate();
+    public void updateDisplay() {   //  A appeler à chaque mise à jour de colorBox (ou le cas échéant de defaultColorBow)
+        setTextColor(colorBox.getColor(BUTTON_COLOR_TYPES.TEXT.INDEX()).RGBInt);   //  TextView.setTextColor ne devrait pas être appelé dans onDraw() car TextView.setTextColor appelle déjà lui-même invalidate() et donc onDraw() => Boucle infinie
+        //invalidate();   // Inutile car TextView.setTextColor appelle déjà invalidate(), qui mettra à jour le TextView (via onDraw())
     }
 
     private void setupDefaultColorBox() {
@@ -264,12 +264,12 @@ public final class ImageButtonView extends TextView {
         final String TEXT_COLOR_DEFAULT = "000000";
 
         defaultColorBox = new ColorBox();
-        defaultColorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT_COLOR.INDEX(), UNPRESSED_FRONT_COLOR_DEFAULT);
-        defaultColorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK_COLOR.INDEX(), UNPRESSED_BACK_COLOR_DEFAULT);
-        defaultColorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_FRONT_COLOR.INDEX(), PRESSED_FRONT_COLOR_DEFAULT);
-        defaultColorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_BACK_COLOR.INDEX(), PRESSED_BACK_COLOR_DEFAULT);
-        defaultColorBox.setColor(BUTTON_COLOR_TYPES.OUTLINE_COLOR.INDEX(), OUTLINE_COLOR_DEFAULT);
-        defaultColorBox.setColor(BUTTON_COLOR_TYPES.TEXT_COLOR.INDEX(), TEXT_COLOR_DEFAULT);
+        defaultColorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT.INDEX(), UNPRESSED_FRONT_COLOR_DEFAULT);
+        defaultColorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK.INDEX(), UNPRESSED_BACK_COLOR_DEFAULT);
+        defaultColorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_FRONT.INDEX(), PRESSED_FRONT_COLOR_DEFAULT);
+        defaultColorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_BACK.INDEX(), PRESSED_BACK_COLOR_DEFAULT);
+        defaultColorBox.setColor(BUTTON_COLOR_TYPES.OUTLINE.INDEX(), OUTLINE_COLOR_DEFAULT);
+        defaultColorBox.setColor(BUTTON_COLOR_TYPES.TEXT.INDEX(), TEXT_COLOR_DEFAULT);
     }
 
     private void setupColorBox() {
@@ -279,12 +279,12 @@ public final class ImageButtonView extends TextView {
         colorBox = new ColorBox();
         hasFrontColorFilter = HAS_FRONT_COLOR_FILTER_DEFAULT;
         hasBackColorFilter = HAS_BACK_COLOR_FILTER_DEFAULT;
-        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT_COLOR.INDEX(), defaultColorBox.getColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT_COLOR.INDEX()).RGBString);
-        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK_COLOR.INDEX(), defaultColorBox.getColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK_COLOR.INDEX()).RGBString);
-        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_FRONT_COLOR.INDEX(), defaultColorBox.getColor(BUTTON_COLOR_TYPES.PRESSED_FRONT_COLOR.INDEX()).RGBString);
-        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_BACK_COLOR.INDEX(), defaultColorBox.getColor(BUTTON_COLOR_TYPES.PRESSED_BACK_COLOR.INDEX()).RGBString);
-        colorBox.setColor(BUTTON_COLOR_TYPES.OUTLINE_COLOR.INDEX(), defaultColorBox.getColor(BUTTON_COLOR_TYPES.OUTLINE_COLOR.INDEX()).RGBString);
-        colorBox.setColor(BUTTON_COLOR_TYPES.TEXT_COLOR.INDEX(), defaultColorBox.getColor(BUTTON_COLOR_TYPES.TEXT_COLOR.INDEX()).RGBString);
+        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT.INDEX(), defaultColorBox.getColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT.INDEX()).RGBString);
+        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK.INDEX(), defaultColorBox.getColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK.INDEX()).RGBString);
+        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_FRONT.INDEX(), defaultColorBox.getColor(BUTTON_COLOR_TYPES.PRESSED_FRONT.INDEX()).RGBString);
+        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_BACK.INDEX(), defaultColorBox.getColor(BUTTON_COLOR_TYPES.PRESSED_BACK.INDEX()).RGBString);
+        colorBox.setColor(BUTTON_COLOR_TYPES.OUTLINE.INDEX(), defaultColorBox.getColor(BUTTON_COLOR_TYPES.OUTLINE.INDEX()).RGBString);
+        colorBox.setColor(BUTTON_COLOR_TYPES.TEXT.INDEX(), defaultColorBox.getColor(BUTTON_COLOR_TYPES.TEXT.INDEX()).RGBString);
     }
 
     private void setupImageBackPaint() {

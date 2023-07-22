@@ -312,9 +312,9 @@ public class PresetsActivity extends Activity {
         ColorBox colorBox = buttons[COMMANDS.FIELD.INDEX()].getColorBox();
         ColorBox defaultColorbox = buttons[COMMANDS.FIELD.INDEX()].getDefaultColorBox();
         boolean needSpecialColor = (listIndex != LIST_INDEX_DEFAULT_VALUE);
-        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK_COLOR.INDEX(), (needSpecialColor) ? FIELD_UNPRESSED_COLOR : defaultColorbox.getColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK_COLOR.INDEX()).RGBString);
-        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_BACK_COLOR.INDEX(), (needSpecialColor) ? FIELD_PRESSED_COLOR : defaultColorbox.getColor(BUTTON_COLOR_TYPES.PRESSED_BACK_COLOR.INDEX()).RGBString);
-        buttons[COMMANDS.FIELD.INDEX()].updateDisplayColors();
+        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK.INDEX(), (needSpecialColor) ? FIELD_UNPRESSED_COLOR : defaultColorbox.getColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK.INDEX()).RGBString);
+        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_BACK.INDEX(), (needSpecialColor) ? FIELD_PRESSED_COLOR : defaultColorbox.getColor(BUTTON_COLOR_TYPES.PRESSED_BACK.INDEX()).RGBString);
+        buttons[COMMANDS.FIELD.INDEX()].updateDisplay();
     }
 
     private void updateDisplayButtonSpecialColors() {
@@ -322,9 +322,9 @@ public class PresetsActivity extends Activity {
         final String OK_PRESSED_COLOR_DEFAULT = "0040FF";
 
         ColorBox colorBox = buttons[COMMANDS.OK.INDEX()].getColorBox();
-        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK_COLOR.INDEX(), OK_UNPRESSED_COLOR_DEFAULT);
-        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_BACK_COLOR.INDEX(), OK_PRESSED_COLOR_DEFAULT);
-        buttons[COMMANDS.OK.INDEX()].updateDisplayColors();
+        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK.INDEX(), OK_UNPRESSED_COLOR_DEFAULT);
+        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_BACK.INDEX(), OK_PRESSED_COLOR_DEFAULT);
+        buttons[COMMANDS.OK.INDEX()].updateDisplay();
     }
 
     private void rebuildPresets() {

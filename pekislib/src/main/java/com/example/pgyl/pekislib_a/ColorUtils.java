@@ -12,25 +12,25 @@ public class ColorUtils {
         public int RGBInt;     //  RGB int code
     }
 
+    public static enum BUTTON_COLOR_TYPES {   //  Destiné à ImageButtonView
+        UNPRESSED_FRONT, UNPRESSED_BACK, PRESSED_FRONT, PRESSED_BACK, OUTLINE, TEXT;   //  Pour la couleur du texte, utiliser setTextColor(int color) de son ancêtre TextView
+
+        public int INDEX() {
+            return ordinal();
+        }
+    }
+
+    public static enum DOT_MATRIX_COLOR_TYPES {   //  Destiné à DotMatrixDisplayView
+        UNPRESSED_FRONT, UNPRESSED_BACK, PRESSED_FRONT, PRESSED_BACK, BACK_SCREEN;
+
+        public int INDEX() {
+            return ordinal();
+        }
+    }
+
     public static class StateColorCode {
         int pressed;
         int unpressed;
-    }
-
-    public static enum BUTTON_COLOR_TYPES {
-        UNPRESSED_FRONT_COLOR, UNPRESSED_BACK_COLOR, PRESSED_FRONT_COLOR, PRESSED_BACK_COLOR, OUTLINE_COLOR, TEXT_COLOR;
-
-        public int INDEX() {
-            return ordinal();
-        }
-    }
-
-    public static enum DOT_MATRIX_COLOR_TYPES {
-        UNPRESSED_FRONT_COLOR, UNPRESSED_BACK_COLOR, PRESSED_FRONT_COLOR, PRESSED_BACK_COLOR, BACK_SCREEN_COLOR;
-
-        public int INDEX() {
-            return ordinal();
-        }
     }
 
     public static String RGBToHSV(String RGBColorText) {   //  RRGGBB -> HHSSVV  (HSV dégradé, en particulier H, ramené sur 255 au lieu de 360)
