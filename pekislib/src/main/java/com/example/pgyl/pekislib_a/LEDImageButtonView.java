@@ -40,7 +40,7 @@ public class LEDImageButtonView extends LinearLayout {
         } catch (IllegalAccessException | NoSuchFieldException ex) {
             Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
         }
-        button.setCustomOnClickListener(new ImageButtonView.onCustomClickListener() {
+        button.setOnCustomClickListener(new ImageButtonView.onCustomClickListener() {
             @Override
             public void onCustomClick() {
                 onButtonClick();

@@ -31,7 +31,7 @@ public final class ImageButtonView extends TextView {
         void onCustomClick();
     }
 
-    public void setCustomOnClickListener(onCustomClickListener listener) {
+    public void setOnCustomClickListener(onCustomClickListener listener) {
         mOnCustomClickListener = listener;
     }
 

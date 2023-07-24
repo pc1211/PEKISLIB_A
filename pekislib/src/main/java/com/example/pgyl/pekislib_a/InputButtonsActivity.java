@@ -828,7 +828,7 @@ public class InputButtonsActivity extends Activity {
                 buttons[command.INDEX()] = findViewById(rid.getField(BUTTON_XML_PREFIX + command.toString()).getInt(rid));   //  1, 2, 3 ... dans le XML
                 buttons[command.INDEX()].setText(command.TEXT());
                 final COMMANDS fcommand = command;
-                buttons[command.INDEX()].setCustomOnClickListener(new ImageButtonView.onCustomClickListener() {
+                buttons[command.INDEX()].setOnCustomClickListener(new ImageButtonView.onCustomClickListener() {
                     @Override
                     public void onCustomClick() {
                         onButtonClick(fcommand);
@@ -850,7 +850,7 @@ public class InputButtonsActivity extends Activity {
             try {
                 keyboardButtons[i] = findViewById(rid.getField(BUTTON_XML_PREFIX + (i + 1)).getInt(rid));  // BTN_P1, BTN_P2, ...
                 final int index = i;
-                keyboardButtons[i].setCustomOnClickListener(new ImageButtonView.onCustomClickListener() {
+                keyboardButtons[i].setOnCustomClickListener(new ImageButtonView.onCustomClickListener() {
                     @Override
                     public void onCustomClick() {
                         onKeyboardButtonClick(index);
