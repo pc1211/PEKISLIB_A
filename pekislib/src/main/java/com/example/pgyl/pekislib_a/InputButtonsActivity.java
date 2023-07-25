@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
-import static com.example.pgyl.pekislib_a.Constants.ACTIVITY_EXTRA_KEYS;
+import static com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.Constants.ERROR_VALUE;
 import static com.example.pgyl.pekislib_a.Constants.HEX_RADIX;
 import static com.example.pgyl.pekislib_a.Constants.NOT_FOUND;
@@ -353,7 +353,7 @@ public class InputButtonsActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
-        title = getIntent().getStringExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString());
+        title = getIntent().getStringExtra(PEKISLIB_ACTIVITY_EXTRA_KEYS.TITLE.toString());
         getActionBar().setTitle(title);
         setupOrientationLayout();
     }
@@ -454,7 +454,7 @@ public class InputButtonsActivity extends Activity {
         if (error.equals(NO_ERROR)) {  //  Good guy
             editString = normalizedCandidate(candidate);
             Intent returnIntent = new Intent();
-            returnIntent.putExtra(Constants.ACTIVITY_EXTRA_KEYS.TITLE.toString(), title);
+            returnIntent.putExtra(PEKISLIB_ACTIVITY_EXTRA_KEYS.TITLE.toString(), title);
             setResult(RESULT_OK, returnIntent);
             finish();
         } else {  //  Bad guy
@@ -887,7 +887,7 @@ public class InputButtonsActivity extends Activity {
 
     private void launchHelpActivity() {
         Intent callingIntent = new Intent(this, HelpActivity.class);
-        callingIntent.putExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString(), HELP_ACTIVITY_TITLE);
+        callingIntent.putExtra(PEKISLIB_ACTIVITY_EXTRA_KEYS.TITLE.toString(), HELP_ACTIVITY_TITLE);
         callingIntent.putExtra(HELP_ACTIVITY_EXTRA_KEYS.HTML_ID.toString(), R.raw.helpinputbuttonsactivity);
         startActivity(callingIntent);
     }

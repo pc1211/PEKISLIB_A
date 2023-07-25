@@ -19,7 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.example.pgyl.pekislib_a.ColorUtils.BUTTON_COLOR_TYPES;
-import static com.example.pgyl.pekislib_a.Constants.ACTIVITY_EXTRA_KEYS;
+import static com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITIES;
 import static com.example.pgyl.pekislib_a.Constants.SHP_FILE_NAME_SUFFIX;
 import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
@@ -101,7 +101,7 @@ public class PresetsActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
-        getActionBar().setTitle(getIntent().getStringExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString()));
+        getActionBar().setTitle(getIntent().getStringExtra(PEKISLIB_ACTIVITY_EXTRA_KEYS.TITLE.toString()));
 
         validReturnFromCalledActivity = false;
     }
@@ -452,13 +452,13 @@ public class PresetsActivity extends Activity {
         Intent callingIntent = new Intent(this, InputButtonsActivity.class);
         callingIntent.putExtra(TABLE_EXTRA_KEYS.TABLE.toString(), tableName);
         callingIntent.putExtra(TABLE_EXTRA_KEYS.INDEX.toString(), columnIndex);
-        callingIntent.putExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString(), labelNames[columnIndex]);
+        callingIntent.putExtra(PEKISLIB_ACTIVITY_EXTRA_KEYS.TITLE.toString(), labelNames[columnIndex]);
         startActivityForResult(callingIntent, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.INDEX());
     }
 
     private void launchHelpActivity() {
         Intent callingIntent = new Intent(this, HelpActivity.class);
-        callingIntent.putExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString(), HELP_ACTIVITY_TITLE);
+        callingIntent.putExtra(PEKISLIB_ACTIVITY_EXTRA_KEYS.TITLE.toString(), HELP_ACTIVITY_TITLE);
         callingIntent.putExtra(HELP_ACTIVITY_EXTRA_KEYS.HTML_ID.toString(), R.raw.helppresetsactivity);
         startActivity(callingIntent);
     }

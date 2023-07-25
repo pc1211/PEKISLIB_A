@@ -9,7 +9,7 @@ public class Constants {
         }
     }
 
-    public enum ACTIVITY_EXTRA_KEYS {TITLE}
+    public enum PEKISLIB_ACTIVITY_EXTRA_KEYS {TITLE}
 
     public enum BUTTON_STATES {UNPRESSED, PRESSED}
 
