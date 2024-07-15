@@ -14,7 +14,7 @@
         <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_NEXT_FIELD"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginLeft="4dp"
             android:layout_weight="3"
             android:textColor="@android:color/black" />
@@ -22,7 +22,7 @@
         <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_FIELD"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginLeft="4dp"
             android:layout_weight="3"
             android:textColor="@android:color/black"
@@ -31,7 +31,7 @@
         <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_CANCEL"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginLeft="4dp"
             android:layout_weight="2"
             android:textColor="@android:color/black" />
@@ -47,7 +47,7 @@
         <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_ADD"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginLeft="4dp"
             android:layout_weight="2"
             android:textColor="@android:color/black" />
@@ -55,7 +55,7 @@
         <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_REMOVE"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginLeft="4dp"
             android:layout_weight="2"
             android:textColor="@android:color/black" />
@@ -63,7 +63,7 @@
         <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_DEFAULT"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginLeft="4dp"
             android:layout_weight="2"
             android:textColor="@android:color/black" />
@@ -71,7 +71,7 @@
         <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_OK"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginLeft="4dp"
             android:layout_weight="2"
             android:textColor="@android:color/black"
