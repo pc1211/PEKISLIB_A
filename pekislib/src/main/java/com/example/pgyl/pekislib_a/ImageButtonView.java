@@ -1,7 +1,6 @@
 package com.example.pgyl.pekislib_a;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -49,14 +48,11 @@ public final class ImageButtonView extends TextView {
     private boolean hasBackColorFilter;
     private boolean clickDownInButtonZone;
     private RectF buttonZone;
-    private Bitmap viewBitmap;
-    private Canvas viewCanvas;
     private Paint imageBackPaint;
     private Paint buttonBackPaint;
     private Paint buttonOutlinePaint;
-    private RectF viewCanvasRect;
     private RectF viewCanvasRectExceptOutline;
-    private Bitmap imageBitmap;
+    private RectF viewCanvasSubRectExceptOutline;
     private Picture picture;
     private float imageAspectRatio;
     private RectF imageRelativePositionCoeffs;
@@ -153,9 +149,6 @@ public final class ImageButtonView extends TextView {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
 
-        imageBitmap = null;
-        viewBitmap = null;
-        viewCanvas = null;
         imageBackPaint = null;
         buttonBackPaint = null;
         buttonOutlinePaint = null;
@@ -168,17 +161,13 @@ public final class ImageButtonView extends TextView {
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
 
-        viewBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        viewCanvas = new Canvas(viewBitmap);
-        viewCanvasRect = new RectF(0, 0, w, h);
-        viewCanvasRectExceptOutline = new RectF(outlineStrokeWidthPx, outlineStrokeWidthPx, w - outlineStrokeWidthPx, h - outlineStrokeWidthPx);
+        rebuild(w, h);
+    }
 
-        imageBitmap = Bitmap.createBitmap((int) viewCanvasRectExceptOutline.width(), (int) viewCanvasRectExceptOutline.height(), Bitmap.Config.ARGB_8888);
-        if (picture != null) {
-            Canvas imageViewCanvas = new Canvas(imageBitmap);
-            imageViewCanvas.drawPicture(picture, getMaxSubRect(viewCanvasRectExceptOutline, imageRelativePositionCoeffs, imageAspectRatio, imageSizeCoeff));
-        }
-        buttonZone.set(getLeft() + viewCanvasRect.left, getTop() + viewCanvasRect.top, getLeft() + viewCanvasRect.right, getTop() + viewCanvasRect.bottom);
+    public void rebuild(int w, int h) {
+        viewCanvasRectExceptOutline = new RectF(outlineStrokeWidthPx, outlineStrokeWidthPx, w - outlineStrokeWidthPx, h - outlineStrokeWidthPx);
+        viewCanvasSubRectExceptOutline = getMaxSubRect(viewCanvasRectExceptOutline, imageRelativePositionCoeffs, imageAspectRatio, imageSizeCoeff);
+        buttonZone.set(getLeft(), getTop(), getLeft() + w, getTop() + h);
         backCornerRadius = (Math.min(w, h) * pcBackCornerRadius) / 200;    //  Rayon pour coin arrondi (% appliqué à la moitié de la largeur ou hauteur)
     }
 
@@ -186,30 +175,29 @@ public final class ImageButtonView extends TextView {
     protected void onDraw(Canvas canvas) {
         int frontColor = (buttonState.equals(BUTTON_STATES.PRESSED)) ? colorBox.getColor(BUTTON_COLOR_TYPES.PRESSED_FRONT.INDEX()).RGBInt : colorBox.getColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT.INDEX()).RGBInt;
         int backColor = (buttonState.equals(BUTTON_STATES.PRESSED)) ? colorBox.getColor(BUTTON_COLOR_TYPES.PRESSED_BACK.INDEX()).RGBInt : colorBox.getColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK.INDEX()).RGBInt;
-        int outlineColor = colorBox.getColor(BUTTON_COLOR_TYPES.OUTLINE.INDEX()).RGBInt;
+        int outlineColor = colorBox.getColor(BUTTON_COLOR_TYPES.UNPRESSED_OUTLINE.INDEX()).RGBInt;
 
         if (picture != null) {
-            viewCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
-            viewCanvas.drawBitmap(imageBitmap, 0, 0, null);
+            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
+            canvas.drawPicture(picture, viewCanvasSubRectExceptOutline);
             if (hasFrontColorFilter) {
-                viewCanvas.drawColor(frontColor, PorterDuff.Mode.SRC_IN);
+                canvas.drawColor(frontColor, PorterDuff.Mode.SRC_IN);
             }
             if (hasBackColorFilter) {
                 imageBackPaint.setColor(backColor);
-                viewCanvas.drawRoundRect(viewCanvasRectExceptOutline, backCornerRadius, backCornerRadius, imageBackPaint);
+                canvas.drawRoundRect(viewCanvasRectExceptOutline, backCornerRadius, backCornerRadius, imageBackPaint);
             }
         } else {   //  Pas de Picture => Un ractangle simple suffit; Le texte (avec sa couleur) viendra au-dessus
             if (hasBackColorFilter) {
                 buttonBackPaint.setColor(backColor);
-                viewCanvas.drawRoundRect(viewCanvasRectExceptOutline, backCornerRadius, backCornerRadius, buttonBackPaint);
+                canvas.drawRoundRect(viewCanvasRectExceptOutline, backCornerRadius, backCornerRadius, buttonBackPaint);
             }
         }
         if (outlineStrokeWidthPx != 0) {
             buttonOutlinePaint.setStrokeWidth(outlineStrokeWidthPx);
             buttonOutlinePaint.setColor(outlineColor);
-            viewCanvas.drawRoundRect(viewCanvasRectExceptOutline, backCornerRadius, backCornerRadius, buttonOutlinePaint);
+            canvas.drawRoundRect(viewCanvasRectExceptOutline, backCornerRadius, backCornerRadius, buttonOutlinePaint);
         }
-        canvas.drawBitmap(viewBitmap, 0, 0, null);
 
         super.onDraw(canvas);   //  Dessinera le texte (avec sa couleur) au-dessus
     }
@@ -268,7 +256,7 @@ public final class ImageButtonView extends TextView {
         defaultColorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK.INDEX(), UNPRESSED_BACK_COLOR_DEFAULT);
         defaultColorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_FRONT.INDEX(), PRESSED_FRONT_COLOR_DEFAULT);
         defaultColorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_BACK.INDEX(), PRESSED_BACK_COLOR_DEFAULT);
-        defaultColorBox.setColor(BUTTON_COLOR_TYPES.OUTLINE.INDEX(), OUTLINE_COLOR_DEFAULT);
+        defaultColorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_OUTLINE.INDEX(), OUTLINE_COLOR_DEFAULT);
         defaultColorBox.setColor(BUTTON_COLOR_TYPES.TEXT.INDEX(), TEXT_COLOR_DEFAULT);
     }
 
@@ -283,7 +271,7 @@ public final class ImageButtonView extends TextView {
         colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK.INDEX(), defaultColorBox.getColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK.INDEX()).RGBString);
         colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_FRONT.INDEX(), defaultColorBox.getColor(BUTTON_COLOR_TYPES.PRESSED_FRONT.INDEX()).RGBString);
         colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_BACK.INDEX(), defaultColorBox.getColor(BUTTON_COLOR_TYPES.PRESSED_BACK.INDEX()).RGBString);
-        colorBox.setColor(BUTTON_COLOR_TYPES.OUTLINE.INDEX(), defaultColorBox.getColor(BUTTON_COLOR_TYPES.OUTLINE.INDEX()).RGBString);
+        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_OUTLINE.INDEX(), defaultColorBox.getColor(BUTTON_COLOR_TYPES.UNPRESSED_OUTLINE.INDEX()).RGBString);
         colorBox.setColor(BUTTON_COLOR_TYPES.TEXT.INDEX(), defaultColorBox.getColor(BUTTON_COLOR_TYPES.TEXT.INDEX()).RGBString);
     }
 

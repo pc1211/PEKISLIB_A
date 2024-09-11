@@ -27,7 +27,9 @@ public class PointRectUtils {  //  Routines adaptées à des coordonnées (0,0) 
     //          ...
     public static RectF ALIGN_WIDTH_HEIGHT = new RectF(UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED);
     public static RectF ALIGN_RIGHT_BOTTOM = new RectF(UNDEFINED, UNDEFINED, 1, 1);
+    public static RectF ALIGN_RIGHT_TOP = new RectF(UNDEFINED, 0, 1, UNDEFINED);
     public static RectF ALIGN_LEFT_HEIGHT = new RectF(0, UNDEFINED, UNDEFINED, UNDEFINED);
+    public static RectF ALIGN_RIGHT_HEIGHT = new RectF(UNDEFINED, UNDEFINED, 1, UNDEFINED);
     public static float FULL_SIZE_COEFF = 1;
     public static float SQUARE_ASPECT_RATIO = 1;
 

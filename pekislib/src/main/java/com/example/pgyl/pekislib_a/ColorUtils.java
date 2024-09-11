@@ -13,7 +13,7 @@ public class ColorUtils {
     }
 
     public static enum BUTTON_COLOR_TYPES {   //  Destiné à ImageButtonView
-        UNPRESSED_FRONT, UNPRESSED_BACK, PRESSED_FRONT, PRESSED_BACK, OUTLINE, TEXT;   //  Pour la couleur du texte, utiliser setTextColor(int color) de son ancêtre TextView
+        UNPRESSED_FRONT, UNPRESSED_BACK, UNPRESSED_OUTLINE, PRESSED_FRONT, PRESSED_BACK, PRESSED_OUTLINE, BACK_SCREEN, TEXT;   //  Pour la couleur du texte, utiliser setTextColor(int color) de son ancêtre TextView
 
         public int INDEX() {
             return ordinal();
